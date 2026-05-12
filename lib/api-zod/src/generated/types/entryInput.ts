@@ -5,21 +5,6 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
-
-export interface Entry {
-  id: number;
-  giveawayId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  ticketQty: number;
-  ticketNumbers: string[];
-  amountPaid: string;
-  createdAt: string;
-}
 
 export interface EntryInput {
   giveawayId: number;
@@ -32,8 +17,4 @@ export interface EntryInput {
   ticketQty: number;
   ticketNumbers: string[];
   amountPaid: string;
-}
-
-export interface ErrorResponse {
-  error: string;
 }

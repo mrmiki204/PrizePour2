@@ -5,18 +5,26 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  Entry,
+  EntryInput,
+  ErrorResponse,
+  HealthStatus,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -92,6 +100,257 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary List all entries
+ */
+export const getListEntriesUrl = () => {
+  return `/api/entries`;
+};
+
+export const listEntries = async (options?: RequestInit): Promise<Entry[]> => {
+  return customFetch<Entry[]>(getListEntriesUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListEntriesQueryKey = () => {
+  return [`/api/entries`] as const;
+};
+
+export const getListEntriesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listEntries>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listEntries>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListEntriesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listEntries>>> = ({
+    signal,
+  }) => listEntries({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listEntries>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListEntriesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listEntries>>
+>;
+export type ListEntriesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all entries
+ */
+
+export function useListEntries<
+  TData = Awaited<ReturnType<typeof listEntries>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listEntries>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListEntriesQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a new giveaway entry
+ */
+export const getCreateEntryUrl = () => {
+  return `/api/entries`;
+};
+
+export const createEntry = async (
+  entryInput: EntryInput,
+  options?: RequestInit,
+): Promise<Entry> => {
+  return customFetch<Entry>(getCreateEntryUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(entryInput),
+  });
+};
+
+export const getCreateEntryMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createEntry>>,
+    TError,
+    { data: BodyType<EntryInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createEntry>>,
+  TError,
+  { data: BodyType<EntryInput> },
+  TContext
+> => {
+  const mutationKey = ["createEntry"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createEntry>>,
+    { data: BodyType<EntryInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createEntry(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateEntryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createEntry>>
+>;
+export type CreateEntryMutationBody = BodyType<EntryInput>;
+export type CreateEntryMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Create a new giveaway entry
+ */
+export const useCreateEntry = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createEntry>>,
+    TError,
+    { data: BodyType<EntryInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createEntry>>,
+  TError,
+  { data: BodyType<EntryInput> },
+  TContext
+> => {
+  return useMutation(getCreateEntryMutationOptions(options));
+};
+
+/**
+ * @summary List entries for a specific giveaway
+ */
+export const getListEntriesByGiveawayUrl = (giveawayId: number) => {
+  return `/api/entries/giveaway/${giveawayId}`;
+};
+
+export const listEntriesByGiveaway = async (
+  giveawayId: number,
+  options?: RequestInit,
+): Promise<Entry[]> => {
+  return customFetch<Entry[]>(getListEntriesByGiveawayUrl(giveawayId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListEntriesByGiveawayQueryKey = (giveawayId: number) => {
+  return [`/api/entries/giveaway/${giveawayId}`] as const;
+};
+
+export const getListEntriesByGiveawayQueryOptions = <
+  TData = Awaited<ReturnType<typeof listEntriesByGiveaway>>,
+  TError = ErrorType<unknown>,
+>(
+  giveawayId: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listEntriesByGiveaway>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListEntriesByGiveawayQueryKey(giveawayId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listEntriesByGiveaway>>
+  > = ({ signal }) =>
+    listEntriesByGiveaway(giveawayId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!giveawayId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof listEntriesByGiveaway>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListEntriesByGiveawayQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listEntriesByGiveaway>>
+>;
+export type ListEntriesByGiveawayQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List entries for a specific giveaway
+ */
+
+export function useListEntriesByGiveaway<
+  TData = Awaited<ReturnType<typeof listEntriesByGiveaway>>,
+  TError = ErrorType<unknown>,
+>(
+  giveawayId: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listEntriesByGiveaway>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListEntriesByGiveawayQueryOptions(
+    giveawayId,
+    options,
+  );
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

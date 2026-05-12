@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: entries
+    description: Giveaway entry operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,66 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /entries:
+    get:
+      operationId: listEntries
+      tags: [entries]
+      summary: List all entries
+      responses:
+        "200":
+          description: List of entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Entry"
+    post:
+      operationId: createEntry
+      tags: [entries]
+      summary: Create a new giveaway entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntryInput"
+      responses:
+        "201":
+          description: Entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entry"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /entries/giveaway/{giveawayId}:
+    get:
+      operationId: listEntriesByGiveaway
+      tags: [entries]
+      summary: List entries for a specific giveaway
+      parameters:
+        - name: giveawayId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Entries for the giveaway
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Entry"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +96,60 @@ components:
       required:
         - status
 
+    Entry:
+      type: object
+      required: [id, giveawayId, firstName, lastName, email, ticketQty, ticketNumbers, amountPaid, createdAt]
+      properties:
+        id:
+          type: integer
+        giveawayId:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        ticketQty:
+          type: integer
+        ticketNumbers:
+          type: array
+          items:
+            type: string
+        amountPaid:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    EntryInput:
+      type: object
+      required: [giveawayId, firstName, lastName, email, ticketQty, ticketNumbers, amountPaid]
+      properties:
+        giveawayId:
+          type: integer
+        firstName:
+          type: string
+          minLength: 1
+        lastName:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+        ticketQty:
+          type: integer
+          minimum: 1
+        ticketNumbers:
+          type: array
+          items:
+            type: string
+        amountPaid:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string

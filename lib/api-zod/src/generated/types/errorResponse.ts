@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export * from "./entry";
-export * from "./entryInput";
-export * from "./errorResponse";
-export * from "./healthStatus";
+export interface ErrorResponse {
+  error: string;
+}

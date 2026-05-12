@@ -14,3 +14,55 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * @summary List all entries
+ */
+export const ListEntriesResponseItem = zod.object({
+  id: zod.number(),
+  giveawayId: zod.number(),
+  firstName: zod.string(),
+  lastName: zod.string(),
+  email: zod.string(),
+  ticketQty: zod.number(),
+  ticketNumbers: zod.array(zod.string()),
+  amountPaid: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+export const ListEntriesResponse = zod.array(ListEntriesResponseItem);
+
+/**
+ * @summary Create a new giveaway entry
+ */
+
+export const CreateEntryBody = zod.object({
+  giveawayId: zod.number(),
+  firstName: zod.string().min(1),
+  lastName: zod.string().min(1),
+  email: zod.string().email(),
+  ticketQty: zod.number().min(1),
+  ticketNumbers: zod.array(zod.string()),
+  amountPaid: zod.string(),
+});
+
+/**
+ * @summary List entries for a specific giveaway
+ */
+export const ListEntriesByGiveawayParams = zod.object({
+  giveawayId: zod.coerce.number(),
+});
+
+export const ListEntriesByGiveawayResponseItem = zod.object({
+  id: zod.number(),
+  giveawayId: zod.number(),
+  firstName: zod.string(),
+  lastName: zod.string(),
+  email: zod.string(),
+  ticketQty: zod.number(),
+  ticketNumbers: zod.array(zod.string()),
+  amountPaid: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+export const ListEntriesByGiveawayResponse = zod.array(
+  ListEntriesByGiveawayResponseItem,
+);

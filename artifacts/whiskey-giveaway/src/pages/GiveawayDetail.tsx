@@ -12,6 +12,7 @@ import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft, HelpCircl
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
+import { useCreateEntry } from '@workspace/api-client-react';
 
 const TICKET_PACKAGES = [
   { id: 1, qty: 1, price: 4.99, badge: null },
@@ -25,6 +26,8 @@ export function GiveawayDetail() {
   const [, setLocation] = useLocation();
   const giveawayId = params?.id ? parseInt(params.id) : 1;
   const giveaway = ACTIVE_GIVEAWAYS.find(g => g.id === giveawayId) || ACTIVE_GIVEAWAYS[0];
+
+  const createEntry = useCreateEntry();
 
   const [step, setStep] = useState(1);
   const [selectedPackage, setSelectedPackage] = useState(TICKET_PACKAGES[0]);
@@ -72,17 +75,30 @@ export function GiveawayDetail() {
 
   const processPayment = () => {
     setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      // Generate random ticket numbers
-      const tickets = Array.from({ length: selectedPackage.qty }).map(() => 
-        "#" + Math.floor(1000 + Math.random() * 9000).toString()
-      );
-      // Save tickets to local storage so draw page can use them
-      localStorage.setItem(`giveaway_${giveaway.id}_tickets`, JSON.stringify(tickets));
-      setAssignedTickets(tickets);
-      nextStep();
-    }, 2000);
+    const tickets = Array.from({ length: selectedPackage.qty }).map(() =>
+      "#" + Math.floor(1000 + Math.random() * 9000).toString()
+    );
+    createEntry.mutate(
+      {
+        data: {
+          giveawayId: giveaway.id,
+          firstName: details.firstName,
+          lastName: details.lastName,
+          email: details.email,
+          ticketQty: selectedPackage.qty,
+          ticketNumbers: tickets,
+          amountPaid: selectedPackage.price.toFixed(2),
+        },
+      },
+      {
+        onSettled: () => {
+          setIsProcessing(false);
+          localStorage.setItem(`giveaway_${giveaway.id}_tickets`, JSON.stringify(tickets));
+          setAssignedTickets(tickets);
+          nextStep();
+        },
+      }
+    );
   };
 
   const isDetailsValid = 
