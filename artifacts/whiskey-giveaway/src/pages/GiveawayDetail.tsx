@@ -1,0 +1,458 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation, useRoute } from 'wouter';
+import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
+import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
+import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
+
+const TICKET_PACKAGES = [
+  { id: 1, qty: 1, price: 4.99, badge: null },
+  { id: 2, qty: 5, price: 19.99, badge: "Best Value" },
+  { id: 3, qty: 10, price: 34.99, badge: "Most Popular" },
+  { id: 4, qty: 25, price: 74.99, badge: null },
+];
+
+export function GiveawayDetail() {
+  const [, params] = useRoute("/giveaway/:id");
+  const [, setLocation] = useLocation();
+  const giveawayId = params?.id ? parseInt(params.id) : 1;
+  const giveaway = ACTIVE_GIVEAWAYS.find(g => g.id === giveawayId) || ACTIVE_GIVEAWAYS[0];
+
+  const [step, setStep] = useState(1);
+  const [selectedPackage, setSelectedPackage] = useState(TICKET_PACKAGES[0]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [assignedTickets, setAssignedTickets] = useState<string[]>([]);
+  
+  // Form Details
+  const [details, setDetails] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    confirmEmail: '',
+    ageVerified: false,
+    termsAccepted: false
+  });
+
+  // Payment Details
+  const [payment, setPayment] = useState({
+    cardNumber: '',
+    expiry: '',
+    cvv: '',
+    name: ''
+  });
+
+  const nextStep = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setStep(s => s + 1);
+  };
+
+  const processPayment = () => {
+    setIsProcessing(true);
+    setTimeout(() => {
+      setIsProcessing(false);
+      // Generate random ticket numbers
+      const tickets = Array.from({ length: selectedPackage.qty }).map(() => 
+        "#" + Math.floor(1000 + Math.random() * 9000).toString()
+      );
+      // Save tickets to local storage so draw page can use them
+      localStorage.setItem(`giveaway_${giveaway.id}_tickets`, JSON.stringify(tickets));
+      setAssignedTickets(tickets);
+      nextStep();
+    }, 2000);
+  };
+
+  const isDetailsValid = 
+    details.firstName.length > 0 && 
+    details.lastName.length > 0 && 
+    details.email.length > 0 && 
+    details.email === details.confirmEmail &&
+    details.ageVerified && 
+    details.termsAccepted;
+
+  return (
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <Navbar />
+      
+      <div className="flex-1 pt-24 pb-12 max-w-4xl mx-auto w-full px-6">
+        <Button variant="ghost" className="mb-6 -ml-4 text-muted-foreground hover:text-foreground" onClick={() => setLocation('/')}>
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Giveaways
+        </Button>
+
+        {/* Progress Bar */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center text-sm font-mono tracking-widest text-muted-foreground mb-4">
+            <span className={step >= 1 ? "text-primary" : ""}>Choose Tickets</span>
+            <span className="hidden sm:inline">→</span>
+            <span className={step >= 2 ? "text-primary" : ""}>Your Details</span>
+            <span className="hidden sm:inline">→</span>
+            <span className={step >= 3 ? "text-primary" : ""}>Payment</span>
+            <span className="hidden sm:inline">→</span>
+            <span className={step >= 4 ? "text-primary" : ""}>Confirmed</span>
+          </div>
+          <div className="h-1 bg-secondary rounded-full overflow-hidden flex">
+            <motion.div 
+              className="h-full bg-primary"
+              initial={{ width: "25%" }}
+              animate={{ width: `${(step / 4) * 100}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {/* STEP 1: TICKETS */}
+          {step === 1 && (
+            <motion.div 
+              key="step1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-8"
+            >
+              <div className="grid md:grid-cols-2 gap-8 bg-card border border-border p-6 rounded-sm shadow-xl">
+                <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
+                  <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6 space-y-4">
+                    <h2 className="text-3xl font-serif leading-tight">{giveaway.name}</h2>
+                    <div className="flex justify-between items-center text-sm font-mono">
+                      <span className="text-primary">{giveaway.value} Value</span>
+                      <span className="text-muted-foreground">{giveaway.baseEntries + selectedPackage.qty} Total Entries</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6 flex flex-col">
+                  <div>
+                    <h3 className="text-xl font-serif mb-2">Draw Ends In:</h3>
+                    <CountdownTimer daysToAdd={giveaway.daysLeft} />
+                  </div>
+                  
+                  <div className="h-px w-full bg-border/50 my-2" />
+
+                  <div className="flex-1 space-y-4">
+                    <h3 className="font-serif text-xl mb-4">Select Ticket Quantity</h3>
+                    {TICKET_PACKAGES.map((pkg) => (
+                      <button
+                        key={pkg.id}
+                        onClick={() => setSelectedPackage(pkg)}
+                        className={`w-full relative flex items-center justify-between p-4 border rounded-sm transition-all duration-200 ${
+                          selectedPackage.id === pkg.id 
+                            ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(234,146,55,0.15)]' 
+                            : 'border-border bg-card/50 hover:border-primary/50'
+                        }`}
+                      >
+                        {pkg.badge && (
+                          <div className="absolute -top-3 left-4 bg-primary text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-sm">
+                            {pkg.badge}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-3">
+                          <Ticket className={`w-5 h-5 ${selectedPackage.id === pkg.id ? 'text-primary' : 'text-muted-foreground'}`} />
+                          <span className="font-serif text-lg">{pkg.qty} {pkg.qty === 1 ? 'Ticket' : 'Tickets'}</span>
+                        </div>
+                        <span className="font-mono text-primary">${pkg.price}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="bg-secondary/30 p-4 border border-secondary text-sm text-center text-muted-foreground mt-auto rounded-sm">
+                    Selecting {selectedPackage.qty} tickets improves your odds to {(selectedPackage.qty / (giveaway.baseEntries + selectedPackage.qty) * 100).toFixed(2)}%
+                  </div>
+
+                  <Button 
+                    className="w-full h-14 text-lg bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest"
+                    onClick={nextStep}
+                  >
+                    Continue to Details
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* STEP 2: DETAILS */}
+          {step === 2 && (
+            <motion.div 
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="max-w-2xl mx-auto space-y-8"
+            >
+              <div className="text-center space-y-2 mb-8">
+                <h2 className="text-3xl font-serif text-primary">Your Details</h2>
+                <p className="text-muted-foreground">Please provide your legal name for the official draw.</p>
+              </div>
+
+              <div className="bg-card border border-border p-8 rounded-sm space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>First Name</Label>
+                    <Input 
+                      value={details.firstName} 
+                      onChange={e => setDetails({...details, firstName: e.target.value})} 
+                      placeholder="James" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Last Name</Label>
+                    <Input 
+                      value={details.lastName} 
+                      onChange={e => setDetails({...details, lastName: e.target.value})} 
+                      placeholder="Bond" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email Address</Label>
+                  <Input 
+                    type="email"
+                    value={details.email} 
+                    onChange={e => setDetails({...details, email: e.target.value})} 
+                    placeholder="james@example.com" 
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Confirm Email</Label>
+                  <Input 
+                    type="email"
+                    value={details.confirmEmail} 
+                    onChange={e => setDetails({...details, confirmEmail: e.target.value})} 
+                    placeholder="james@example.com" 
+                  />
+                </div>
+
+                <div className="pt-4 space-y-4 border-t border-border/50">
+                  <div className="flex items-start space-x-3">
+                    <Checkbox 
+                      id="age" 
+                      checked={details.ageVerified} 
+                      onCheckedChange={(c) => setDetails({...details, ageVerified: !!c})} 
+                      className="mt-1"
+                    />
+                    <Label htmlFor="age" className="text-sm font-normal leading-tight text-muted-foreground">
+                      I confirm I am 18 years of age or older and legally permitted to purchase alcohol in my jurisdiction.
+                    </Label>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Checkbox 
+                      id="terms" 
+                      checked={details.termsAccepted} 
+                      onCheckedChange={(c) => setDetails({...details, termsAccepted: !!c})} 
+                      className="mt-1"
+                    />
+                    <Label htmlFor="terms" className="text-sm font-normal leading-tight text-muted-foreground">
+                      I agree to the PrizePour Terms & Conditions and Privacy Policy.
+                    </Label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between">
+                <Button variant="ghost" onClick={() => setStep(1)}>Back</Button>
+                <Button 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest px-8"
+                  disabled={!isDetailsValid}
+                  onClick={nextStep}
+                >
+                  Continue to Payment
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* STEP 3: PAYMENT */}
+          {step === 3 && (
+            <motion.div 
+              key="step3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="grid md:grid-cols-5 gap-8"
+            >
+              <div className="md:col-span-3 space-y-8">
+                <div className="space-y-2 mb-8">
+                  <h2 className="text-3xl font-serif text-primary">Secure Payment</h2>
+                  <p className="text-muted-foreground text-sm">Demo mode — no real payment is processed</p>
+                </div>
+
+                <div className="bg-card border border-border p-8 rounded-sm space-y-6">
+                  <div className="space-y-2">
+                    <Label>Cardholder Name</Label>
+                    <Input 
+                      value={payment.name} 
+                      onChange={e => setPayment({...payment, name: e.target.value})} 
+                      placeholder="JAMES BOND" 
+                      className="uppercase"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Card Number</Label>
+                    <div className="relative">
+                      <CreditCard className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        value={payment.cardNumber} 
+                        onChange={e => {
+                          const val = e.target.value.replace(/\D/g, '');
+                          const formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+                          if (formatted.length <= 19) setPayment({...payment, cardNumber: formatted});
+                        }} 
+                        placeholder="XXXX XXXX XXXX XXXX" 
+                        className="pl-10 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Expiry Date</Label>
+                      <Input 
+                        value={payment.expiry} 
+                        onChange={e => {
+                          let val = e.target.value.replace(/\D/g, '');
+                          if (val.length > 2) val = val.slice(0,2) + '/' + val.slice(2,4);
+                          if (val.length <= 5) setPayment({...payment, expiry: val});
+                        }} 
+                        placeholder="MM/YY" 
+                        className="font-mono"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>CVV</Label>
+                      <Input 
+                        value={payment.cvv} 
+                        onChange={e => {
+                          const val = e.target.value.replace(/\D/g, '');
+                          if (val.length <= 4) setPayment({...payment, cvv: val});
+                        }} 
+                        type="password"
+                        placeholder="123" 
+                        className="font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
+                </div>
+              </div>
+
+              <div className="md:col-span-2 space-y-6">
+                <div className="bg-secondary/20 border border-secondary p-6 rounded-sm sticky top-28">
+                  <h3 className="font-serif text-xl mb-6">Order Summary</h3>
+                  
+                  <div className="space-y-4 text-sm mb-6">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{giveaway.name} Entry</span>
+                      <span></span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>{selectedPackage.qty}x Tickets</span>
+                      <span className="text-foreground">${selectedPackage.price}</span>
+                    </div>
+                    <div className="h-px bg-border/50 my-4" />
+                    <div className="flex justify-between font-serif text-lg text-primary">
+                      <span>Total</span>
+                      <span>${selectedPackage.price}</span>
+                    </div>
+                  </div>
+
+                  <Button 
+                    className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest"
+                    onClick={processPayment}
+                    disabled={isProcessing || !payment.cardNumber || !payment.expiry || !payment.cvv}
+                  >
+                    {isProcessing ? (
+                      <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</>
+                    ) : (
+                      "Complete Purchase"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* STEP 4: CONFIRMATION */}
+          {step === 4 && (
+            <motion.div 
+              key="step4"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="max-w-2xl mx-auto text-center space-y-10 py-12"
+            >
+              <motion.div 
+                className="relative w-32 h-32 mx-auto"
+                initial={{ rotate: -180, scale: 0 }}
+                animate={{ rotate: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              >
+                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
+                <div className="relative w-full h-full bg-gradient-to-br from-primary to-amber-600 rounded-full flex items-center justify-center shadow-2xl border-4 border-background">
+                  <Trophy className="w-16 h-16 text-primary-foreground" />
+                </div>
+              </motion.div>
+
+              <div className="space-y-4">
+                <h1 className="text-5xl font-serif text-primary">Entry Confirmed!</h1>
+                <p className="text-xl text-muted-foreground">You're officially in the running for the {giveaway.name}.</p>
+              </div>
+
+              <div className="bg-card border border-border p-8 rounded-sm text-left shadow-lg">
+                <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border">
+                  <CheckCircle2 className="w-6 h-6 text-primary" />
+                  <h3 className="text-lg font-serif">Your Official Ticket Numbers</h3>
+                </div>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {assignedTickets.map((ticket, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + (i * 0.1) }}
+                      className="bg-secondary/30 border border-secondary p-3 rounded-sm text-center font-mono text-primary text-lg"
+                    >
+                      {ticket}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-center gap-6 pt-8">
+                <Button 
+                  size="lg" 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base h-14 px-8"
+                  onClick={() => setLocation(`/draw/${giveaway.id}`)}
+                >
+                  Watch the Live Draw
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-border uppercase tracking-widest text-base h-14 px-8"
+                  onClick={() => setLocation('/')}
+                >
+                  Enter Another Giveaway
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}

@@ -1,70 +1,13 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'wouter';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
-import { EntryModal } from '@/components/giveaway/EntryModal';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Trophy, ShieldCheck, Users, Ticket } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
 import pappyImg from '@/assets/images/pappy.png';
-
-const ACTIVE_GIVEAWAYS = [
-  {
-    id: 1,
-    name: "Pappy Van Winkle 23 Year",
-    value: "$4,200",
-    entries: "1,847",
-    daysLeft: 6,
-    description: "The crown jewel of bourbon. Ultra-rare.",
-    image: pappyImg
-  },
-  {
-    id: 2,
-    name: "Glenfarclas 40 Year",
-    value: "$2,800",
-    entries: "923",
-    daysLeft: 12,
-    description: "Speyside legend. Single malt perfection.",
-    image: pappyImg // reusing for mock
-  },
-  {
-    id: 3,
-    name: "Buffalo Trace Antique",
-    value: "$3,500",
-    entries: "2,104",
-    daysLeft: 3,
-    description: "Full set. The most coveted collection.",
-    image: pappyImg // reusing for mock
-  },
-  {
-    id: 4,
-    name: "Hibiki 21 Japanese",
-    value: "$1,200",
-    entries: "1,456",
-    daysLeft: 9,
-    description: "Master blender's masterpiece.",
-    image: pappyImg // reusing for mock
-  },
-  {
-    id: 5,
-    name: "Macallan 18 Sherry Oak",
-    value: "$950",
-    entries: "3,211",
-    daysLeft: 15,
-    description: "Iconic Speyside single malt.",
-    image: pappyImg // reusing for mock
-  },
-  {
-    id: 6,
-    name: "Eagle Rare 17 Year",
-    value: "$800",
-    entries: "1,099",
-    daysLeft: 7,
-    description: "Kentucky's finest aged bourbon.",
-    image: pappyImg // reusing for mock
-  }
-];
+import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
 
 const WINNERS = [
   { name: "Sarah M.", location: "Austin, TX", prize: "Blanton's Gold Edition" },
@@ -74,7 +17,7 @@ const WINNERS = [
 ];
 
 export function Home() {
-  const [selectedGiveaway, setSelectedGiveaway] = useState<string | null>(null);
+  const [, setLocation] = useLocation();
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -115,7 +58,7 @@ export function Home() {
             </motion.p>
             
             <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider" onClick={() => setSelectedGiveaway("Pappy Van Winkle 23 Year")}>
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider" onClick={() => setLocation("/giveaway/1")}>
                 Enter Featured Draw
               </Button>
               <Button size="lg" variant="outline" className="border-border hover:bg-white/5 uppercase tracking-wider">
@@ -145,7 +88,7 @@ export function Home() {
               </div>
               <div className="flex items-center justify-between">
                 <CountdownTimer daysToAdd={6} />
-                <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => setSelectedGiveaway("Pappy Van Winkle 23 Year")}>
+                <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => setLocation("/giveaway/1")}>
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </div>
@@ -216,7 +159,7 @@ export function Home() {
                 
                 <Button 
                   className="w-full bg-secondary hover:bg-primary hover:text-primary-foreground text-secondary-foreground transition-colors uppercase tracking-widest"
-                  onClick={() => setSelectedGiveaway(giveaway.name)}
+                  onClick={() => setLocation(`/giveaway/${giveaway.id}`)}
                 >
                   Enter Draw
                 </Button>
@@ -291,12 +234,6 @@ export function Home() {
       </section>
 
       <Footer />
-
-      <EntryModal 
-        isOpen={!!selectedGiveaway} 
-        onClose={() => setSelectedGiveaway(null)} 
-        giveawayName={selectedGiveaway || ""}
-      />
     </div>
   );
 }

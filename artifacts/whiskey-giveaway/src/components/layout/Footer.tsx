@@ -1,5 +1,5 @@
 import { Instagram, Twitter, Facebook } from 'lucide-react';
-import logoSrc from '@assets/prizepour-logo.png';
+import logoSrc from '@/assets/prizepour-logo.png';
 
 export function Footer() {
   return (

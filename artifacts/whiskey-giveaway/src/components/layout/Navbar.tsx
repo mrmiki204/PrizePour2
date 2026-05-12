@@ -1,6 +1,6 @@
 import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import logoSrc from '@assets/prizepour-logo.png';
+import logoSrc from '@/assets/prizepour-logo.png';
 
 export function Navbar() {
   return (
