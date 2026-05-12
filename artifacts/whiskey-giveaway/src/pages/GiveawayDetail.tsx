@@ -17,7 +17,7 @@ import { useCreateEntry } from '@workspace/api-client-react';
 const TICKET_PACKAGES = [
   { id: 1, qty: 1, price: 4.99, badge: null },
   { id: 2, qty: 5, price: 19.99, badge: "Best Value" },
-  { id: 3, qty: 10, price: 34.99, badge: "Most Popular" },
+  { id: 3, qty: 10, price: 49.99, badge: "Most Popular", bonus: 1 },
   { id: 4, qty: 25, price: 99.99, badge: null },
 ];
 
@@ -120,10 +120,10 @@ export function GiveawayDetail() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           giveawayId: giveaway.id,
-          ticketQty: selectedPackage.qty,
           firstName: details.firstName,
           lastName: details.lastName,
           email: details.email,
+          ticketQty: selectedPackage.qty + (selectedPackage.bonus ?? 0),
           amountCents: Math.round(selectedPackage.price * 100),
           referralCode: referredBy ?? undefined,
         }),
@@ -262,7 +262,10 @@ export function GiveawayDetail() {
                         )}
                         <div className="flex items-center gap-3">
                           <Ticket className={`w-5 h-5 ${selectedPackage.id === pkg.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                          <span className="font-serif text-lg">{pkg.qty} {pkg.qty === 1 ? 'Ticket' : 'Tickets'}</span>
+                          <span className="font-serif text-lg">
+                            {pkg.qty} {pkg.qty === 1 ? 'Ticket' : 'Tickets'}
+                            {pkg.bonus ? <span className="ml-2 text-xs font-mono text-green-400 bg-green-400/10 border border-green-400/20 px-1.5 py-0.5 rounded-sm">+{pkg.bonus} FREE</span> : null}
+                          </span>
                         </div>
                         <span className="font-mono text-primary">${pkg.price}</span>
                       </button>
@@ -270,7 +273,7 @@ export function GiveawayDetail() {
                   </div>
 
                   <div className="bg-secondary/30 p-4 border border-secondary text-sm text-center text-muted-foreground mt-auto rounded-sm">
-                    Selecting {selectedPackage.qty} tickets improves your odds to {(selectedPackage.qty / (giveaway.baseEntries + selectedPackage.qty) * 100).toFixed(2)}%
+                    {(() => { const total = selectedPackage.qty + (selectedPackage.bonus ?? 0); return `Selecting ${total} ticket${total !== 1 ? 's' : ''} improves your odds to ${(total / (giveaway.baseEntries + total) * 100).toFixed(2)}%`; })()}
                   </div>
 
                   <Button 
@@ -406,7 +409,10 @@ export function GiveawayDetail() {
                       <span className="text-muted-foreground">{giveaway.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">{selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}</span>
+                      <span className="text-muted-foreground">
+                        {selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}
+                        {selectedPackage.bonus ? <span className="ml-1.5 text-xs text-green-400">+{selectedPackage.bonus} free</span> : null}
+                      </span>
                       <span className="font-mono text-foreground">${selectedPackage.price}</span>
                     </div>
                     <div className="h-px bg-border/50" />
@@ -457,7 +463,10 @@ export function GiveawayDetail() {
                   <div className="text-sm text-muted-foreground space-y-1">
                     <div className="flex justify-between">
                       <span>Tickets</span>
-                      <span className="text-foreground">{selectedPackage.qty}×</span>
+                      <span className="text-foreground">
+                        {selectedPackage.qty + (selectedPackage.bonus ?? 0)}×
+                        {selectedPackage.bonus ? <span className="ml-1 text-green-400 text-xs">(incl. {selectedPackage.bonus} free)</span> : null}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Draw closes</span>

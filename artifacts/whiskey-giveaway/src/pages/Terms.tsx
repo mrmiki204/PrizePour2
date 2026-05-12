@@ -32,7 +32,7 @@ export function Terms() {
 
             <section className="space-y-3">
               <h2 className="text-xl font-serif text-foreground">4. Ticket Purchases</h2>
-              <p>Purchasing additional tickets increases your probability of winning but does not guarantee a win. All ticket sales are final. Ticket packages are: 1 ticket ($4.99), 5 tickets ($19.99), 10 tickets ($34.99), and 25 tickets ($99.99). Maximum 25 tickets per person per draw unless otherwise stated.</p>
+              <p>Purchasing additional tickets increases your probability of winning but does not guarantee a win. All ticket sales are final. Ticket packages are: 1 ticket ($4.99), 5 tickets ($19.99), 10 tickets + 1 free ticket ($49.99), and 25 tickets ($99.99). Maximum 25 tickets per person per draw unless otherwise stated.</p>
             </section>
 
             <section className="space-y-3">
