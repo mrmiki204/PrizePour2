@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { getUncachableStripeClient } from "../stripeClient.js";
 import { storage } from "../storage.js";
 import { db } from "@workspace/db";
-import { entriesTable } from "@workspace/db";
+import { entriesTable, referralRewardsTable } from "@workspace/db";
 
 const router: IRouter = Router();
 
@@ -127,6 +127,18 @@ router.get("/stripe/session/:sessionId", async (req, res) => {
   }).returning();
 
   req.log.info({ sessionId, giveawayId, qty }, "Entry created from Stripe session");
+
+  // If this entry was referred, create a referral reward for the referrer
+  if (referralCode) {
+    const freeTickets = Math.floor(Math.random() * 5) + 1;
+    await db.insert(referralRewardsTable).values({
+      referralCode,
+      refereeEntryId: entry.id,
+      freeTickets,
+      status: "unclaimed",
+    });
+    req.log.info({ referralCode, freeTickets }, "Referral reward created");
+  }
 
   return res.json({ entry, ticketNumbers: tickets });
 });

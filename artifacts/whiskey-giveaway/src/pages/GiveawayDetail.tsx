@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft, HelpCircle, XCircle, Share2, Copy, Check, Gift } from 'lucide-react';
+import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft, ArrowRight, HelpCircle, XCircle, Share2, Copy, Check, Gift } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
@@ -671,6 +671,34 @@ export function GiveawayDetail() {
                       </div>
                     </div>
                   </div>
+                </motion.div>
+              )}
+
+              {/* Rewards CTA */}
+              {referralLink && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.0 }}
+                  className="bg-card border border-border rounded-sm px-6 py-4 flex items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <Gift className="w-5 h-5 text-primary shrink-0" />
+                    <div>
+                      <p className="text-sm font-serif">Check your referral rewards</p>
+                      <p className="text-xs text-muted-foreground font-mono mt-0.5">See if anyone has used your link — and claim free tickets.</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="shrink-0 border-primary/40 hover:border-primary font-mono text-xs uppercase tracking-widest h-9 px-4 gap-2"
+                    onClick={() => {
+                      const code = referralLink.split('?ref=')[1];
+                      setLocation(`/my-referrals?code=${code}`);
+                    }}
+                  >
+                    My Rewards <ArrowRight className="w-3 h-3" />
+                  </Button>
                 </motion.div>
               )}
 

@@ -9,6 +9,7 @@ import { AdminDashboard } from "@/pages/AdminDashboard";
 import { Terms } from "@/pages/Terms";
 import { Privacy } from "@/pages/Privacy";
 import { Rules } from "@/pages/Rules";
+import { MyReferrals } from "@/pages/MyReferrals";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/rules" component={Rules} />
+      <Route path="/my-referrals" component={MyReferrals} />
       <Route component={NotFound} />
     </Switch>
   );
