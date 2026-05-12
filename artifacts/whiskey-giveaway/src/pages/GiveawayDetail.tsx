@@ -186,7 +186,7 @@ export function GiveawayDetail() {
 
                   <Button 
                     className="w-full h-14 text-lg bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest"
-                    onClick={() => { setQuizError(false); setQuizAnswer(''); setShowQuiz(true); }}
+                    onClick={() => { setQuizError(false); setQuizSelected(''); setShowQuiz(true); }}
                   >
                     Continue to Details
                   </Button>
