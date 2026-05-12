@@ -18,7 +18,7 @@ const TICKET_PACKAGES = [
   { id: 1, qty: 1, price: 4.99, badge: null },
   { id: 2, qty: 5, price: 19.99, badge: "Best Value" },
   { id: 3, qty: 10, price: 34.99, badge: "Most Popular" },
-  { id: 4, qty: 25, price: 74.99, badge: null },
+  { id: 4, qty: 25, price: 100.00, badge: null },
 ];
 
 export function GiveawayDetail() {
