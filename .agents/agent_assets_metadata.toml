@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "ZAYrXXodyw1pe6Jxmyw9d"
@@ -12,3 +11,15 @@ id = "Hx_uzWFkZ2uA7O_P-LY8e"
 uri = "file://artifacts/whiskey-giveaway/src/assets/images/pappy.png"
 type = "image"
 title = "antique bourbon bottle"
+
+[[outputs]]
+id = "yOGJkLWPn4cLMR4PGFt0K"
+uri = "file://attached_assets/image_search/clonakilty32_2.jpg"
+type = "image"
+title = "Clonakilty 32 Year Old — Bottle No. 84 (irishwhiskeyauctions.ie)"
+
+[[outputs]]
+id = "iMI28Vg2GWQxNAaMSH7ol"
+uri = "file://attached_assets/image_search/clonakilty32_1.jpg"
+type = "image"
+title = "Clonakilty 32 Year Old — Thumbnail view"

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
 import pappyImg from '@/assets/images/pappy.png';
+import clonakiltyImg from '@/assets/images/clonakilty32.jpg';
 import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
 import { useListEntries } from '@workspace/api-client-react';
 
@@ -105,13 +106,16 @@ export function Home() {
             <div className="absolute -inset-4 bg-primary/20 blur-3xl rounded-full" />
             <div className="relative bg-card border border-border p-6 rounded-sm shadow-2xl">
               <div className="aspect-[3/4] relative mb-6 overflow-hidden rounded-sm group">
-                <img src={pappyImg} alt="Pappy Van Winkle" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                <img src={clonakiltyImg} alt="Clonakilty 32 Year Old" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                <div className="absolute top-4 left-4">
+                  <span className="bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded-sm">Irish Single Malt · Bottle No. 84 of 84</span>
+                </div>
                 <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-2xl font-serif text-white mb-2">Pappy Van Winkle 23 Year</h3>
+                  <h3 className="text-2xl font-serif text-white mb-2">Clonakilty 32 Year Old</h3>
                   <div className="flex justify-between items-end">
-                    <p className="text-primary font-mono">$4,200 Value</p>
-                    <p className="text-sm text-gray-400 font-mono">1,847 Entries</p>
+                    <p className="text-primary font-mono">€3,800 Value</p>
+                    <p className="text-sm text-gray-400 font-mono">612 Entries</p>
                   </div>
                 </div>
               </div>
