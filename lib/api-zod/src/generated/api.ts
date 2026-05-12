@@ -27,6 +27,8 @@ export const ListEntriesResponseItem = zod.object({
   ticketQty: zod.number(),
   ticketNumbers: zod.array(zod.string()),
   amountPaid: zod.string(),
+  referralCode: zod.string().nullish(),
+  stripeSessionId: zod.string().nullish(),
   createdAt: zod.coerce.date(),
 });
 export const ListEntriesResponse = zod.array(ListEntriesResponseItem);
@@ -43,6 +45,8 @@ export const CreateEntryBody = zod.object({
   ticketQty: zod.number().min(1),
   ticketNumbers: zod.array(zod.string()),
   amountPaid: zod.string(),
+  referralCode: zod.string().nullish(),
+  stripeSessionId: zod.string().nullish(),
 });
 
 /**
@@ -61,6 +65,8 @@ export const ListEntriesByGiveawayResponseItem = zod.object({
   ticketQty: zod.number(),
   ticketNumbers: zod.array(zod.string()),
   amountPaid: zod.string(),
+  referralCode: zod.string().nullish(),
+  stripeSessionId: zod.string().nullish(),
   createdAt: zod.coerce.date(),
 });
 export const ListEntriesByGiveawayResponse = zod.array(

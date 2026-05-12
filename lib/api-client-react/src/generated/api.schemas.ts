@@ -18,6 +18,8 @@ export interface Entry {
   ticketQty: number;
   ticketNumbers: string[];
   amountPaid: string;
+  referralCode?: string | null;
+  stripeSessionId?: string | null;
   createdAt: string;
 }
 
@@ -32,6 +34,27 @@ export interface EntryInput {
   ticketQty: number;
   ticketNumbers: string[];
   amountPaid: string;
+  referralCode?: string | null;
+  stripeSessionId?: string | null;
+}
+
+export interface StripeCheckoutRequest {
+  giveawayId: number;
+  ticketQty: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  amountCents: number;
+  referralCode?: string | null;
+}
+
+export interface StripeCheckoutResponse {
+  url: string;
+}
+
+export interface StripeSessionEntry {
+  entry: Entry;
+  ticketNumbers: string[];
 }
 
 export interface ErrorResponse {

@@ -54,13 +54,8 @@ export function GiveawayDetail() {
     termsAccepted: false
   });
 
-  // Payment Details
-  const [payment, setPayment] = useState({
-    cardNumber: '',
-    expiry: '',
-    cvv: '',
-    name: ''
-  });
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [sessionError, setSessionError] = useState('');
 
   const nextStep = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -78,36 +73,72 @@ export function GiveawayDetail() {
     }
   };
 
-  const processPayment = () => {
+  // On mount: if ?session_id= present, verify payment and jump to confirmation
+  useEffect(() => {
+    const sessionId = new URLSearchParams(window.location.search).get('session_id');
+    if (!sessionId) return;
+
     setIsProcessing(true);
-    const tickets = Array.from({ length: selectedPackage.qty }).map(() =>
-      "#" + Math.floor(1000 + Math.random() * 9000).toString()
-    );
-    createEntry.mutate(
-      {
-        data: {
+    fetch(`/api/stripe/session/${sessionId}`)
+      .then(r => r.json())
+      .then((data: { entry?: { firstName: string; lastName: string; email: string }; ticketNumbers?: string[]; error?: string }) => {
+        if (data.error || !data.ticketNumbers) {
+          setSessionError(data.error ?? 'Payment verification failed');
+          setIsProcessing(false);
+          return;
+        }
+        const tickets = data.ticketNumbers;
+        localStorage.setItem(`giveaway_${giveaway.id}_tickets`, JSON.stringify(tickets));
+        setAssignedTickets(tickets);
+        if (data.entry) {
+          setDetails(d => ({
+            ...d,
+            firstName: data.entry!.firstName,
+            lastName: data.entry!.lastName,
+            email: data.entry!.email,
+          }));
+        }
+        const code = `${(data.entry?.firstName ?? 'friend').toLowerCase().replace(/[^a-z]/g, '')}-${giveaway.id}-${tickets[0].replace('#', '')}`;
+        setReferralLink(`${window.location.origin}/giveaway/${giveaway.id}?ref=${code}`);
+        setIsProcessing(false);
+        // Strip query params and jump to step 4
+        window.history.replaceState({}, '', `/giveaway/${giveaway.id}`);
+        setStep(4);
+      })
+      .catch(() => {
+        setSessionError('Could not verify your payment. Please contact support.');
+        setIsProcessing(false);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const initiateStripeCheckout = async () => {
+    setIsRedirecting(true);
+    try {
+      const resp = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           giveawayId: giveaway.id,
+          ticketQty: selectedPackage.qty,
           firstName: details.firstName,
           lastName: details.lastName,
           email: details.email,
-          ticketQty: selectedPackage.qty,
-          ticketNumbers: tickets,
-          amountPaid: selectedPackage.price.toFixed(2),
-        },
-      },
-      {
-        onSettled: () => {
-          setIsProcessing(false);
-          localStorage.setItem(`giveaway_${giveaway.id}_tickets`, JSON.stringify(tickets));
-          setAssignedTickets(tickets);
-          // Generate referral code: firstName + giveawayId + first ticket digits
-          const code = `${details.firstName.toLowerCase().replace(/[^a-z]/g, '')}-${giveaway.id}-${tickets[0].replace('#', '')}`;
-          const link = `${window.location.origin}/giveaway/${giveaway.id}?ref=${code}`;
-          setReferralLink(link);
-          nextStep();
-        },
+          amountCents: Math.round(selectedPackage.price * 100),
+          referralCode: referredBy ?? undefined,
+        }),
+      });
+      const { url, error } = await resp.json() as { url?: string; error?: string };
+      if (url) {
+        window.location.href = url;
+      } else {
+        setSessionError(error ?? 'Failed to start checkout');
+        setIsRedirecting(false);
       }
-    );
+    } catch {
+      setSessionError('Network error — please try again');
+      setIsRedirecting(false);
+    }
   };
 
   const isDetailsValid = 
@@ -356,105 +387,83 @@ export function GiveawayDetail() {
               className="grid md:grid-cols-5 gap-8"
             >
               <div className="md:col-span-3 space-y-8">
-                <div className="space-y-2 mb-8">
-                  <h2 className="text-3xl font-serif text-primary">Secure Payment</h2>
-                  <p className="text-muted-foreground text-sm">Demo mode — no real payment is processed</p>
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-serif text-primary">Secure Checkout</h2>
+                  <p className="text-muted-foreground text-sm">You'll be redirected to Stripe's secure payment page</p>
                 </div>
 
                 <div className="bg-card border border-border p-8 rounded-sm space-y-6">
-                  <div className="space-y-2">
-                    <Label>Cardholder Name</Label>
-                    <Input 
-                      value={payment.name} 
-                      onChange={e => setPayment({...payment, name: e.target.value})} 
-                      placeholder="JAMES BOND" 
-                      className="uppercase"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Card Number</Label>
-                    <div className="relative">
-                      <CreditCard className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        value={payment.cardNumber} 
-                        onChange={e => {
-                          const val = e.target.value.replace(/\D/g, '');
-                          const formatted = val.match(/.{1,4}/g)?.join(' ') || val;
-                          if (formatted.length <= 19) setPayment({...payment, cardNumber: formatted});
-                        }} 
-                        placeholder="XXXX XXXX XXXX XXXX" 
-                        className="pl-10 font-mono"
-                      />
+                  <div className="flex items-center gap-3 pb-5 border-b border-border/50">
+                    <CreditCard className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="font-serif text-lg">{details.firstName} {details.lastName}</p>
+                      <p className="text-sm text-muted-foreground font-mono">{details.email}</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Expiry Date</Label>
-                      <Input 
-                        value={payment.expiry} 
-                        onChange={e => {
-                          let val = e.target.value.replace(/\D/g, '');
-                          if (val.length > 2) val = val.slice(0,2) + '/' + val.slice(2,4);
-                          if (val.length <= 5) setPayment({...payment, expiry: val});
-                        }} 
-                        placeholder="MM/YY" 
-                        className="font-mono"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>CVV</Label>
-                      <Input 
-                        value={payment.cvv} 
-                        onChange={e => {
-                          const val = e.target.value.replace(/\D/g, '');
-                          if (val.length <= 4) setPayment({...payment, cvv: val});
-                        }} 
-                        type="password"
-                        placeholder="123" 
-                        className="font-mono"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between">
-                  <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
-                </div>
-              </div>
-
-              <div className="md:col-span-2 space-y-6">
-                <div className="bg-secondary/20 border border-secondary p-6 rounded-sm sticky top-28">
-                  <h3 className="font-serif text-xl mb-6">Order Summary</h3>
-                  
-                  <div className="space-y-4 text-sm mb-6">
+                  <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">{giveaway.name} Entry</span>
-                      <span></span>
+                      <span className="text-muted-foreground">{giveaway.name}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>{selectedPackage.qty}x Tickets</span>
-                      <span className="text-foreground">${selectedPackage.price}</span>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}</span>
+                      <span className="font-mono text-foreground">${selectedPackage.price}</span>
                     </div>
-                    <div className="h-px bg-border/50 my-4" />
+                    <div className="h-px bg-border/50" />
                     <div className="flex justify-between font-serif text-lg text-primary">
                       <span>Total</span>
                       <span>${selectedPackage.price}</span>
                     </div>
                   </div>
 
+                  {sessionError && (
+                    <div className="flex items-center gap-2 text-red-400 text-sm font-mono bg-red-400/10 border border-red-400/20 rounded-sm p-3">
+                      <XCircle className="w-4 h-4 shrink-0" />
+                      {sessionError}
+                    </div>
+                  )}
+
                   <Button 
-                    className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest"
-                    onClick={processPayment}
-                    disabled={isProcessing || !payment.cardNumber || !payment.expiry || !payment.cvv}
+                    className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base"
+                    onClick={initiateStripeCheckout}
+                    disabled={isRedirecting}
                   >
-                    {isProcessing ? (
-                      <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</>
+                    {isRedirecting ? (
+                      <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Redirecting to Stripe...</>
                     ) : (
-                      "Complete Purchase"
+                      <><CreditCard className="w-5 h-5 mr-2" /> Pay ${selectedPackage.price} with Stripe</>
                     )}
                   </Button>
+
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
+                    Secured by Stripe · SSL encrypted
+                  </div>
+                </div>
+
+                <Button variant="ghost" onClick={() => setStep(2)}>← Back</Button>
+              </div>
+
+              <div className="md:col-span-2 space-y-6">
+                <div className="bg-secondary/20 border border-secondary p-6 rounded-sm sticky top-28 space-y-5">
+                  <h3 className="font-serif text-xl">Your Entry</h3>
+                  <div className="aspect-video relative bg-black/50 rounded-sm overflow-hidden">
+                    <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
+                  </div>
+                  <div>
+                    <p className="font-serif text-lg">{giveaway.name}</p>
+                    <p className="text-primary text-sm font-mono mt-1">{giveaway.value} prize</p>
+                  </div>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <div className="flex justify-between">
+                      <span>Tickets</span>
+                      <span className="text-foreground">{selectedPackage.qty}×</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Draw closes</span>
+                      <span className="text-foreground">{giveaway.daysLeft} days</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>

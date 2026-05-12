@@ -11,6 +11,8 @@ export const entriesTable = pgTable("entries", {
   ticketQty: integer("ticket_qty").notNull(),
   ticketNumbers: text("ticket_numbers").array().notNull(),
   amountPaid: numeric("amount_paid", { precision: 10, scale: 2 }).notNull(),
+  referralCode: text("referral_code"),
+  stripeSessionId: text("stripe_session_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

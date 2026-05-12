@@ -118,6 +118,12 @@ components:
             type: string
         amountPaid:
           type: string
+        referralCode:
+          type: string
+          nullable: true
+        stripeSessionId:
+          type: string
+          nullable: true
         createdAt:
           type: string
           format: date-time
@@ -146,6 +152,50 @@ components:
             type: string
         amountPaid:
           type: string
+        referralCode:
+          type: string
+          nullable: true
+        stripeSessionId:
+          type: string
+          nullable: true
+
+    StripeCheckoutRequest:
+      type: object
+      required: [giveawayId, ticketQty, firstName, lastName, email, amountCents]
+      properties:
+        giveawayId:
+          type: integer
+        ticketQty:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        amountCents:
+          type: integer
+        referralCode:
+          type: string
+          nullable: true
+
+    StripeCheckoutResponse:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+
+    StripeSessionEntry:
+      type: object
+      required: [entry, ticketNumbers]
+      properties:
+        entry:
+          $ref: "#/components/schemas/Entry"
+        ticketNumbers:
+          type: array
+          items:
+            type: string
 
     ErrorResponse:
       type: object

@@ -15,5 +15,7 @@ export interface Entry {
   ticketQty: number;
   ticketNumbers: string[];
   amountPaid: string;
+  referralCode?: string | null;
+  stripeSessionId?: string | null;
   createdAt: Date;
 }

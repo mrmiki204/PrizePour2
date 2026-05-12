@@ -6,17 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface EntryInput {
+export interface StripeCheckoutRequest {
   giveawayId: number;
-  /** @minLength 1 */
+  ticketQty: number;
   firstName: string;
-  /** @minLength 1 */
   lastName: string;
   email: string;
-  /** @minimum 1 */
-  ticketQty: number;
-  ticketNumbers: string[];
-  amountPaid: string;
+  amountCents: number;
   referralCode?: string | null;
-  stripeSessionId?: string | null;
 }
