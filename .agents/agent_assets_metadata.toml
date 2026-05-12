@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "ZAYrXXodyw1pe6Jxmyw9d"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero.png"
+type = "image"
+title = "whiskey bar background"
+
+[[generated]]
+id = "Hx_uzWFkZ2uA7O_P-LY8e"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/pappy.png"
+type = "image"
+title = "antique bourbon bottle"
