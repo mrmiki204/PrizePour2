@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft, HelpCircle, XCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
 
 const TICKET_PACKAGES = [
@@ -32,7 +33,7 @@ export function GiveawayDetail() {
 
   // Skill-testing question
   const [showQuiz, setShowQuiz] = useState(false);
-  const [quizAnswer, setQuizAnswer] = useState('');
+  const [quizSelected, setQuizSelected] = useState('');
   const [quizError, setQuizError] = useState(false);
   
   // Form Details
@@ -59,9 +60,9 @@ export function GiveawayDetail() {
   };
 
   const submitQuiz = () => {
-    if (quizAnswer.trim().toLowerCase() === 'scotland') {
+    if (quizSelected === 'scotland') {
       setShowQuiz(false);
-      setQuizAnswer('');
+      setQuizSelected('');
       setQuizError(false);
       nextStep();
     } else {
@@ -472,7 +473,7 @@ export function GiveawayDetail() {
       <Footer />
 
       {/* Skill-Testing Question Modal */}
-      <Dialog open={showQuiz} onOpenChange={(open) => { if (!open) { setShowQuiz(false); setQuizError(false); setQuizAnswer(''); } }}>
+      <Dialog open={showQuiz} onOpenChange={(open) => { if (!open) { setShowQuiz(false); setQuizError(false); setQuizSelected(''); } }}>
         <DialogContent className="sm:max-w-md bg-card border border-border text-foreground">
           <DialogHeader className="space-y-3">
             <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
@@ -487,22 +488,29 @@ export function GiveawayDetail() {
           <div className="pt-4 space-y-6">
             <div className="bg-background/60 border border-border/60 rounded-sm p-5 text-center">
               <p className="font-serif text-lg text-foreground leading-relaxed">
-                "What country is Scotch whiskey made in?"
+                "What country is Scotch whisky made in?"
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="quiz-answer" className="text-foreground/80 text-sm uppercase tracking-widest font-mono">Your Answer</Label>
-              <Input
-                id="quiz-answer"
-                data-testid="input-quiz-answer"
-                placeholder="Type your answer..."
-                value={quizAnswer}
-                onChange={e => { setQuizAnswer(e.target.value); setQuizError(false); }}
-                onKeyDown={e => e.key === 'Enter' && submitQuiz()}
-                className={`bg-background border-border focus:ring-primary text-foreground text-lg h-12 ${quizError ? 'border-red-500 focus:ring-red-500' : ''}`}
-                autoFocus
-              />
+              <Label className="text-foreground/80 text-sm uppercase tracking-widest font-mono">Select Your Answer</Label>
+              <Select
+                value={quizSelected}
+                onValueChange={(val) => { setQuizSelected(val); setQuizError(false); }}
+              >
+                <SelectTrigger
+                  data-testid="select-quiz-answer"
+                  className={`w-full h-12 bg-background border-border text-foreground text-base ${quizError ? 'border-red-500' : ''}`}
+                >
+                  <SelectValue placeholder="Choose an answer..." />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border text-foreground">
+                  <SelectItem value="ireland" className="text-base py-3 cursor-pointer hover:bg-primary/10">Ireland</SelectItem>
+                  <SelectItem value="scotland" className="text-base py-3 cursor-pointer hover:bg-primary/10">Scotland</SelectItem>
+                  <SelectItem value="usa" className="text-base py-3 cursor-pointer hover:bg-primary/10">United States</SelectItem>
+                  <SelectItem value="japan" className="text-base py-3 cursor-pointer hover:bg-primary/10">Japan</SelectItem>
+                </SelectContent>
+              </Select>
               {quizError && (
                 <motion.div
                   initial={{ opacity: 0, y: -4 }}
@@ -510,7 +518,7 @@ export function GiveawayDetail() {
                   className="flex items-center gap-2 text-red-400 text-sm font-mono pt-1"
                 >
                   <XCircle className="w-4 h-4 flex-shrink-0" />
-                  Incorrect. Please try again.
+                  Incorrect answer. Please try again.
                 </motion.div>
               )}
             </div>

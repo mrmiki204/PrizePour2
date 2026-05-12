@@ -31,7 +31,7 @@ export function Footer() {
             <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider">Active Draws</a></li>
             <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider">Past Winners</a></li>
             <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider">How it Works</a></li>
-            <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider">Authentication</a></li>
+            <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider">Authenticity</a></li>
           </ul>
         </div>
         
