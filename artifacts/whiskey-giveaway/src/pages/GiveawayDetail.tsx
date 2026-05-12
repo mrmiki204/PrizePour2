@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft, HelpCircle, XCircle } from 'lucide-react';
+import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft, HelpCircle, XCircle, Share2, Copy, Check, Gift } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
@@ -33,6 +33,11 @@ export function GiveawayDetail() {
   const [selectedPackage, setSelectedPackage] = useState(TICKET_PACKAGES[0]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [assignedTickets, setAssignedTickets] = useState<string[]>([]);
+  const [referralLink, setReferralLink] = useState('');
+  const [referralCopied, setReferralCopied] = useState(false);
+
+  // Detect incoming referral param
+  const referredBy = new URLSearchParams(window.location.search).get('ref');
 
   // Skill-testing question
   const [showQuiz, setShowQuiz] = useState(false);
@@ -95,6 +100,10 @@ export function GiveawayDetail() {
           setIsProcessing(false);
           localStorage.setItem(`giveaway_${giveaway.id}_tickets`, JSON.stringify(tickets));
           setAssignedTickets(tickets);
+          // Generate referral code: firstName + giveawayId + first ticket digits
+          const code = `${details.firstName.toLowerCase().replace(/[^a-z]/g, '')}-${giveaway.id}-${tickets[0].replace('#', '')}`;
+          const link = `${window.location.origin}/giveaway/${giveaway.id}?ref=${code}`;
+          setReferralLink(link);
           nextStep();
         },
       }
@@ -149,6 +158,20 @@ export function GiveawayDetail() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8"
             >
+              {/* Referral welcome banner */}
+              {referredBy && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-3 bg-primary/10 border border-primary/30 rounded-sm px-5 py-3"
+                >
+                  <Gift className="w-5 h-5 text-primary shrink-0" />
+                  <p className="text-sm font-mono text-primary">
+                    You were invited by a friend! Enter this draw for your chance to win.
+                  </p>
+                </motion.div>
+              )}
+
               <div className="grid md:grid-cols-2 gap-8 bg-card border border-border p-6 rounded-sm shadow-xl">
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
                   <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
@@ -482,6 +505,71 @@ export function GiveawayDetail() {
                   ))}
                 </div>
               </div>
+
+              {/* Share & Earn referral card */}
+              {referralLink && (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="bg-card border border-primary/30 p-8 rounded-sm text-left shadow-lg space-y-5"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                      <Share2 className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-serif text-lg leading-tight">Spread the Word</h3>
+                      <p className="text-xs font-mono text-muted-foreground mt-0.5">Share your personal referral link with friends</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <div className="flex-1 bg-background border border-border rounded-sm px-4 py-3 font-mono text-xs text-muted-foreground truncate select-all">
+                      {referralLink}
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="shrink-0 border-border h-auto px-4"
+                      onClick={() => {
+                        navigator.clipboard.writeText(referralLink);
+                        setReferralCopied(true);
+                        setTimeout(() => setReferralCopied(false), 2500);
+                      }}
+                    >
+                      {referralCopied ? (
+                        <><Check className="w-4 h-4 text-green-400 mr-2" /><span className="text-green-400 font-mono text-xs uppercase tracking-widest">Copied!</span></>
+                      ) : (
+                        <><Copy className="w-4 h-4 mr-2" /><span className="font-mono text-xs uppercase tracking-widest">Copy</span></>
+                      )}
+                    </Button>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button
+                      size="sm"
+                      className="bg-[#1877f2] hover:bg-[#1877f2]/90 text-white font-mono text-xs uppercase tracking-widest h-9 px-4"
+                      onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`, '_blank')}
+                    >
+                      Facebook
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-[#1d9bf0] hover:bg-[#1d9bf0]/90 text-white font-mono text-xs uppercase tracking-widest h-9 px-4"
+                      onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`I just entered the ${giveaway.name} giveaway on PrizePour — join me!`)}&url=${encodeURIComponent(referralLink)}`, '_blank')}
+                    >
+                      X / Twitter
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-[#25d366] hover:bg-[#25d366]/90 text-white font-mono text-xs uppercase tracking-widest h-9 px-4"
+                      onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`I just entered the ${giveaway.name} giveaway on PrizePour — join me! ${referralLink}`)}`, '_blank')}
+                    >
+                      WhatsApp
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
 
               <div className="flex flex-col sm:flex-row justify-center gap-6 pt-8">
                 <Button 
