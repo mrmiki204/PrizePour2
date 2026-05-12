@@ -15,10 +15,10 @@ import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
 import { useCreateEntry } from '@workspace/api-client-react';
 
 const TICKET_PACKAGES = [
-  { id: 1, qty: 1, price: 4.99, badge: null },
-  { id: 2, qty: 5, price: 19.99, badge: "Best Value" },
-  { id: 3, qty: 10, price: 49.99, badge: "Most Popular", bonus: 1 },
-  { id: 4, qty: 25, price: 99.99, badge: null },
+  { id: 1, qty: 1,  price: 2.99,  badge: null },
+  { id: 2, qty: 4,  price: 9.99,  badge: "Best Value" },
+  { id: 3, qty: 10, price: 24.99, badge: "Most Popular" },
+  { id: 4, qty: 25, price: 64.99, badge: null },
 ];
 
 export function GiveawayDetail() {
