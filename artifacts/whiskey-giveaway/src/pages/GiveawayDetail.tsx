@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
+import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft, HelpCircle, XCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
 
 const TICKET_PACKAGES = [
@@ -28,6 +29,11 @@ export function GiveawayDetail() {
   const [selectedPackage, setSelectedPackage] = useState(TICKET_PACKAGES[0]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [assignedTickets, setAssignedTickets] = useState<string[]>([]);
+
+  // Skill-testing question
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizAnswer, setQuizAnswer] = useState('');
+  const [quizError, setQuizError] = useState(false);
   
   // Form Details
   const [details, setDetails] = useState({
@@ -50,6 +56,17 @@ export function GiveawayDetail() {
   const nextStep = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStep(s => s + 1);
+  };
+
+  const submitQuiz = () => {
+    if (quizAnswer.trim().toLowerCase() === 'scotland') {
+      setShowQuiz(false);
+      setQuizAnswer('');
+      setQuizError(false);
+      nextStep();
+    } else {
+      setQuizError(true);
+    }
   };
 
   const processPayment = () => {
@@ -168,7 +185,7 @@ export function GiveawayDetail() {
 
                   <Button 
                     className="w-full h-14 text-lg bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest"
-                    onClick={nextStep}
+                    onClick={() => { setQuizError(false); setQuizAnswer(''); setShowQuiz(true); }}
                   >
                     Continue to Details
                   </Button>
@@ -453,6 +470,65 @@ export function GiveawayDetail() {
       </div>
 
       <Footer />
+
+      {/* Skill-Testing Question Modal */}
+      <Dialog open={showQuiz} onOpenChange={(open) => { if (!open) { setShowQuiz(false); setQuizError(false); setQuizAnswer(''); } }}>
+        <DialogContent className="sm:max-w-md bg-card border border-border text-foreground">
+          <DialogHeader className="space-y-3">
+            <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+              <HelpCircle className="w-7 h-7 text-primary" />
+            </div>
+            <DialogTitle className="text-2xl font-serif text-center">Skill-Testing Question</DialogTitle>
+            <DialogDescription className="text-center text-muted-foreground">
+              No purchase necessary. Answer the following question correctly to qualify for entry.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="pt-4 space-y-6">
+            <div className="bg-background/60 border border-border/60 rounded-sm p-5 text-center">
+              <p className="font-serif text-lg text-foreground leading-relaxed">
+                "What country is Scotch whiskey made in?"
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="quiz-answer" className="text-foreground/80 text-sm uppercase tracking-widest font-mono">Your Answer</Label>
+              <Input
+                id="quiz-answer"
+                data-testid="input-quiz-answer"
+                placeholder="Type your answer..."
+                value={quizAnswer}
+                onChange={e => { setQuizAnswer(e.target.value); setQuizError(false); }}
+                onKeyDown={e => e.key === 'Enter' && submitQuiz()}
+                className={`bg-background border-border focus:ring-primary text-foreground text-lg h-12 ${quizError ? 'border-red-500 focus:ring-red-500' : ''}`}
+                autoFocus
+              />
+              {quizError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 text-red-400 text-sm font-mono pt-1"
+                >
+                  <XCircle className="w-4 h-4 flex-shrink-0" />
+                  Incorrect. Please try again.
+                </motion.div>
+              )}
+            </div>
+
+            <Button
+              data-testid="button-submit-quiz"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-widest"
+              onClick={submitQuiz}
+            >
+              Submit Answer
+            </Button>
+
+            <p className="text-center text-xs text-muted-foreground font-mono">
+              This question is required by law as an alternative means of entry.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
