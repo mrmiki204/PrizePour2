@@ -7,7 +7,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <GlassWater className="w-8 h-8 text-primary" />
-          <span className="font-serif text-2xl font-bold tracking-widest text-primary">THE BARREL</span>
+          <span className="font-serif text-2xl font-bold tracking-widest text-primary">PRIZEPOUR</span>
         </div>
         
         <div className="hidden md:flex items-center gap-8">
