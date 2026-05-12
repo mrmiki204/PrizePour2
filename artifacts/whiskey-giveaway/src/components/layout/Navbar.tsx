@@ -1,6 +1,6 @@
 import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import logoSrc from '@assets/WhatsApp_Image_2026-05-12_at_21.07.11_1778616565600.jpeg';
+import logoSrc from '@assets/prizepour-logo.png';
 
 export function Navbar() {
   return (
