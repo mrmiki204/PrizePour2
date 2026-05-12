@@ -7,10 +7,10 @@ export const ACTIVE_GIVEAWAYS = [
   {
     id: 1,
     name: "Clonakilty 32 Year Old",
-    value: "€3,800",
-    priceNumeric: 3800,
-    maxEntries: 1067,   // ceil(3800 * 1.4 / 4.99)
-    baseEntries: 875,   // 82% sold — 6 days left
+    value: "€2,200",
+    priceNumeric: 2200,
+    maxEntries: 618,    // ceil(2200 * 1.4 / 4.99)
+    baseEntries: 507,   // 82% sold — 6 days left
     get entries() { return this.baseEntries.toLocaleString(); },
     daysLeft: 6,
     description: "Ultra-rare 32-year Irish single malt. One of only 84 bottles ever released from the West Cork distillery.",
