@@ -196,12 +196,35 @@ export function Home() {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-serif mb-2 line-clamp-1">{giveaway.name}</h3>
-                <p className="text-sm text-muted-foreground mb-6 line-clamp-2">{giveaway.description}</p>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{giveaway.description}</p>
+
+                {/* Capacity bar */}
+                {(() => {
+                  const pct = Math.min((giveaway.baseEntries / giveaway.maxEntries) * 100, 100);
+                  const remaining = giveaway.maxEntries - giveaway.baseEntries;
+                  return (
+                    <div className="mb-5">
+                      <div className="flex justify-between items-center text-xs font-mono mb-1.5">
+                        <span className="text-muted-foreground">{giveaway.entries} / {giveaway.maxEntries.toLocaleString()} tickets</span>
+                        <span className={remaining <= 80 ? 'text-red-400' : 'text-primary'}>{remaining} left</span>
+                      </div>
+                      <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                        <motion.div
+                          className={`h-full rounded-full ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${pct}%` }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 1, delay: index * 0.1 + 0.3 }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div className="flex items-center justify-between mb-6 pb-6 border-b border-border/50">
                   <div className="flex items-center gap-2">
                     <Ticket className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-mono">{giveaway.entries} Entries</span>
+                    <span className="text-sm font-mono">{(Math.min(giveaway.baseEntries / giveaway.maxEntries * 100, 100)).toFixed(0)}% sold</span>
                   </div>
                   <CountdownTimer daysToAdd={giveaway.daysLeft} />
                 </div>

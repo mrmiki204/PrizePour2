@@ -157,8 +157,27 @@ export function GiveawayDetail() {
                     <h2 className="text-3xl font-serif leading-tight">{giveaway.name}</h2>
                     <div className="flex justify-between items-center text-sm font-mono">
                       <span className="text-primary">{giveaway.value} Value</span>
-                      <span className="text-muted-foreground">{giveaway.baseEntries + selectedPackage.qty} Total Entries</span>
+                      <span className="text-muted-foreground">{(giveaway.baseEntries + selectedPackage.qty).toLocaleString()} / {giveaway.maxEntries.toLocaleString()}</span>
                     </div>
+                    {/* Capacity fill bar */}
+                    {(() => {
+                      const sold = giveaway.baseEntries + selectedPackage.qty;
+                      const pct = Math.min((sold / giveaway.maxEntries) * 100, 100);
+                      const remaining = giveaway.maxEntries - sold;
+                      return (
+                        <div className="mt-2">
+                          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <p className={`text-xs font-mono mt-1 ${remaining <= 80 ? 'text-red-400' : 'text-muted-foreground'}`}>
+                            {remaining > 0 ? `${remaining} tickets remaining` : 'SOLD OUT'}
+                          </p>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
