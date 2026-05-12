@@ -1,13 +1,13 @@
-import { GlassWater, Menu, User } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logoSrc from '@assets/WhatsApp_Image_2026-05-12_at_21.07.11_1778616565600.jpeg';
 
 export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <GlassWater className="w-8 h-8 text-primary" />
-          <span className="font-serif text-2xl font-bold tracking-widest text-primary">PRIZEPOUR</span>
+        <div className="flex items-center">
+          <img src={logoSrc} alt="PrizePour" className="h-14 w-auto object-contain" />
         </div>
         
         <div className="hidden md:flex items-center gap-8">

@@ -1,13 +1,13 @@
-import { GlassWater, Instagram, Twitter, Facebook } from 'lucide-react';
+import { Instagram, Twitter, Facebook } from 'lucide-react';
+import logoSrc from '@assets/WhatsApp_Image_2026-05-12_at_21.07.11_1778616565600.jpeg';
 
 export function Footer() {
   return (
     <footer className="bg-card border-t border-border py-16">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-2 space-y-6">
-          <div className="flex items-center gap-2">
-            <GlassWater className="w-8 h-8 text-primary" />
-            <span className="font-serif text-2xl font-bold tracking-widest text-primary">PRIZEPOUR</span>
+          <div className="flex items-center">
+            <img src={logoSrc} alt="PrizePour" className="h-16 w-auto object-contain" />
           </div>
           <p className="text-muted-foreground max-w-sm">
             Curating the finest, rarest, and most sought-after whiskies for those who appreciate the craft. An exclusive club for serious collectors.
