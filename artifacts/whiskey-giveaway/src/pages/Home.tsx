@@ -147,7 +147,7 @@ export function Home() {
           </div>
           <div className="text-center px-4">
             <p className="text-3xl md:text-4xl font-serif text-primary mb-2">
-              {liveRevenue > 0 ? `$${liveRevenue.toFixed(0)}` : '$2.1M'}
+              {liveRevenue > 0 ? `£${liveRevenue.toFixed(0)}` : '£2.1M'}
             </p>
             <p className="text-xs uppercase tracking-widest text-muted-foreground">
               {liveRevenue > 0 ? 'Revenue' : 'Prizes Awarded'}
@@ -162,7 +162,7 @@ export function Home() {
             </p>
           </div>
           <div className="text-center px-4">
-            <p className="text-3xl md:text-4xl font-serif text-primary mb-2">$4.99</p>
+            <p className="text-3xl md:text-4xl font-serif text-primary mb-2">£2.99</p>
             <p className="text-xs uppercase tracking-widest text-muted-foreground">Avg Entry</p>
           </div>
         </div>
@@ -363,7 +363,7 @@ export function Home() {
                 <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-sm border border-border rounded-sm p-4">
                   <p className="text-xs font-mono text-primary uppercase tracking-widest mb-1">Currently Live</p>
                   <p className="font-serif text-lg">6 Active Draws</p>
-                  <p className="text-xs text-muted-foreground mt-1">From $4.99 entry · Draw closes soon</p>
+                  <p className="text-xs text-muted-foreground mt-1">From £2.99 entry · Draw closes soon</p>
                 </div>
               </div>
             </div>

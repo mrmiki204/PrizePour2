@@ -39,7 +39,7 @@ router.post("/stripe/checkout", async (req, res) => {
     // Fallback: inline price (works before seed script is run)
     priceConfig = {
       price_data: {
-        currency: "usd",
+        currency: "gbp",
         unit_amount: amountCents,
         product_data: {
           name: `PrizePour — ${ticketQty} Ticket${ticketQty > 1 ? "s" : ""}`,

@@ -61,10 +61,10 @@ async function createProducts() {
     const price = await stripe.prices.create({
       product: product.id,
       unit_amount: pkg.priceCents,
-      currency: 'usd',
+      currency: 'gbp',
     });
 
-    console.log(`✓ Created: ${searchName} — $${(pkg.priceCents / 100).toFixed(2)} (price: ${price.id})`);
+    console.log(`✓ Created: ${searchName} — £${(pkg.priceCents / 100).toFixed(2)} (price: ${price.id})`);
   }
 
   console.log('\n✓ Done! Products are synced automatically via webhooks.');

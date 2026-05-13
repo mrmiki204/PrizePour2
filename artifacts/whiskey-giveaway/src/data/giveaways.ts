@@ -24,7 +24,7 @@ export const ACTIVE_GIVEAWAYS: Giveaway[] = [
   {
     id: 1,
     name: "Clonakilty 21 Year Old Single Malt",
-    value: "€220",
+    value: "£220",
     priceNumeric: 220,
     maxEntries: 62,     // ceil(220 * 1.4 / 4.99)
     baseEntries: 51,    // 82% sold — 6 days left
@@ -36,7 +36,7 @@ export const ACTIVE_GIVEAWAYS: Giveaway[] = [
   {
     id: 2,
     name: "Clonakilty Single Pot Still",
-    value: "€60",
+    value: "£60",
     priceNumeric: 59.95,
     maxEntries: 17,     // ceil(59.95 * 1.4 / 4.99)
     baseEntries: 14,    // 80% sold — 10 days left
@@ -48,7 +48,7 @@ export const ACTIVE_GIVEAWAYS: Giveaway[] = [
   {
     id: 3,
     name: "Clonakilty Cognac Cask Finish",
-    value: "€59",
+    value: "£59",
     priceNumeric: 59,
     maxEntries: 17,     // ceil(59 * 1.4 / 4.99)
     baseEntries: 13,    // 75% sold — 12 days left
@@ -60,7 +60,7 @@ export const ACTIVE_GIVEAWAYS: Giveaway[] = [
   {
     id: 4,
     name: "Clonakilty Double Oak",
-    value: "€50",
+    value: "£50",
     priceNumeric: 49.50,
     maxEntries: 14,     // ceil(49.50 * 1.4 / 4.99)
     baseEntries: 13,    // 93% sold — only 3 days left!
@@ -72,7 +72,7 @@ export const ACTIVE_GIVEAWAYS: Giveaway[] = [
   {
     id: 5,
     name: "Clonakilty Port Cask",
-    value: "€50",
+    value: "£50",
     priceNumeric: 49.50,
     maxEntries: 14,     // ceil(49.50 * 1.4 / 4.99)
     baseEntries: 11,    // 80% sold — 9 days left
@@ -84,7 +84,7 @@ export const ACTIVE_GIVEAWAYS: Giveaway[] = [
   {
     id: 6,
     name: "Clonakilty Galley Head Single Malt",
-    value: "€42",
+    value: "£42",
     priceNumeric: 41.95,
     maxEntries: 12,     // ceil(41.95 * 1.4 / 4.99)
     baseEntries: 8,     // 70% sold — 15 days left

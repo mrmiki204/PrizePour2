@@ -291,7 +291,7 @@ export function GiveawayDetail() {
                             {pkg.bonus ? <span className="ml-2 text-xs font-mono text-green-400 bg-green-400/10 border border-green-400/20 px-1.5 py-0.5 rounded-sm">+{pkg.bonus} FREE</span> : null}
                           </span>
                         </div>
-                        <span className="font-mono text-primary">${pkg.price}</span>
+                        <span className="font-mono text-primary">£{pkg.price}</span>
                       </button>
                     ))}
                   </div>
@@ -465,12 +465,12 @@ export function GiveawayDetail() {
                         {selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}
                         {selectedPackage.bonus ? <span className="ml-1.5 text-xs text-green-400">+{selectedPackage.bonus} free</span> : null}
                       </span>
-                      <span className="font-mono text-foreground">${selectedPackage.price}</span>
+                      <span className="font-mono text-foreground">£{selectedPackage.price}</span>
                     </div>
                     <div className="h-px bg-border/50" />
                     <div className="flex justify-between font-serif text-lg text-primary">
                       <span>Total</span>
-                      <span>${selectedPackage.price}</span>
+                      <span>£{selectedPackage.price}</span>
                     </div>
                   </div>
 
@@ -489,7 +489,7 @@ export function GiveawayDetail() {
                     {isRedirecting ? (
                       <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Redirecting to Stripe...</>
                     ) : (
-                      <><CreditCard className="w-5 h-5 mr-2" /> Pay ${selectedPackage.price} with Stripe</>
+                      <><CreditCard className="w-5 h-5 mr-2" /> Pay £{selectedPackage.price} with Stripe</>
                     )}
                   </Button>
 
