@@ -85,8 +85,17 @@ export function DrawPage() {
                 <h1 className="text-5xl md:text-7xl font-serif">{giveaway.name}</h1>
               </div>
 
-              <div className="w-48 h-48 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
-                {giveaway.image ? (
+              <div className="w-56 h-40 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
+                {giveaway.bottles && giveaway.bottles.length > 0 ? (
+                  <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
+                    {giveaway.bottles.map((bottle, i) => (
+                      <div key={i} className="relative overflow-hidden bg-black">
+                        <img src={bottle.image} alt={bottle.name} className="w-full h-full object-cover opacity-80" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                      </div>
+                    ))}
+                  </div>
+                ) : giveaway.image ? (
                   <img src={giveaway.image} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
@@ -206,7 +215,7 @@ export function DrawPage() {
                     <p className="text-6xl md:text-8xl font-mono text-primary font-bold">{winningTicket}</p>
                     <div className="h-px w-24 bg-border mx-auto my-8" />
                     <p className="text-3xl font-serif">Sarah M. from Austin, TX</p>
-                    <p className="text-muted-foreground">Winner of the {giveaway.name}</p>
+                    <p className="text-muted-foreground">Winner of the {giveaway.name} — all 6 bottles</p>
                   </div>
                 </div>
 
