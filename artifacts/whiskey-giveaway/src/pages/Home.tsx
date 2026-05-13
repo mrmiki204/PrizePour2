@@ -6,7 +6,6 @@ import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
-import clonakiltyImg from '@/assets/images/clonakilty32.jpg';
 import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
 import { useListEntries } from '@workspace/api-client-react';
 
@@ -105,16 +104,22 @@ export function Home() {
             <div className="absolute -inset-4 bg-primary/20 blur-3xl rounded-full" />
             <div className="relative bg-card border border-border p-6 rounded-sm shadow-2xl">
               <div className="aspect-[3/4] relative mb-6 overflow-hidden rounded-sm group">
-                <img src={clonakiltyImg} alt="Clonakilty 32 Year Old" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                {ACTIVE_GIVEAWAYS[0].image ? (
+                  <img src={ACTIVE_GIVEAWAYS[0].image} alt={ACTIVE_GIVEAWAYS[0].name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
+                    <Package className="w-24 h-24 text-primary/40" />
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                 <div className="absolute top-4 left-4">
-                  <span className="bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded-sm">Irish Single Malt · Bottle No. 84 of 84</span>
+                  <span className="bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded-sm">Irish Single Malt · West Cork Distillery</span>
                 </div>
                 <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-2xl font-serif text-white mb-2">Clonakilty 32 Year Old</h3>
+                  <h3 className="text-2xl font-serif text-white mb-2">{ACTIVE_GIVEAWAYS[0].name}</h3>
                   <div className="flex justify-between items-end">
-                    <p className="text-primary font-mono">€3,800 Value</p>
-                    <p className="text-sm text-gray-400 font-mono">612 Entries</p>
+                    <p className="text-primary font-mono">{ACTIVE_GIVEAWAYS[0].value} Value</p>
+                    <p className="text-sm text-gray-400 font-mono">{ACTIVE_GIVEAWAYS[0].entries} Entries</p>
                   </div>
                 </div>
               </div>
