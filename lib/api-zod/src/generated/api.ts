@@ -72,3 +72,117 @@ export const ListEntriesByGiveawayResponseItem = zod.object({
 export const ListEntriesByGiveawayResponse = zod.array(
   ListEntriesByGiveawayResponseItem,
 );
+
+/**
+ * @summary List all active giveaways
+ */
+export const ListGiveawaysQueryParams = zod.object({
+  all: zod.coerce
+    .boolean()
+    .optional()
+    .describe("If true, include inactive giveaways (admin use)"),
+});
+
+export const ListGiveawaysResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string(),
+  prizeValue: zod.string(),
+  prizeValueNumeric: zod.string(),
+  maxEntries: zod.number(),
+  drawDate: zod.coerce.date(),
+  imageUrl: zod.string().nullish(),
+  isActive: zod.boolean(),
+  entryCount: zod.number(),
+  createdAt: zod.coerce.date(),
+});
+export const ListGiveawaysResponse = zod.array(ListGiveawaysResponseItem);
+
+/**
+ * @summary Create a new giveaway draw
+ */
+
+export const CreateGiveawayBody = zod.object({
+  name: zod.string().min(1),
+  description: zod.string().min(1),
+  prizeValue: zod.string().min(1),
+  prizeValueNumeric: zod.number(),
+  maxEntries: zod.number().min(1),
+  drawDate: zod.coerce.date(),
+  imageUrl: zod.string().nullish(),
+  isActive: zod.boolean().optional(),
+});
+
+/**
+ * @summary Get a single giveaway by ID
+ */
+export const GetGiveawayParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetGiveawayResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string(),
+  prizeValue: zod.string(),
+  prizeValueNumeric: zod.string(),
+  maxEntries: zod.number(),
+  drawDate: zod.coerce.date(),
+  imageUrl: zod.string().nullish(),
+  isActive: zod.boolean(),
+  entryCount: zod.number(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Update a giveaway draw
+ */
+export const UpdateGiveawayParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateGiveawayBody = zod.object({
+  name: zod.string().min(1).optional(),
+  description: zod.string().min(1).optional(),
+  prizeValue: zod.string().min(1).optional(),
+  prizeValueNumeric: zod.number().optional(),
+  maxEntries: zod.number().min(1).optional(),
+  drawDate: zod.coerce.date().optional(),
+  imageUrl: zod.string().nullish(),
+  isActive: zod.boolean().optional(),
+});
+
+export const UpdateGiveawayResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string(),
+  prizeValue: zod.string(),
+  prizeValueNumeric: zod.string(),
+  maxEntries: zod.number(),
+  drawDate: zod.coerce.date(),
+  imageUrl: zod.string().nullish(),
+  isActive: zod.boolean(),
+  entryCount: zod.number(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Disable a giveaway draw
+ */
+export const DeleteGiveawayParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteGiveawayResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string(),
+  prizeValue: zod.string(),
+  prizeValueNumeric: zod.string(),
+  maxEntries: zod.number(),
+  drawDate: zod.coerce.date(),
+  imageUrl: zod.string().nullish(),
+  isActive: zod.boolean(),
+  entryCount: zod.number(),
+  createdAt: zod.coerce.date(),
+});

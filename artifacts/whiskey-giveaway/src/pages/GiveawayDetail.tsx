@@ -8,11 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Ticket, Trophy, CreditCard, CheckCircle2, Loader2, ArrowLeft, ArrowRight, HelpCircle, XCircle, Share2, Copy, Check, Gift } from 'lucide-react';
+import { Ticket, CreditCard, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
-import { useCreateEntry } from '@workspace/api-client-react';
+import { useGetGiveaway } from '@workspace/api-client-react';
+import { getGiveawayImage, daysUntil } from '@/data/giveaways';
 
 const TICKET_PACKAGES = [
   { id: 1, qty: 1,  price: 2.99,  badge: null },
@@ -25,9 +24,7 @@ export function GiveawayDetail() {
   const [, params] = useRoute("/giveaway/:id");
   const [, setLocation] = useLocation();
   const giveawayId = params?.id ? parseInt(params.id) : 1;
-  const giveaway = ACTIVE_GIVEAWAYS.find(g => g.id === giveawayId) || ACTIVE_GIVEAWAYS[0];
-
-  const createEntry = useCreateEntry();
+  const { data: giveaway, isLoading } = useGetGiveaway(giveawayId);
 
   const [step, setStep] = useState(1);
   const [selectedPackage, setSelectedPackage] = useState(TICKET_PACKAGES[0]);
@@ -36,15 +33,12 @@ export function GiveawayDetail() {
   const [referralLink, setReferralLink] = useState('');
   const [referralCopied, setReferralCopied] = useState(false);
 
-  // Detect incoming referral param
   const referredBy = new URLSearchParams(window.location.search).get('ref');
 
-  // Skill-testing question
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizSelected, setQuizSelected] = useState('');
   const [quizError, setQuizError] = useState(false);
   
-  // Form Details
   const [details, setDetails] = useState({
     firstName: '',
     lastName: '',
@@ -73,7 +67,6 @@ export function GiveawayDetail() {
     }
   };
 
-  // On mount: if ?session_id= present, verify payment and jump to confirmation
   useEffect(() => {
     const sessionId = new URLSearchParams(window.location.search).get('session_id');
     if (!sessionId) return;
@@ -88,7 +81,7 @@ export function GiveawayDetail() {
           return;
         }
         const tickets = data.ticketNumbers;
-        localStorage.setItem(`giveaway_${giveaway.id}_tickets`, JSON.stringify(tickets));
+        localStorage.setItem(`giveaway_${giveawayId}_tickets`, JSON.stringify(tickets));
         setAssignedTickets(tickets);
         if (data.entry) {
           setDetails(d => ({
@@ -98,11 +91,10 @@ export function GiveawayDetail() {
             email: data.entry!.email,
           }));
         }
-        const code = `${(data.entry?.firstName ?? 'friend').toLowerCase().replace(/[^a-z]/g, '')}-${giveaway.id}-${tickets[0].replace('#', '')}`;
-        setReferralLink(`${window.location.origin}/giveaway/${giveaway.id}?ref=${code}`);
+        const code = `${(data.entry?.firstName ?? 'friend').toLowerCase().replace(/[^a-z]/g, '')}-${giveawayId}-${tickets[0].replace('#', '')}`;
+        setReferralLink(`${window.location.origin}/giveaway/${giveawayId}?ref=${code}`);
         setIsProcessing(false);
-        // Strip query params and jump to step 4
-        window.history.replaceState({}, '', `/giveaway/${giveaway.id}`);
+        window.history.replaceState({}, '', `/giveaway/${giveawayId}`);
         setStep(4);
       })
       .catch(() => {
@@ -113,6 +105,7 @@ export function GiveawayDetail() {
   }, []);
 
   const initiateStripeCheckout = async () => {
+    if (!giveaway) return;
     setIsRedirecting(true);
     try {
       const resp = await fetch('/api/stripe/checkout', {
@@ -123,7 +116,7 @@ export function GiveawayDetail() {
           firstName: details.firstName,
           lastName: details.lastName,
           email: details.email,
-          ticketQty: selectedPackage.qty + (selectedPackage.bonus ?? 0),
+          ticketQty: selectedPackage.qty,
           amountCents: Math.round(selectedPackage.price * 100),
           referralCode: referredBy ?? undefined,
         }),
@@ -148,6 +141,30 @@ export function GiveawayDetail() {
     details.email === details.confirmEmail &&
     details.ageVerified && 
     details.termsAccepted;
+
+  if (isLoading || !giveaway) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isProcessing) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground font-mono text-sm">Verifying your payment…</p>
+        </div>
+      </div>
+    );
+  }
+
+  const img = getGiveawayImage(giveaway.id, giveaway.imageUrl);
+  const entryCount = giveaway.entryCount;
+  const pct = Math.min((entryCount / giveaway.maxEntries) * 100, 100);
+  const remaining = giveaway.maxEntries - entryCount;
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -189,7 +206,6 @@ export function GiveawayDetail() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8"
             >
-              {/* Referral welcome banner */}
               {referredBy && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
@@ -218,20 +234,8 @@ export function GiveawayDetail() {
 
               <div className="grid md:grid-cols-2 gap-8 bg-card border border-border p-6 rounded-sm shadow-xl">
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
-                  {giveaway.bottles && giveaway.bottles.length > 0 ? (
-                    <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
-                      {giveaway.bottles.map((bottle, i) => (
-                        <div key={i} className="relative overflow-hidden bg-black">
-                          <img src={bottle.image} alt={bottle.name} className="w-full h-full object-cover opacity-80 mix-blend-screen" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                          <div className="absolute bottom-1 left-1 right-1">
-                            <p className="text-[8px] font-mono text-primary leading-tight truncate">{bottle.value}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : giveaway.image ? (
-                    <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
+                  {img ? (
+                    <img src={img} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
                       <svg viewBox="0 0 80 160" className="w-16 h-32 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
@@ -246,35 +250,27 @@ export function GiveawayDetail() {
                   <div className="absolute bottom-6 left-6 right-6 space-y-4">
                     <h2 className="text-3xl font-serif leading-tight">{giveaway.name}</h2>
                     <div className="flex justify-between items-center text-sm font-mono">
-                      <span className="text-primary">{giveaway.value} Value</span>
-                      <span className="text-muted-foreground">{(giveaway.baseEntries + selectedPackage.qty).toLocaleString()} / {giveaway.maxEntries.toLocaleString()}</span>
+                      <span className="text-primary">{giveaway.prizeValue} Value</span>
+                      <span className="text-muted-foreground">{(entryCount + selectedPackage.qty).toLocaleString()} / {giveaway.maxEntries.toLocaleString()}</span>
                     </div>
-                    {/* Capacity fill bar */}
-                    {(() => {
-                      const sold = giveaway.baseEntries + selectedPackage.qty;
-                      const pct = Math.min((sold / giveaway.maxEntries) * 100, 100);
-                      const remaining = giveaway.maxEntries - sold;
-                      return (
-                        <div className="mt-2">
-                          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all duration-500 ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                          <p className={`text-xs font-mono mt-1 ${remaining <= 80 ? 'text-red-400' : 'text-muted-foreground'}`}>
-                            {remaining > 0 ? `${remaining} tickets remaining` : 'SOLD OUT'}
-                          </p>
-                        </div>
-                      );
-                    })()}
+                    <div className="mt-2">
+                      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
+                          style={{ width: `${Math.min(((entryCount + selectedPackage.qty) / giveaway.maxEntries) * 100, 100)}%` }}
+                        />
+                      </div>
+                      <p className={`text-xs font-mono mt-1 ${remaining <= 5 ? 'text-red-400' : 'text-muted-foreground'}`}>
+                        {remaining > 0 ? `${remaining} tickets remaining` : 'SOLD OUT'}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 <div className="space-y-6 flex flex-col">
                   <div>
                     <h3 className="text-xl font-serif mb-2">Draw Ends In:</h3>
-                    <CountdownTimer daysToAdd={giveaway.daysLeft} />
+                    <CountdownTimer daysToAdd={daysUntil(giveaway.drawDate)} />
                   </div>
                   
                   <div className="h-px w-full bg-border/50 my-2" />
@@ -300,7 +296,6 @@ export function GiveawayDetail() {
                           <Ticket className={`w-5 h-5 ${selectedPackage.id === pkg.id ? 'text-primary' : 'text-muted-foreground'}`} />
                           <span className="font-serif text-lg">
                             {pkg.qty} {pkg.qty === 1 ? 'Ticket' : 'Tickets'}
-                            {pkg.bonus ? <span className="ml-2 text-xs font-mono text-green-400 bg-green-400/10 border border-green-400/20 px-1.5 py-0.5 rounded-sm">+{pkg.bonus} FREE</span> : null}
                           </span>
                         </div>
                         <span className="font-mono text-primary">£{pkg.price}</span>
@@ -309,7 +304,7 @@ export function GiveawayDetail() {
                   </div>
 
                   <div className="bg-secondary/30 p-4 border border-secondary text-sm text-center text-muted-foreground mt-auto rounded-sm">
-                    {(() => { const total = selectedPackage.qty + (selectedPackage.bonus ?? 0); return `Selecting ${total} ticket${total !== 1 ? 's' : ''} improves your odds to ${(total / (giveaway.baseEntries + total) * 100).toFixed(2)}%`; })()}
+                    {`Selecting ${selectedPackage.qty} ticket${selectedPackage.qty !== 1 ? 's' : ''} — odds: ${(selectedPackage.qty / (entryCount + selectedPackage.qty) * 100).toFixed(2)}%`}
                   </div>
 
                   <Button 
@@ -321,7 +316,6 @@ export function GiveawayDetail() {
                 </div>
               </div>
 
-              {/* Refer & Earn teaser */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -337,12 +331,12 @@ export function GiveawayDetail() {
                     { icon: '🎟️', title: 'Enter the draw', desc: 'Purchase any ticket package to enter.' },
                     { icon: '🔗', title: 'Get your link', desc: 'Receive a personal referral link on confirmation.' },
                     { icon: '📣', title: 'Share & grow', desc: 'Share with friends — every referral helps grow the community.' },
-                  ].map((step) => (
-                    <div key={step.title} className="flex gap-3">
-                      <span className="text-xl mt-0.5">{step.icon}</span>
+                  ].map((s) => (
+                    <div key={s.title} className="flex gap-3">
+                      <span className="text-xl mt-0.5">{s.icon}</span>
                       <div>
-                        <p className="text-sm font-serif text-foreground">{step.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{step.desc}</p>
+                        <p className="text-sm font-serif text-foreground">{s.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{s.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -369,63 +363,35 @@ export function GiveawayDetail() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>First Name</Label>
-                    <Input 
-                      value={details.firstName} 
-                      onChange={e => setDetails({...details, firstName: e.target.value})} 
-                      placeholder="James" 
-                    />
+                    <Input value={details.firstName} onChange={e => setDetails({...details, firstName: e.target.value})} placeholder="James" />
                   </div>
                   <div className="space-y-2">
                     <Label>Last Name</Label>
-                    <Input 
-                      value={details.lastName} 
-                      onChange={e => setDetails({...details, lastName: e.target.value})} 
-                      placeholder="Bond" 
-                    />
+                    <Input value={details.lastName} onChange={e => setDetails({...details, lastName: e.target.value})} placeholder="Bond" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Email Address</Label>
-                  <Input 
-                    type="email"
-                    value={details.email} 
-                    onChange={e => setDetails({...details, email: e.target.value})} 
-                    placeholder="james@example.com" 
-                  />
+                  <Input type="email" value={details.email} onChange={e => setDetails({...details, email: e.target.value})} placeholder="james@example.com" />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Confirm Email</Label>
-                  <Input 
-                    type="email"
-                    value={details.confirmEmail} 
-                    onChange={e => setDetails({...details, confirmEmail: e.target.value})} 
-                    placeholder="james@example.com" 
-                  />
+                  <Input type="email" value={details.confirmEmail} onChange={e => setDetails({...details, confirmEmail: e.target.value})} placeholder="james@example.com" />
                 </div>
 
                 <div className="pt-4 space-y-4 border-t border-border/50">
                   <div className="flex items-start space-x-3">
-                    <Checkbox 
-                      id="age" 
-                      checked={details.ageVerified} 
-                      onCheckedChange={(c) => setDetails({...details, ageVerified: !!c})} 
-                      className="mt-1"
-                    />
+                    <Checkbox id="age" checked={details.ageVerified} onCheckedChange={(c) => setDetails({...details, ageVerified: !!c})} className="mt-1" />
                     <Label htmlFor="age" className="text-sm font-normal leading-tight text-muted-foreground">
                       I confirm I am 18 years of age or older and legally permitted to purchase alcohol in my jurisdiction.
                     </Label>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <Checkbox 
-                      id="terms" 
-                      checked={details.termsAccepted} 
-                      onCheckedChange={(c) => setDetails({...details, termsAccepted: !!c})} 
-                      className="mt-1"
-                    />
+                    <Checkbox id="terms" checked={details.termsAccepted} onCheckedChange={(c) => setDetails({...details, termsAccepted: !!c})} className="mt-1" />
                     <Label htmlFor="terms" className="text-sm font-normal leading-tight text-muted-foreground">
-                      I agree to the PrizePour Terms & Conditions and Privacy Policy.
+                      I agree to the PrizePour Terms &amp; Conditions and Privacy Policy.
                     </Label>
                   </div>
                 </div>
@@ -473,10 +439,7 @@ export function GiveawayDetail() {
                       <span className="text-muted-foreground">{giveaway.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        {selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}
-                        {selectedPackage.bonus ? <span className="ml-1.5 text-xs text-green-400">+{selectedPackage.bonus} free</span> : null}
-                      </span>
+                      <span className="text-muted-foreground">{selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}</span>
                       <span className="font-mono text-foreground">£{selectedPackage.price}</span>
                     </div>
                     <div className="h-px bg-border/50" />
@@ -506,260 +469,94 @@ export function GiveawayDetail() {
                   </Button>
 
                   <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
-                    Secured by Stripe · SSL encrypted
+                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                    Secured by Stripe · 256-bit SSL
                   </div>
                 </div>
-
-                <Button variant="ghost" onClick={() => setStep(2)}>← Back</Button>
               </div>
 
               <div className="md:col-span-2 space-y-6">
-                <div className="bg-secondary/20 border border-secondary p-6 rounded-sm sticky top-28 space-y-5">
-                  <h3 className="font-serif text-xl">Your Entry</h3>
-                  <div className="aspect-video relative bg-black/50 rounded-sm overflow-hidden">
-                    {giveaway.bottles && giveaway.bottles.length > 0 ? (
-                      <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
-                        {giveaway.bottles.map((bottle, i) => (
-                          <div key={i} className="relative overflow-hidden bg-black">
-                            <img src={bottle.image} alt={bottle.name} className="w-full h-full object-cover opacity-75 mix-blend-screen" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                          </div>
-                        ))}
-                      </div>
-                    ) : giveaway.image ? (
-                      <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
+                <div className="bg-card border border-border rounded-sm p-6 space-y-4">
+                  <h3 className="font-serif text-lg border-b border-border/50 pb-3">Order Summary</h3>
+                  <div className="aspect-[4/3] relative overflow-hidden rounded-sm">
+                    {img ? (
+                      <img src={img} alt={giveaway.name} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
-                        <svg viewBox="0 0 80 160" className="w-10 h-20 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
-                          <rect x="28" y="0" width="24" height="20" rx="4" />
-                          <rect x="20" y="18" width="40" height="8" rx="2" />
-                          <rect x="16" y="24" width="48" height="110" rx="6" />
-                          <rect x="20" y="134" width="40" height="26" rx="4" />
-                        </svg>
-                      </div>
+                      <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950" />
                     )}
                   </div>
-                  <div>
-                    <p className="font-serif text-lg">{giveaway.name}</p>
-                    <p className="text-primary text-sm font-mono mt-1">{giveaway.value} prize</p>
-                  </div>
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <div className="flex justify-between">
-                      <span>Tickets</span>
-                      <span className="text-foreground">
-                        {selectedPackage.qty + (selectedPackage.bonus ?? 0)}×
-                        {selectedPackage.bonus ? <span className="ml-1 text-green-400 text-xs">(incl. {selectedPackage.bonus} free)</span> : null}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Draw closes</span>
-                      <span className="text-foreground">{giveaway.daysLeft} days</span>
-                    </div>
+                  <p className="font-serif">{giveaway.name}</p>
+                  <div className="text-xs font-mono space-y-1 text-muted-foreground">
+                    <div className="flex justify-between"><span>Prize Value</span><span>{giveaway.prizeValue}</span></div>
+                    <div className="flex justify-between"><span>Max Entries</span><span>{giveaway.maxEntries}</span></div>
+                    <div className="flex justify-between"><span>Your Tickets</span><span>{selectedPackage.qty}</span></div>
                   </div>
                 </div>
+                <Button variant="ghost" className="w-full" onClick={() => setStep(2)}>← Back</Button>
               </div>
             </motion.div>
           )}
 
           {/* STEP 4: CONFIRMATION */}
           {step === 4 && (
-            <motion.div 
+            <motion.div
               key="step4"
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="max-w-2xl mx-auto text-center space-y-10 py-12"
+              className="max-w-2xl mx-auto text-center space-y-8"
             >
-              <motion.div 
-                className="relative w-32 h-32 mx-auto"
-                initial={{ rotate: -180, scale: 0 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
+                className="w-20 h-20 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center mx-auto"
               >
-                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
-                <div className="relative w-full h-full bg-gradient-to-br from-primary to-amber-600 rounded-full flex items-center justify-center shadow-2xl border-4 border-background">
-                  <Trophy className="w-16 h-16 text-primary-foreground" />
-                </div>
+                <CheckCircle2 className="w-10 h-10 text-primary" />
               </motion.div>
 
-              <div className="space-y-4">
-                <h1 className="text-5xl font-serif text-primary">Entry Confirmed!</h1>
-                <p className="text-xl text-muted-foreground">You're officially in the running for the {giveaway.name}.</p>
+              <div>
+                <h2 className="text-4xl font-serif text-primary mb-3">You're In!</h2>
+                <p className="text-muted-foreground">Your entry for <span className="text-foreground font-serif">{giveaway.name}</span> has been confirmed.</p>
               </div>
 
-              <div className="bg-card border border-border p-8 rounded-sm text-left shadow-lg">
-                <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border">
-                  <CheckCircle2 className="w-6 h-6 text-primary" />
-                  <h3 className="text-lg font-serif">Your Official Ticket Numbers</h3>
+              {assignedTickets.length > 0 && (
+                <div className="bg-card border border-border rounded-sm p-6 space-y-4">
+                  <p className="text-sm font-mono uppercase tracking-widest text-muted-foreground">Your Ticket Numbers</p>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {assignedTickets.map(t => (
+                      <span key={t} className="bg-primary/10 border border-primary/30 text-primary font-mono text-lg px-4 py-2 rounded-sm">{t}</span>
+                    ))}
+                  </div>
                 </div>
-                
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {assignedTickets.map((ticket, i) => (
-                    <motion.div 
-                      key={i}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 + (i * 0.1) }}
-                      className="bg-secondary/30 border border-secondary p-3 rounded-sm text-center font-mono text-primary text-lg"
+              )}
+
+              {referralLink && (
+                <div className="bg-card border border-border rounded-sm p-6 space-y-3 text-left">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Share2 className="w-4 h-4 text-primary" />
+                    <p className="font-serif text-base">Your Referral Link</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Share this link — when a friend enters, you'll both benefit.</p>
+                  <div className="flex gap-2">
+                    <Input value={referralLink} readOnly className="font-mono text-xs bg-secondary/30 border-border" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="shrink-0 gap-2"
+                      onClick={() => { navigator.clipboard.writeText(referralLink); setReferralCopied(true); setTimeout(() => setReferralCopied(false), 2000); }}
                     >
-                      {ticket}
-                    </motion.div>
-                  ))}
+                      {referralCopied ? <><Check className="w-3.5 h-3.5 text-green-400" /> Copied</> : <><Copy className="w-3.5 h-3.5" /> Copy</>}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-
-              {/* Refer & Earn card */}
-              {referralLink && (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                  className="bg-gradient-to-br from-card via-card to-primary/5 border border-primary/30 rounded-sm text-left shadow-xl overflow-hidden"
-                >
-                  {/* Header */}
-                  <div className="bg-primary/10 border-b border-primary/20 px-8 py-5 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
-                      <Share2 className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-serif text-2xl text-primary">Refer &amp; Earn</h3>
-                      <p className="text-sm text-muted-foreground mt-0.5">You're now part of the PrizePour community. Help it grow.</p>
-                    </div>
-                  </div>
-
-                  <div className="p-8 space-y-6">
-                    {/* How it works */}
-                    <div className="grid sm:grid-cols-3 gap-4">
-                      {[
-                        { n: '1', title: 'Copy your link', desc: 'Every entrant gets a unique personal link.' },
-                        { n: '2', title: 'Share it', desc: 'Send it to friends via any platform below.' },
-                        { n: '3', title: 'Build the pool', desc: 'More entrants means bigger, better future draws.' },
-                      ].map(s => (
-                        <div key={s.n} className="flex gap-3 items-start">
-                          <span className="w-6 h-6 rounded-full bg-primary/20 border border-primary/40 text-primary text-xs font-mono flex items-center justify-center shrink-0 mt-0.5">{s.n}</span>
-                          <div>
-                            <p className="text-sm font-serif text-foreground">{s.title}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">{s.desc}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Link row */}
-                    <div className="space-y-2">
-                      <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">Your referral link</p>
-                      <div className="flex gap-2">
-                        <div className="flex-1 bg-background border border-border rounded-sm px-4 py-3 font-mono text-xs text-primary truncate select-all">
-                          {referralLink}
-                        </div>
-                        <Button
-                          variant="outline"
-                          className="shrink-0 border-primary/40 hover:border-primary h-auto px-5"
-                          onClick={() => {
-                            navigator.clipboard.writeText(referralLink);
-                            setReferralCopied(true);
-                            setTimeout(() => setReferralCopied(false), 2500);
-                          }}
-                        >
-                          {referralCopied ? (
-                            <><Check className="w-4 h-4 text-green-400 mr-2" /><span className="text-green-400 font-mono text-xs uppercase tracking-widest">Copied!</span></>
-                          ) : (
-                            <><Copy className="w-4 h-4 mr-2" /><span className="font-mono text-xs uppercase tracking-widest">Copy Link</span></>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Share buttons */}
-                    <div className="space-y-2">
-                      <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">Share on</p>
-                      <div className="flex flex-wrap gap-3">
-                        <Button
-                          size="sm"
-                          className="bg-[#1877f2] hover:bg-[#1877f2]/90 text-white font-mono text-xs uppercase tracking-widest h-10 px-5 gap-2"
-                          onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`, '_blank')}
-                        >
-                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                          Facebook
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="bg-black hover:bg-black/80 text-white font-mono text-xs uppercase tracking-widest h-10 px-5 gap-2"
-                          onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`I just entered the ${giveaway.name} giveaway on PrizePour — join me!`)}&url=${encodeURIComponent(referralLink)}`, '_blank')}
-                        >
-                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                          X / Twitter
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="bg-[#25d366] hover:bg-[#25d366]/90 text-white font-mono text-xs uppercase tracking-widest h-10 px-5 gap-2"
-                          onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`I just entered the ${giveaway.name} giveaway on PrizePour — join me! ${referralLink}`)}`, '_blank')}
-                        >
-                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                          WhatsApp
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-border font-mono text-xs uppercase tracking-widest h-10 px-5 gap-2"
-                          onClick={() => {
-                            const subject = encodeURIComponent(`Join me in the ${giveaway.name} giveaway`);
-                            const body = encodeURIComponent(`Hey!\n\nI just entered the ${giveaway.name} giveaway on PrizePour and thought you might want in too.\n\nUse my link to enter: ${referralLink}\n\nGood luck!`);
-                            window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-                          }}
-                        >
-                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                          Email
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
               )}
 
-              {/* Rewards CTA */}
-              {referralLink && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.0 }}
-                  className="bg-card border border-border rounded-sm px-6 py-4 flex items-center justify-between gap-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <Gift className="w-5 h-5 text-primary shrink-0" />
-                    <div>
-                      <p className="text-sm font-serif">Check your referral rewards</p>
-                      <p className="text-xs text-muted-foreground font-mono mt-0.5">See if anyone has used your link — and claim free tickets.</p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="shrink-0 border-primary/40 hover:border-primary font-mono text-xs uppercase tracking-widest h-9 px-4 gap-2"
-                    onClick={() => {
-                      const code = referralLink.split('?ref=')[1];
-                      setLocation(`/my-referrals?code=${code}`);
-                    }}
-                  >
-                    My Rewards <ArrowRight className="w-3 h-3" />
-                  </Button>
-                </motion.div>
-              )}
-
-              <div className="flex flex-col sm:flex-row justify-center gap-6 pt-8">
-                <Button 
-                  size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base h-14 px-8"
-                  onClick={() => setLocation(`/draw/${giveaway.id}`)}
-                >
-                  Watch the Live Draw
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest" onClick={() => setLocation('/draw/' + giveaway.id)}>
+                  Watch the Draw
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-border uppercase tracking-widest text-base h-14 px-8"
-                  onClick={() => setLocation('/')}
-                >
-                  Enter Another Giveaway
+                <Button variant="outline" onClick={() => setLocation('/')}>
+                  Browse More Draws
                 </Button>
               </div>
             </motion.div>
@@ -767,73 +564,48 @@ export function GiveawayDetail() {
         </AnimatePresence>
       </div>
 
-      <Footer />
-
-      {/* Skill-Testing Question Modal */}
-      <Dialog open={showQuiz} onOpenChange={(open) => { if (!open) { setShowQuiz(false); setQuizError(false); setQuizSelected(''); } }}>
-        <DialogContent className="sm:max-w-md bg-card border border-border text-foreground">
-          <DialogHeader className="space-y-3">
-            <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
-              <HelpCircle className="w-7 h-7 text-primary" />
-            </div>
-            <DialogTitle className="text-2xl font-serif text-center">Skill-Testing Question</DialogTitle>
-            <DialogDescription className="text-center text-muted-foreground">
-              No purchase necessary. Answer the following question correctly to qualify for entry.
+      {/* Skill-testing question dialog */}
+      <Dialog open={showQuiz} onOpenChange={setShowQuiz}>
+        <DialogContent className="bg-card border border-border max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">Skill-Testing Question</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm">
+              As required by contest law, please answer this question correctly to proceed.
             </DialogDescription>
           </DialogHeader>
-
-          <div className="pt-4 space-y-6">
-            <div className="bg-background/60 border border-border/60 rounded-sm p-5 text-center">
-              <p className="font-serif text-lg text-foreground leading-relaxed">
-                "What country is Scotch whisky made in?"
-              </p>
-            </div>
-
+          <div className="space-y-4 pt-2">
+            <p className="font-serif text-base">Scotch whisky must be aged for a minimum of how many years?</p>
             <div className="space-y-2">
-              <Label className="text-foreground/80 text-sm uppercase tracking-widest font-mono">Select Your Answer</Label>
-              <Select
-                value={quizSelected}
-                onValueChange={(val) => { setQuizSelected(val); setQuizError(false); }}
-              >
-                <SelectTrigger
-                  data-testid="select-quiz-answer"
-                  className={`w-full h-12 bg-background border-border text-foreground text-base ${quizError ? 'border-red-500' : ''}`}
+              {[
+                { val: 'one', label: '1 year' },
+                { val: 'three', label: '3 years' },
+                { val: 'scotland', label: '5 years' },
+                { val: 'ten', label: '10 years' },
+              ].map(opt => (
+                <button
+                  key={opt.val}
+                  onClick={() => setQuizSelected(opt.val)}
+                  className={`w-full text-left px-4 py-3 border rounded-sm transition-colors font-mono text-sm ${
+                    quizSelected === opt.val ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50'
+                  }`}
                 >
-                  <SelectValue placeholder="Choose an answer..." />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border text-foreground">
-                  <SelectItem value="ireland" className="text-base py-3 cursor-pointer hover:bg-primary/10">Ireland</SelectItem>
-                  <SelectItem value="scotland" className="text-base py-3 cursor-pointer hover:bg-primary/10">Scotland</SelectItem>
-                  <SelectItem value="usa" className="text-base py-3 cursor-pointer hover:bg-primary/10">United States</SelectItem>
-                  <SelectItem value="japan" className="text-base py-3 cursor-pointer hover:bg-primary/10">Japan</SelectItem>
-                </SelectContent>
-              </Select>
-              {quizError && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 text-red-400 text-sm font-mono pt-1"
-                >
-                  <XCircle className="w-4 h-4 flex-shrink-0" />
-                  Incorrect answer. Please try again.
-                </motion.div>
-              )}
+                  {opt.label}
+                </button>
+              ))}
             </div>
-
+            {quizError && <p className="text-red-400 text-xs font-mono">Incorrect — please try again.</p>}
             <Button
-              data-testid="button-submit-quiz"
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-widest"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest"
               onClick={submitQuiz}
+              disabled={!quizSelected}
             >
               Submit Answer
             </Button>
-
-            <p className="text-center text-xs text-muted-foreground font-mono">
-              This question is required by law as an alternative means of entry.
-            </p>
           </div>
         </DialogContent>
       </Dialog>
+
+      <Footer />
     </div>
   );
 }

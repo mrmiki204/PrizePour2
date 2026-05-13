@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: entries
     description: Giveaway entry operations
+  - name: giveaways
+    description: Giveaway draw management
 paths:
   /healthz:
     get:
@@ -86,6 +88,128 @@ paths:
                 items:
                   $ref: "#/components/schemas/Entry"
 
+  /giveaways:
+    get:
+      operationId: listGiveaways
+      tags: [giveaways]
+      summary: List all active giveaways
+      parameters:
+        - name: all
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: If true, include inactive giveaways (admin use)
+      responses:
+        "200":
+          description: List of giveaways
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Giveaway"
+    post:
+      operationId: createGiveaway
+      tags: [giveaways]
+      summary: Create a new giveaway draw
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GiveawayInput"
+      responses:
+        "201":
+          description: Giveaway created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Giveaway"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /giveaways/{id}:
+    get:
+      operationId: getGiveaway
+      tags: [giveaways]
+      summary: Get a single giveaway by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Giveaway found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Giveaway"
+        "404":
+          description: Giveaway not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateGiveaway
+      tags: [giveaways]
+      summary: Update a giveaway draw
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GiveawayUpdate"
+      responses:
+        "200":
+          description: Giveaway updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Giveaway"
+        "404":
+          description: Giveaway not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteGiveaway
+      tags: [giveaways]
+      summary: Disable a giveaway draw
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Giveaway disabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Giveaway"
+        "404":
+          description: Giveaway not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -95,6 +219,89 @@ components:
           type: string
       required:
         - status
+
+    Giveaway:
+      type: object
+      required: [id, name, description, prizeValue, prizeValueNumeric, maxEntries, drawDate, isActive, entryCount, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        prizeValue:
+          type: string
+        prizeValueNumeric:
+          type: string
+        maxEntries:
+          type: integer
+        drawDate:
+          type: string
+          format: date-time
+        imageUrl:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+        entryCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    GiveawayInput:
+      type: object
+      required: [name, description, prizeValue, prizeValueNumeric, maxEntries, drawDate]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        prizeValue:
+          type: string
+          minLength: 1
+        prizeValueNumeric:
+          type: number
+        maxEntries:
+          type: integer
+          minimum: 1
+        drawDate:
+          type: string
+          format: date-time
+        imageUrl:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+
+    GiveawayUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        prizeValue:
+          type: string
+          minLength: 1
+        prizeValueNumeric:
+          type: number
+        maxEntries:
+          type: integer
+          minimum: 1
+        drawDate:
+          type: string
+          format: date-time
+        imageUrl:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
 
     Entry:
       type: object

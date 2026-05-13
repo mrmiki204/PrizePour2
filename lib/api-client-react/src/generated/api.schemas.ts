@@ -9,6 +9,50 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface Giveaway {
+  id: number;
+  name: string;
+  description: string;
+  prizeValue: string;
+  prizeValueNumeric: string;
+  maxEntries: number;
+  drawDate: string;
+  imageUrl?: string | null;
+  isActive: boolean;
+  entryCount: number;
+  createdAt: string;
+}
+
+export interface GiveawayInput {
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  description: string;
+  /** @minLength 1 */
+  prizeValue: string;
+  prizeValueNumeric: number;
+  /** @minimum 1 */
+  maxEntries: number;
+  drawDate: string;
+  imageUrl?: string | null;
+  isActive?: boolean;
+}
+
+export interface GiveawayUpdate {
+  /** @minLength 1 */
+  name?: string;
+  /** @minLength 1 */
+  description?: string;
+  /** @minLength 1 */
+  prizeValue?: string;
+  prizeValueNumeric?: number;
+  /** @minimum 1 */
+  maxEntries?: number;
+  drawDate?: string;
+  imageUrl?: string | null;
+  isActive?: boolean;
+}
+
 export interface Entry {
   id: number;
   giveawayId: number;
@@ -60,3 +104,10 @@ export interface StripeSessionEntry {
 export interface ErrorResponse {
   error: string;
 }
+
+export type ListGiveawaysParams = {
+  /**
+   * If true, include inactive giveaways (admin use)
+   */
+  all?: boolean;
+};

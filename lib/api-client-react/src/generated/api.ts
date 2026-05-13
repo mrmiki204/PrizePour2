@@ -20,7 +20,11 @@ import type {
   Entry,
   EntryInput,
   ErrorResponse,
+  Giveaway,
+  GiveawayInput,
+  GiveawayUpdate,
   HealthStatus,
+  ListGiveawaysParams,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -358,3 +362,441 @@ export function useListEntriesByGiveaway<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary List all active giveaways
+ */
+export const getListGiveawaysUrl = (params?: ListGiveawaysParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/giveaways?${stringifiedParams}`
+    : `/api/giveaways`;
+};
+
+export const listGiveaways = async (
+  params?: ListGiveawaysParams,
+  options?: RequestInit,
+): Promise<Giveaway[]> => {
+  return customFetch<Giveaway[]>(getListGiveawaysUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListGiveawaysQueryKey = (params?: ListGiveawaysParams) => {
+  return [`/api/giveaways`, ...(params ? [params] : [])] as const;
+};
+
+export const getListGiveawaysQueryOptions = <
+  TData = Awaited<ReturnType<typeof listGiveaways>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListGiveawaysParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listGiveaways>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListGiveawaysQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listGiveaways>>> = ({
+    signal,
+  }) => listGiveaways(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listGiveaways>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListGiveawaysQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listGiveaways>>
+>;
+export type ListGiveawaysQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all active giveaways
+ */
+
+export function useListGiveaways<
+  TData = Awaited<ReturnType<typeof listGiveaways>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListGiveawaysParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listGiveaways>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListGiveawaysQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a new giveaway draw
+ */
+export const getCreateGiveawayUrl = () => {
+  return `/api/giveaways`;
+};
+
+export const createGiveaway = async (
+  giveawayInput: GiveawayInput,
+  options?: RequestInit,
+): Promise<Giveaway> => {
+  return customFetch<Giveaway>(getCreateGiveawayUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(giveawayInput),
+  });
+};
+
+export const getCreateGiveawayMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGiveaway>>,
+    TError,
+    { data: BodyType<GiveawayInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createGiveaway>>,
+  TError,
+  { data: BodyType<GiveawayInput> },
+  TContext
+> => {
+  const mutationKey = ["createGiveaway"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createGiveaway>>,
+    { data: BodyType<GiveawayInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createGiveaway(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateGiveawayMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createGiveaway>>
+>;
+export type CreateGiveawayMutationBody = BodyType<GiveawayInput>;
+export type CreateGiveawayMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Create a new giveaway draw
+ */
+export const useCreateGiveaway = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGiveaway>>,
+    TError,
+    { data: BodyType<GiveawayInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createGiveaway>>,
+  TError,
+  { data: BodyType<GiveawayInput> },
+  TContext
+> => {
+  return useMutation(getCreateGiveawayMutationOptions(options));
+};
+
+/**
+ * @summary Get a single giveaway by ID
+ */
+export const getGetGiveawayUrl = (id: number) => {
+  return `/api/giveaways/${id}`;
+};
+
+export const getGiveaway = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Giveaway> => {
+  return customFetch<Giveaway>(getGetGiveawayUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetGiveawayQueryKey = (id: number) => {
+  return [`/api/giveaways/${id}`] as const;
+};
+
+export const getGetGiveawayQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGiveaway>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getGiveaway>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetGiveawayQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getGiveaway>>> = ({
+    signal,
+  }) => getGiveaway(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getGiveaway>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetGiveawayQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGiveaway>>
+>;
+export type GetGiveawayQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get a single giveaway by ID
+ */
+
+export function useGetGiveaway<
+  TData = Awaited<ReturnType<typeof getGiveaway>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getGiveaway>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetGiveawayQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Update a giveaway draw
+ */
+export const getUpdateGiveawayUrl = (id: number) => {
+  return `/api/giveaways/${id}`;
+};
+
+export const updateGiveaway = async (
+  id: number,
+  giveawayUpdate: GiveawayUpdate,
+  options?: RequestInit,
+): Promise<Giveaway> => {
+  return customFetch<Giveaway>(getUpdateGiveawayUrl(id), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(giveawayUpdate),
+  });
+};
+
+export const getUpdateGiveawayMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateGiveaway>>,
+    TError,
+    { id: number; data: BodyType<GiveawayUpdate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateGiveaway>>,
+  TError,
+  { id: number; data: BodyType<GiveawayUpdate> },
+  TContext
+> => {
+  const mutationKey = ["updateGiveaway"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateGiveaway>>,
+    { id: number; data: BodyType<GiveawayUpdate> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateGiveaway(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateGiveawayMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateGiveaway>>
+>;
+export type UpdateGiveawayMutationBody = BodyType<GiveawayUpdate>;
+export type UpdateGiveawayMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Update a giveaway draw
+ */
+export const useUpdateGiveaway = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateGiveaway>>,
+    TError,
+    { id: number; data: BodyType<GiveawayUpdate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateGiveaway>>,
+  TError,
+  { id: number; data: BodyType<GiveawayUpdate> },
+  TContext
+> => {
+  return useMutation(getUpdateGiveawayMutationOptions(options));
+};
+
+/**
+ * @summary Disable a giveaway draw
+ */
+export const getDeleteGiveawayUrl = (id: number) => {
+  return `/api/giveaways/${id}`;
+};
+
+export const deleteGiveaway = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Giveaway> => {
+  return customFetch<Giveaway>(getDeleteGiveawayUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteGiveawayMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteGiveaway>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteGiveaway>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteGiveaway"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteGiveaway>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteGiveaway(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteGiveawayMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteGiveaway>>
+>;
+
+export type DeleteGiveawayMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Disable a giveaway draw
+ */
+export const useDeleteGiveaway = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteGiveaway>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteGiveaway>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteGiveawayMutationOptions(options));
+};

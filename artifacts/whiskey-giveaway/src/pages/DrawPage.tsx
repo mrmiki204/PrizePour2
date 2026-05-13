@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRoute, useLocation } from 'wouter';
-import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
+import { useGetGiveaway } from '@workspace/api-client-react';
+import { getGiveawayImage } from '@/data/giveaways';
 import { Button } from '@/components/ui/button';
 import { Trophy, ArrowLeft } from 'lucide-react';
 
@@ -9,50 +10,45 @@ export function DrawPage() {
   const [, params] = useRoute("/draw/:id");
   const [, setLocation] = useLocation();
   const giveawayId = params?.id ? parseInt(params.id) : 1;
-  const giveaway = ACTIVE_GIVEAWAYS.find(g => g.id === giveawayId) || ACTIVE_GIVEAWAYS[0];
+  const { data: giveaway } = useGetGiveaway(giveawayId);
 
-  // Load user's tickets from local storage, fallback to random if they skipped
-  const storedTickets = localStorage.getItem(`giveaway_${giveaway.id}_tickets`);
-  const userTickets = storedTickets ? JSON.parse(storedTickets) : ["#8472", "#9311"];
-  
-  // To ensure the user "wins" in the demo
+  const storedTickets = localStorage.getItem(`giveaway_${giveawayId}_tickets`);
+  const userTickets: string[] = storedTickets ? JSON.parse(storedTickets) : ["#8472", "#9311"];
   const winningTicket = userTickets[0];
 
   const [phase, setPhase] = useState<'lobby' | 'draw' | 'reveal'>('lobby');
   const [lobbyCount, setLobbyCount] = useState(0);
-  const targetEntries = giveaway.baseEntries + userTickets.length;
+  const targetEntries = (giveaway?.entryCount ?? 0) + userTickets.length;
+
+  const img = giveaway ? getGiveawayImage(giveaway.id, giveaway.imageUrl) : undefined;
 
   useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
     if (phase === 'lobby') {
-      const interval = setInterval(() => {
+      intervalId = setInterval(() => {
         setLobbyCount(prev => {
           if (prev >= targetEntries) {
-            clearInterval(interval);
+            clearInterval(intervalId);
             return targetEntries;
           }
           return prev + Math.floor(targetEntries / 30);
         });
       }, 50);
-
-      const timeout = setTimeout(() => {
-        setPhase('draw');
-      }, 3500);
-
-      return () => {
-        clearInterval(interval);
-        clearTimeout(timeout);
-      };
+      timeoutId = setTimeout(() => setPhase('draw'), 3500);
     } else if (phase === 'draw') {
-      const timeout = setTimeout(() => {
-        setPhase('reveal');
-      }, 6000);
-      return () => clearTimeout(timeout);
+      timeoutId = setTimeout(() => setPhase('reveal'), 6000);
     }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [phase, targetEntries]);
 
-  // Generate a long list of random tickets for the spinner
   const spinnerItems = Array.from({ length: 50 }).map((_, i) => {
-    if (i === 48) return winningTicket; // The winning ticket placed near the end to land on
+    if (i === 48) return winningTicket;
     return "#" + Math.floor(1000 + Math.random() * 9000).toString();
   });
 
@@ -61,8 +57,8 @@ export function DrawPage() {
       
       {/* Cinematic Background */}
       <div className="absolute inset-0 z-0">
-        {giveaway.image && (
-          <img src={giveaway.image} alt="Background" className="w-full h-full object-cover opacity-10 blur-xl scale-110 mix-blend-screen" />
+        {img && (
+          <img src={img} alt="Background" className="w-full h-full object-cover opacity-10 blur-xl scale-110 mix-blend-screen" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/95 to-background/50" />
       </div>
@@ -82,21 +78,12 @@ export function DrawPage() {
             >
               <div className="space-y-4">
                 <p className="text-primary font-mono tracking-[0.2em] uppercase text-sm animate-pulse">Official Draw</p>
-                <h1 className="text-5xl md:text-7xl font-serif">{giveaway.name}</h1>
+                <h1 className="text-5xl md:text-7xl font-serif">{giveaway?.name ?? '...'}</h1>
               </div>
 
-              <div className="w-56 h-40 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
-                {giveaway.bottles && giveaway.bottles.length > 0 ? (
-                  <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
-                    {giveaway.bottles.map((bottle, i) => (
-                      <div key={i} className="relative overflow-hidden bg-black">
-                        <img src={bottle.image} alt={bottle.name} className="w-full h-full object-cover opacity-80" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                      </div>
-                    ))}
-                  </div>
-                ) : giveaway.image ? (
-                  <img src={giveaway.image} className="w-full h-full object-cover" />
+              <div className="w-48 h-48 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
+                {img ? (
+                  <img src={img} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
                     <svg viewBox="0 0 80 160" className="w-12 h-24 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
@@ -135,11 +122,8 @@ export function DrawPage() {
               <h2 className="text-3xl font-serif text-muted-foreground">Selecting Winner...</h2>
 
               <div className="relative h-40 overflow-hidden mx-auto max-w-md w-full bg-black/50 border-y-2 border-primary/50 shadow-[0_0_50px_rgba(234,146,55,0.2)] flex items-center justify-center">
-                {/* Gradient masks for smooth fade at top and bottom */}
                 <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-background to-transparent z-20" />
                 <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background to-transparent z-20" />
-                
-                {/* Center highlight line */}
                 <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-16 bg-primary/10 border-y border-primary/30 z-10" />
 
                 <motion.div
@@ -149,7 +133,7 @@ export function DrawPage() {
                   }}
                   transition={{ 
                     duration: 5.5, 
-                    ease: [0.1, 0.8, 0.3, 1], // Custom ease-out to simulate spinning down
+                    ease: [0.1, 0.8, 0.3, 1],
                   }}
                 >
                   {spinnerItems.map((item, idx) => (
@@ -171,27 +155,19 @@ export function DrawPage() {
               transition={{ type: "spring", bounce: 0.5 }}
               className="text-center w-full max-w-2xl relative"
             >
-              {/* Confetti effect using simple divs */}
               <div className="absolute inset-0 overflow-visible pointer-events-none z-0">
                 {Array.from({ length: 30 }).map((_, i) => (
                   <motion.div
                     key={`confetti-${i}`}
                     className="absolute w-2 h-2 bg-primary rounded-full"
-                    initial={{ 
-                      x: "50%", 
-                      y: "50%", 
-                      opacity: 1 
-                    }}
+                    initial={{ x: "50%", y: "50%", opacity: 1 }}
                     animate={{ 
                       x: `${50 + (Math.random() * 200 - 100)}%`, 
                       y: `${50 + (Math.random() * 200 - 150)}%`,
                       opacity: 0,
                       scale: 0
                     }}
-                    transition={{ 
-                      duration: 1 + Math.random(), 
-                      ease: "easeOut" 
-                    }}
+                    transition={{ duration: 1 + Math.random(), ease: "easeOut" }}
                   />
                 ))}
               </div>
@@ -215,7 +191,7 @@ export function DrawPage() {
                     <p className="text-6xl md:text-8xl font-mono text-primary font-bold">{winningTicket}</p>
                     <div className="h-px w-24 bg-border mx-auto my-8" />
                     <p className="text-3xl font-serif">Sarah M. from Austin, TX</p>
-                    <p className="text-muted-foreground">Winner of the {giveaway.name} — all 6 bottles</p>
+                    <p className="text-muted-foreground">Winner of the {giveaway?.name ?? 'draw'}</p>
                   </div>
                 </div>
 
@@ -238,6 +214,15 @@ export function DrawPage() {
           )}
 
         </AnimatePresence>
+
+        {phase === 'lobby' && (
+          <button
+            onClick={() => setLocation('/')}
+            className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-mono text-sm"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back
+          </button>
+        )}
       </div>
     </div>
   );

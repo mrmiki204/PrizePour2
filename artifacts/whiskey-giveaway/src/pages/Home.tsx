@@ -6,8 +6,8 @@ import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
-import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
-import { useListEntries } from '@workspace/api-client-react';
+import { getGiveawayImage, daysUntil } from '@/data/giveaways';
+import { useListEntries, useListGiveaways } from '@workspace/api-client-react';
 
 const WINNERS = [
   { name: "Sarah M.", location: "Austin, TX", prize: "Blanton's Gold Edition", date: "Apr 2026" },
@@ -47,7 +47,9 @@ const fadeIn = {
 export function Home() {
   const [, setLocation] = useLocation();
   const { data: entries = [] } = useListEntries();
+  const { data: giveaways = [] } = useListGiveaways();
 
+  const featured = giveaways[0];
   const liveEntries = entries.length;
   const liveRevenue = entries.reduce((s, e) => s + parseFloat(e.amountPaid), 0);
   const liveTickets = entries.reduce((s, e) => s + e.ticketQty, 0);
@@ -86,7 +88,7 @@ export function Home() {
             </motion.p>
 
             <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider" onClick={() => setLocation("/giveaway/1")}>
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider" onClick={() => featured && setLocation(`/giveaway/${featured.id}`)}>
                 Enter Featured Draw
               </Button>
               <Button size="lg" variant="outline" className="border-border hover:bg-white/5 uppercase tracking-wider" onClick={() => scrollTo('giveaways')}>
@@ -104,8 +106,14 @@ export function Home() {
             <div className="absolute -inset-4 bg-primary/20 blur-3xl rounded-full" />
             <div className="relative bg-card border border-border p-6 rounded-sm shadow-2xl">
               <div className="aspect-[3/4] relative mb-6 overflow-hidden rounded-sm group">
-                {ACTIVE_GIVEAWAYS[0].image ? (
-                  <img src={ACTIVE_GIVEAWAYS[0].image} alt={ACTIVE_GIVEAWAYS[0].name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                {featured ? (
+                  getGiveawayImage(featured.id, featured.imageUrl) ? (
+                    <img src={getGiveawayImage(featured.id, featured.imageUrl)} alt={featured.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
+                      <Package className="w-24 h-24 text-primary/40" />
+                    </div>
+                  )
                 ) : (
                   <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
                     <Package className="w-24 h-24 text-primary/40" />
@@ -115,17 +123,19 @@ export function Home() {
                 <div className="absolute top-4 left-4">
                   <span className="bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded-sm">Full Collection · 6 Expressions</span>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-2xl font-serif text-white mb-2">{ACTIVE_GIVEAWAYS[0].name}</h3>
-                  <div className="flex justify-between items-end">
-                    <p className="text-primary font-mono">{ACTIVE_GIVEAWAYS[0].value} Value</p>
-                    <p className="text-sm text-gray-400 font-mono">{ACTIVE_GIVEAWAYS[0].entries} Entries</p>
+                {featured && (
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-2xl font-serif text-white mb-2">{featured.name}</h3>
+                    <div className="flex justify-between items-end">
+                      <p className="text-primary font-mono">{featured.prizeValue} Value</p>
+                      <p className="text-sm text-gray-400 font-mono">{featured.entryCount.toLocaleString()} Entries</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
               <div className="flex items-center justify-between">
-                <CountdownTimer daysToAdd={6} />
-                <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => setLocation("/giveaway/1")}>
+                {featured && <CountdownTimer daysToAdd={daysUntil(featured.drawDate)} />}
+                <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => featured && setLocation(`/giveaway/${featured.id}`)}>
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </div>
@@ -176,101 +186,86 @@ export function Home() {
           <p className="text-muted-foreground max-w-xl">Enter once for a chance to win all six Clonakilty expressions — worth £481 combined, shipped insured to your door.</p>
         </div>
 
-        {ACTIVE_GIVEAWAYS.map((giveaway) => {
-          const pct = Math.min((giveaway.baseEntries / giveaway.maxEntries) * 100, 100);
-          const remaining = giveaway.maxEntries - giveaway.baseEntries;
-          return (
-            <motion.div
-              key={giveaway.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 hover:border-primary/40 transition-colors"
-            >
-              {/* Left: 2×3 bottle grid */}
-              {giveaway.bottles && giveaway.bottles.length > 0 ? (
-                <div className="grid grid-cols-3 gap-px bg-border/30">
-                  {giveaway.bottles.map((bottle, i) => (
-                    <div key={i} className="aspect-[3/4] relative overflow-hidden bg-black group/bottle">
-                      <img
-                        src={bottle.image}
-                        alt={bottle.name}
-                        className="w-full h-full object-cover opacity-75 group-hover/bottle:opacity-100 transition-opacity duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-2">
-                        <p className="text-[10px] font-mono text-primary leading-tight">{bottle.value}</p>
-                        <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name.replace('Clonakilty ', '')}</p>
+        {giveaways.length === 0 ? (
+          <div className="text-center py-20 text-muted-foreground font-mono text-sm">
+            No active draws at the moment. Check back soon.
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {giveaways.map((giveaway, index) => {
+              const img = getGiveawayImage(giveaway.id, giveaway.imageUrl);
+              const pct = Math.min((giveaway.entryCount / giveaway.maxEntries) * 100, 100);
+              const remaining = giveaway.maxEntries - giveaway.entryCount;
+              return (
+                <motion.div
+                  key={giveaway.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="group bg-card border border-border rounded-sm overflow-hidden hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={() => setLocation(`/giveaway/${giveaway.id}`)}
+                >
+                  <div className="aspect-[4/3] relative overflow-hidden bg-black">
+                    {img ? (
+                      <img src={img} alt={giveaway.name} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 group-hover:opacity-100" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
+                        <svg viewBox="0 0 80 160" className="w-16 h-32 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
+                          <rect x="28" y="0" width="24" height="20" rx="4" />
+                          <rect x="20" y="18" width="40" height="8" rx="2" />
+                          <rect x="16" y="24" width="48" height="110" rx="6" />
+                          <rect x="20" y="134" width="40" height="26" rx="4" />
+                        </svg>
+                      </div>
+                    )}
+                    <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-sm border border-border">
+                      <span className="text-xs font-mono text-primary">{giveaway.prizeValue} Value</span>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
+                      <span className="text-white font-mono text-sm uppercase tracking-widest border border-white/50 px-4 py-2 rounded-sm">Enter Draw →</span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-serif mb-2 line-clamp-1">{giveaway.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{giveaway.description}</p>
+
+                    <div className="mb-5">
+                      <div className="flex justify-between items-center text-xs font-mono mb-1.5">
+                        <span className="text-muted-foreground">{giveaway.entryCount.toLocaleString()} / {giveaway.maxEntries.toLocaleString()} tickets</span>
+                        <span className={remaining <= 5 ? 'text-red-400' : 'text-primary'}>{remaining} left</span>
+                      </div>
+                      <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                        <motion.div
+                          className={`h-full rounded-full ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${pct}%` }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 1, delay: index * 0.1 + 0.3 }}
+                        />
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="aspect-video bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
-                  <Package className="w-24 h-24 text-primary/40" />
-                </div>
-              )}
 
-              {/* Right: info panel */}
-              <div className="p-8 lg:p-10 flex flex-col justify-between gap-8">
-                <div className="space-y-4">
-                  <div>
-                    <span className="text-xs font-mono text-primary uppercase tracking-widest">Combined Prize</span>
-                    <h3 className="text-3xl font-serif mt-2 mb-1">{giveaway.name}</h3>
-                    <p className="text-4xl font-serif text-primary">{giveaway.value}</p>
-                  </div>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{giveaway.description}</p>
-
-                  {/* Bottle list */}
-                  <div className="space-y-1.5 pt-2">
-                    {giveaway.bottles?.map((bottle, i) => (
-                      <div key={i} className="flex justify-between items-center text-xs font-mono py-1 border-b border-border/30 last:border-0">
-                        <span className="text-foreground/70">{bottle.name}</span>
-                        <span className="text-primary">{bottle.value}</span>
+                    <div className="flex items-center justify-between mb-6 pb-6 border-b border-border/50">
+                      <div className="flex items-center gap-2">
+                        <Ticket className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-mono">{pct.toFixed(0)}% sold</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  {/* Capacity bar */}
-                  <div>
-                    <div className="flex justify-between items-center text-xs font-mono mb-2">
-                      <span className="text-muted-foreground">{giveaway.entries} / {giveaway.maxEntries} tickets sold</span>
-                      <span className={remaining <= 20 ? 'text-red-400' : 'text-primary'}>{remaining} remaining</span>
+                      <CountdownTimer daysToAdd={daysUntil(giveaway.drawDate)} />
                     </div>
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <motion.div
-                        className={`h-full rounded-full ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${pct}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.2 }}
-                      />
-                    </div>
-                  </div>
 
-                  <div className="flex items-center justify-between">
-                    <CountdownTimer daysToAdd={giveaway.daysLeft} />
-                    <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-                      <Ticket className="w-3.5 h-3.5 text-primary" />
-                      {pct.toFixed(0)}% sold
-                    </div>
+                    <Button
+                      className="w-full bg-secondary hover:bg-primary hover:text-primary-foreground text-secondary-foreground transition-colors uppercase tracking-widest"
+                      onClick={e => { e.stopPropagation(); setLocation(`/giveaway/${giveaway.id}`); }}
+                    >
+                      Enter Draw
+                    </Button>
                   </div>
-
-                  <Button
-                    size="lg"
-                    className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-sm font-mono"
-                    onClick={() => setLocation(`/giveaway/${giveaway.id}`)}
-                  >
-                    Enter the Draw — from £2.99
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* ── How it Works ── */}
@@ -379,7 +374,7 @@ export function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-sm border border-border rounded-sm p-4">
                   <p className="text-xs font-mono text-primary uppercase tracking-widest mb-1">Currently Live</p>
-                  <p className="font-serif text-lg">6 Active Draws</p>
+                  <p className="font-serif text-lg">{giveaways.length} Active {giveaways.length === 1 ? 'Draw' : 'Draws'}</p>
                   <p className="text-xs text-muted-foreground mt-1">From £2.99 entry · Draw closes soon</p>
                 </div>
               </div>

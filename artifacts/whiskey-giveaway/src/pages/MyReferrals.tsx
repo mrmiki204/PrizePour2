@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Gift, Ticket, CheckCircle2, Clock, Loader2, ArrowRight, Trophy } from 'lucide-react';
-import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
+import { useListGiveaways } from '@workspace/api-client-react';
 
 interface Reward {
   id: number;
@@ -39,6 +39,8 @@ export function MyReferrals() {
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState('');
   const [claimResult, setClaimResult] = useState<{ tickets: string[]; giveawayName: string } | null>(null);
+
+  const { data: giveaways = [] } = useListGiveaways();
 
   useEffect(() => {
     if (code) fetchRewards(code);
@@ -89,7 +91,7 @@ export function MyReferrals() {
       const data = await r.json() as { ticketNumbers?: string[]; error?: string };
       if (data.error) { setClaimError(data.error); }
       else {
-        const giveaway = ACTIVE_GIVEAWAYS.find(g => g.id === parseInt(claim.giveawayId, 10));
+        const giveaway = giveaways.find(g => g.id === parseInt(claim.giveawayId, 10));
         setClaimResult({ tickets: data.ticketNumbers ?? [], giveawayName: giveaway?.name ?? 'the draw' });
         fetchRewards(code);
         setClaim({ rewardId: null, giveawayId: '', firstName: '', lastName: '', email: '' });
@@ -106,7 +108,6 @@ export function MyReferrals() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm px-6 py-4 flex items-center justify-between">
         <button onClick={() => setLocation('/')} className="font-serif text-xl text-primary tracking-widest">PRIZEPOUR</button>
         <Button variant="ghost" size="sm" onClick={() => setLocation('/')} className="font-mono text-xs uppercase tracking-widest">← Back to Draws</Button>
@@ -119,7 +120,6 @@ export function MyReferrals() {
           <p className="text-muted-foreground text-sm">When someone enters a draw using your referral link, you earn 1–5 free tickets to use on any draw.</p>
         </div>
 
-        {/* Code lookup */}
         <form onSubmit={handleLookup} className="bg-card border border-border rounded-sm p-6 space-y-4">
           <Label className="text-sm font-mono uppercase tracking-widest">Your Referral Code</Label>
           <div className="flex gap-2">
@@ -138,7 +138,6 @@ export function MyReferrals() {
 
         {code && !loading && (
           <AnimatePresence mode="wait">
-            {/* Claim success banner */}
             {claimResult && (
               <motion.div key="claim-success" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="bg-green-400/10 border border-green-400/30 rounded-sm p-5 flex items-start gap-4">
                 <Trophy className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
@@ -154,7 +153,6 @@ export function MyReferrals() {
               </motion.div>
             )}
 
-            {/* Unclaimed rewards */}
             {unclaimed.length > 0 && (
               <motion.div key="unclaimed" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                 <h2 className="font-serif text-xl flex items-center gap-2">
@@ -204,8 +202,8 @@ export function MyReferrals() {
                               required
                             >
                               <option value="">— Choose a draw —</option>
-                              {ACTIVE_GIVEAWAYS.map(g => (
-                                <option key={g.id} value={g.id}>{g.name} ({g.value})</option>
+                              {giveaways.map(g => (
+                                <option key={g.id} value={g.id}>{g.name} ({g.prizeValue})</option>
                               ))}
                             </select>
                           </div>
@@ -243,14 +241,13 @@ export function MyReferrals() {
               </motion.div>
             )}
 
-            {/* Claimed rewards */}
             {claimed.length > 0 && (
               <motion.div key="claimed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
                 <h2 className="font-serif text-lg text-muted-foreground flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4" /> Claimed
                 </h2>
                 {claimed.map(reward => {
-                  const g = ACTIVE_GIVEAWAYS.find(x => x.id === reward.claimedGiveawayId);
+                  const g = giveaways.find(x => x.id === reward.claimedGiveawayId);
                   return (
                     <div key={reward.id} className="bg-card border border-border rounded-sm px-5 py-4 flex items-center justify-between opacity-60">
                       <div className="flex items-center gap-3">
@@ -267,7 +264,6 @@ export function MyReferrals() {
               </motion.div>
             )}
 
-            {/* Empty state */}
             {rewards.length === 0 && !error && (
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 space-y-4">
                 <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto">

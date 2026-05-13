@@ -1,0 +1,150 @@
+import { Router, type IRouter } from "express";
+import { eq, sql } from "drizzle-orm";
+import { db, giveawaysTable, entriesTable } from "@workspace/db";
+import {
+  ListGiveawaysQueryParams,
+  ListGiveawaysResponse,
+  CreateGiveawayBody,
+  GetGiveawayParams,
+  GetGiveawayResponse,
+  UpdateGiveawayParams,
+  UpdateGiveawayBody,
+  UpdateGiveawayResponse,
+  DeleteGiveawayParams,
+  DeleteGiveawayResponse,
+} from "@workspace/api-zod";
+
+const router: IRouter = Router();
+
+async function withEntryCount(rows: (typeof giveawaysTable.$inferSelect)[]) {
+  if (rows.length === 0) return [];
+  const counts = await db
+    .select({
+      giveawayId: entriesTable.giveawayId,
+      count: sql<number>`cast(count(*) as int)`,
+    })
+    .from(entriesTable)
+    .groupBy(entriesTable.giveawayId);
+
+  const countMap = Object.fromEntries(counts.map((c) => [c.giveawayId, c.count]));
+  return rows.map((g) => ({ ...g, entryCount: countMap[g.id] ?? 0 }));
+}
+
+router.get("/giveaways", async (req, res): Promise<void> => {
+  const query = ListGiveawaysQueryParams.safeParse(req.query);
+  const showAll = query.success && query.data.all === true;
+
+  const rows = showAll
+    ? await db.select().from(giveawaysTable).orderBy(giveawaysTable.createdAt)
+    : await db.select().from(giveawaysTable).where(eq(giveawaysTable.isActive, true)).orderBy(giveawaysTable.createdAt);
+
+  const giveaways = await withEntryCount(rows);
+  req.log.info({ count: giveaways.length, showAll }, "Listed giveaways");
+  res.json(ListGiveawaysResponse.parse(giveaways));
+});
+
+router.post("/giveaways", async (req, res): Promise<void> => {
+  const parsed = CreateGiveawayBody.safeParse(req.body);
+  if (!parsed.success) {
+    req.log.warn({ errors: parsed.error.message }, "Invalid giveaway input");
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const { prizeValueNumeric, drawDate, isActive, ...rest } = parsed.data;
+  const [giveaway] = await db
+    .insert(giveawaysTable)
+    .values({
+      ...rest,
+      prizeValueNumeric: String(prizeValueNumeric),
+      drawDate: new Date(drawDate),
+      isActive: isActive ?? true,
+    })
+    .returning();
+
+  const [withCount] = await withEntryCount([giveaway]);
+  req.log.info({ giveawayId: giveaway.id }, "Giveaway created");
+  res.status(201).json(GetGiveawayResponse.parse(withCount));
+});
+
+router.get("/giveaways/:id", async (req, res): Promise<void> => {
+  const params = GetGiveawayParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const [giveaway] = await db
+    .select()
+    .from(giveawaysTable)
+    .where(eq(giveawaysTable.id, params.data.id));
+
+  if (!giveaway) {
+    res.status(404).json({ error: "Giveaway not found" });
+    return;
+  }
+
+  const [withCount] = await withEntryCount([giveaway]);
+  req.log.info({ giveawayId: giveaway.id }, "Fetched giveaway");
+  res.json(GetGiveawayResponse.parse(withCount));
+});
+
+router.patch("/giveaways/:id", async (req, res): Promise<void> => {
+  const params = UpdateGiveawayParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const body = UpdateGiveawayBody.safeParse(req.body);
+  if (!body.success) {
+    req.log.warn({ errors: body.error.message }, "Invalid giveaway update");
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const { prizeValueNumeric, drawDate, ...rest } = body.data;
+  const updates: Record<string, unknown> = { ...rest };
+  if (prizeValueNumeric !== undefined) updates.prizeValueNumeric = String(prizeValueNumeric);
+  if (drawDate !== undefined) updates.drawDate = new Date(drawDate);
+
+  const [updated] = await db
+    .update(giveawaysTable)
+    .set(updates)
+    .where(eq(giveawaysTable.id, params.data.id))
+    .returning();
+
+  if (!updated) {
+    res.status(404).json({ error: "Giveaway not found" });
+    return;
+  }
+
+  const [withCount] = await withEntryCount([updated]);
+  req.log.info({ giveawayId: updated.id }, "Giveaway updated");
+  res.json(UpdateGiveawayResponse.parse(withCount));
+});
+
+router.delete("/giveaways/:id", async (req, res): Promise<void> => {
+  const params = DeleteGiveawayParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const [disabled] = await db
+    .update(giveawaysTable)
+    .set({ isActive: false })
+    .where(eq(giveawaysTable.id, params.data.id))
+    .returning();
+
+  if (!disabled) {
+    res.status(404).json({ error: "Giveaway not found" });
+    return;
+  }
+
+  const [withCount] = await withEntryCount([disabled]);
+  req.log.info({ giveawayId: disabled.id }, "Giveaway disabled");
+  res.json(DeleteGiveawayResponse.parse(withCount));
+});
+
+export default router;
