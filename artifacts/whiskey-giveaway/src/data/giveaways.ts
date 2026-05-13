@@ -1,9 +1,21 @@
-import pappyImg from '@/assets/images/pappy.png';
 import clonakiltyImg from '@/assets/images/clonakilty32.jpg';
+
+export interface Giveaway {
+  id: number;
+  name: string;
+  value: string;
+  priceNumeric: number;
+  maxEntries: number;
+  baseEntries: number;
+  entries: string;
+  daysLeft: number;
+  description: string;
+  image?: string;
+}
 
 // maxEntries = ceil(prizeValueNumeric * 1.4 / 4.99)
 // baseEntries set so draws closer to close date are closer to capacity
-export const ACTIVE_GIVEAWAYS = [
+export const ACTIVE_GIVEAWAYS: Giveaway[] = [
   {
     id: 1,
     name: "Clonakilty 32 Year Old",
@@ -25,8 +37,7 @@ export const ACTIVE_GIVEAWAYS = [
     baseEntries: 944,   // 80% sold — 10 days left
     get entries() { return this.baseEntries.toLocaleString(); },
     daysLeft: 10,
-    description: "The crown jewel of American bourbon. Impossibly rare.",
-    image: pappyImg
+    description: "The crown jewel of American bourbon. Impossibly rare."
   },
   {
     id: 3,
@@ -37,8 +48,7 @@ export const ACTIVE_GIVEAWAYS = [
     baseEntries: 590,   // 75% sold — 12 days left
     get entries() { return this.baseEntries.toLocaleString(); },
     daysLeft: 12,
-    description: "Speyside legend. Single malt perfection aged four decades.",
-    image: pappyImg
+    description: "Speyside legend. Single malt perfection aged four decades."
   },
   {
     id: 4,
@@ -49,8 +59,7 @@ export const ACTIVE_GIVEAWAYS = [
     baseEntries: 913,   // 93% sold — only 3 days left!
     get entries() { return this.baseEntries.toLocaleString(); },
     daysLeft: 3,
-    description: "The full BTAC set. The most coveted bourbon collection.",
-    image: pappyImg
+    description: "The full BTAC set. The most coveted bourbon collection."
   },
   {
     id: 5,
@@ -61,8 +70,7 @@ export const ACTIVE_GIVEAWAYS = [
     baseEntries: 270,   // 80% sold — 9 days left
     get entries() { return this.baseEntries.toLocaleString(); },
     daysLeft: 9,
-    description: "Master blender's masterpiece. Japan's finest blended whisky.",
-    image: pappyImg
+    description: "Master blender's masterpiece. Japan's finest blended whisky."
   },
   {
     id: 6,
@@ -73,7 +81,6 @@ export const ACTIVE_GIVEAWAYS = [
     baseEntries: 187,   // 70% sold — 15 days left
     get entries() { return this.baseEntries.toLocaleString(); },
     daysLeft: 15,
-    description: "Iconic Speyside single malt aged in hand-picked sherry casks.",
-    image: pappyImg
+    description: "Iconic Speyside single malt aged in hand-picked sherry casks."
   }
 ];

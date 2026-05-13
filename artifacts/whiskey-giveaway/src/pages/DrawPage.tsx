@@ -61,7 +61,9 @@ export function DrawPage() {
       
       {/* Cinematic Background */}
       <div className="absolute inset-0 z-0">
-        <img src={giveaway.image} alt="Background" className="w-full h-full object-cover opacity-10 blur-xl scale-110 mix-blend-screen" />
+        {giveaway.image && (
+          <img src={giveaway.image} alt="Background" className="w-full h-full object-cover opacity-10 blur-xl scale-110 mix-blend-screen" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/95 to-background/50" />
       </div>
 
@@ -84,7 +86,18 @@ export function DrawPage() {
               </div>
 
               <div className="w-48 h-48 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
-                <img src={giveaway.image} className="w-full h-full object-cover" />
+                {giveaway.image ? (
+                  <img src={giveaway.image} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
+                    <svg viewBox="0 0 80 160" className="w-12 h-24 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="28" y="0" width="24" height="20" rx="4" />
+                      <rect x="20" y="18" width="40" height="8" rx="2" />
+                      <rect x="16" y="24" width="48" height="110" rx="6" />
+                      <rect x="20" y="134" width="40" height="26" rx="4" />
+                    </svg>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">

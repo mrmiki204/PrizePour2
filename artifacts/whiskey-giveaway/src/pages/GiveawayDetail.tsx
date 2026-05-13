@@ -218,7 +218,18 @@ export function GiveawayDetail() {
 
               <div className="grid md:grid-cols-2 gap-8 bg-card border border-border p-6 rounded-sm shadow-xl">
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
-                  <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
+                  {giveaway.image ? (
+                    <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
+                      <svg viewBox="0 0 80 160" className="w-16 h-32 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="28" y="0" width="24" height="20" rx="4" />
+                        <rect x="20" y="18" width="40" height="8" rx="2" />
+                        <rect x="16" y="24" width="48" height="110" rx="6" />
+                        <rect x="20" y="134" width="40" height="26" rx="4" />
+                      </svg>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6 space-y-4">
                     <h2 className="text-3xl font-serif leading-tight">{giveaway.name}</h2>
@@ -495,7 +506,18 @@ export function GiveawayDetail() {
                 <div className="bg-secondary/20 border border-secondary p-6 rounded-sm sticky top-28 space-y-5">
                   <h3 className="font-serif text-xl">Your Entry</h3>
                   <div className="aspect-video relative bg-black/50 rounded-sm overflow-hidden">
-                    <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
+                    {giveaway.image ? (
+                      <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
+                        <svg viewBox="0 0 80 160" className="w-10 h-20 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
+                          <rect x="28" y="0" width="24" height="20" rx="4" />
+                          <rect x="20" y="18" width="40" height="8" rx="2" />
+                          <rect x="16" y="24" width="48" height="110" rx="6" />
+                          <rect x="20" y="134" width="40" height="26" rx="4" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <p className="font-serif text-lg">{giveaway.name}</p>

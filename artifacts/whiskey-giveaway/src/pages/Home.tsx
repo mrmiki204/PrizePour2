@@ -6,7 +6,6 @@ import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
-import pappyImg from '@/assets/images/pappy.png';
 import clonakiltyImg from '@/assets/images/clonakilty32.jpg';
 import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
 import { useListEntries } from '@workspace/api-client-react';
@@ -186,7 +185,18 @@ export function Home() {
               onClick={() => setLocation(`/giveaway/${giveaway.id}`)}
             >
               <div className="aspect-[4/3] relative overflow-hidden bg-black">
-                <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 group-hover:opacity-100" />
+                {giveaway.image ? (
+                  <img src={giveaway.image} alt={giveaway.name} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 group-hover:opacity-100" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
+                    <svg viewBox="0 0 80 160" className="w-16 h-32 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="28" y="0" width="24" height="20" rx="4" />
+                      <rect x="20" y="18" width="40" height="8" rx="2" />
+                      <rect x="16" y="24" width="48" height="110" rx="6" />
+                      <rect x="20" y="134" width="40" height="26" rx="4" />
+                    </svg>
+                  </div>
+                )}
                 <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-sm border border-border">
                   <span className="text-xs font-mono text-primary">{giveaway.value} Value</span>
                 </div>
@@ -336,7 +346,14 @@ export function Home() {
             <div className="relative">
               <div className="absolute -inset-8 bg-primary/10 blur-3xl rounded-full" />
               <div className="relative aspect-[4/5] rounded-sm overflow-hidden">
-                <img src={pappyImg} alt="Rare whiskey collection" className="w-full h-full object-cover" />
+                <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/50 to-stone-950 flex items-center justify-center">
+                  <svg viewBox="0 0 80 160" className="w-24 h-48 opacity-15 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="28" y="0" width="24" height="20" rx="4" />
+                    <rect x="20" y="18" width="40" height="8" rx="2" />
+                    <rect x="16" y="24" width="48" height="110" rx="6" />
+                    <rect x="20" y="134" width="40" height="26" rx="4" />
+                  </svg>
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-sm border border-border rounded-sm p-4">
                   <p className="text-xs font-mono text-primary uppercase tracking-widest mb-1">Currently Live</p>
