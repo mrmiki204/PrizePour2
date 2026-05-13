@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRoute, useLocation } from 'wouter';
 import { useGetGiveaway } from '@workspace/api-client-react';
-import { getGiveawayImage } from '@/data/giveaways';
+import { getGiveawayImage, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { Button } from '@/components/ui/button';
 import { Trophy, ArrowLeft } from 'lucide-react';
 
@@ -81,19 +81,15 @@ export function DrawPage() {
                 <h1 className="text-5xl md:text-7xl font-serif">{giveaway?.name ?? '...'}</h1>
               </div>
 
-              <div className="w-48 h-48 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
-                {img ? (
-                  <img src={img} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
-                    <svg viewBox="0 0 80 160" className="w-12 h-24 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="28" y="0" width="24" height="20" rx="4" />
-                      <rect x="20" y="18" width="40" height="8" rx="2" />
-                      <rect x="16" y="24" width="48" height="110" rx="6" />
-                      <rect x="20" y="134" width="40" height="26" rx="4" />
-                    </svg>
-                  </div>
-                )}
+              <div className="w-56 h-40 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
+                <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
+                  {COLLECTION_BOTTLES.map((bottle, i) => (
+                    <div key={i} className="relative overflow-hidden bg-black">
+                      <img src={bottle.image} alt={bottle.name} className="w-full h-full object-cover opacity-80" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-2">

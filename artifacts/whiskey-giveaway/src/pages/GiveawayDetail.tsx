@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Ticket, CreditCard, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useGetGiveaway } from '@workspace/api-client-react';
-import { getGiveawayImage, daysUntil } from '@/data/giveaways';
+import { getGiveawayImage, daysUntil, COLLECTION_BOTTLES } from '@/data/giveaways';
 
 const TICKET_PACKAGES = [
   { id: 1, qty: 1,  price: 2.99,  badge: null },
@@ -234,18 +234,17 @@ export function GiveawayDetail() {
 
               <div className="grid md:grid-cols-2 gap-8 bg-card border border-border p-6 rounded-sm shadow-xl">
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
-                  {img ? (
-                    <img src={img} alt={giveaway.name} className="w-full h-full object-cover mix-blend-screen" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950 flex items-center justify-center">
-                      <svg viewBox="0 0 80 160" className="w-16 h-32 opacity-20 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="28" y="0" width="24" height="20" rx="4" />
-                        <rect x="20" y="18" width="40" height="8" rx="2" />
-                        <rect x="16" y="24" width="48" height="110" rx="6" />
-                        <rect x="20" y="134" width="40" height="26" rx="4" />
-                      </svg>
-                    </div>
-                  )}
+                  <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
+                    {COLLECTION_BOTTLES.map((bottle, i) => (
+                      <div key={i} className="relative overflow-hidden bg-black">
+                        <img src={bottle.image} alt={bottle.name} className="w-full h-full object-cover opacity-80 mix-blend-screen" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                        <div className="absolute bottom-1 left-1 right-1">
+                          <p className="text-[8px] font-mono text-primary leading-tight truncate">{bottle.value}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent pointer-events-none" />
                   <div className="absolute bottom-6 left-6 right-6 space-y-4">
                     <h2 className="text-3xl font-serif leading-tight">{giveaway.name}</h2>

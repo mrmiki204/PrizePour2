@@ -14,6 +14,45 @@ export interface Bottle {
   description: string;
 }
 
+export const COLLECTION_BOTTLES: Bottle[] = [
+  {
+    name: "21 Year Old Single Malt",
+    value: "£220",
+    image: twentyOneYoImg,
+    description: "West Cork's finest aged expression, bottled at 46% for maximum character."
+  },
+  {
+    name: "Single Pot Still",
+    value: "£60",
+    image: singlePotStillImg,
+    description: "Classic Irish style made from malted and unmalted barley."
+  },
+  {
+    name: "Cognac Cask Finish",
+    value: "£59",
+    image: cognacCaskImg,
+    description: "Rich dried fruit and spice from ex-Cognac cask finishing."
+  },
+  {
+    name: "Double Oak",
+    value: "£50",
+    image: doubleOakImg,
+    description: "Layered vanilla and toasted oak, honey and spice on the finish."
+  },
+  {
+    name: "Port Cask",
+    value: "£50",
+    image: portCaskImg,
+    description: "Lush red berries and dark chocolate from ruby port cask finishing."
+  },
+  {
+    name: "Galley Head Single Malt",
+    value: "£42",
+    image: galleyHeadImg,
+    description: "Light, coastal, and refreshingly approachable Atlantic expression."
+  },
+];
+
 export const BUNDLED_IMAGE_MAP: Record<number, string> = {
   1: twentyOneYoImg,
   2: singlePotStillImg,

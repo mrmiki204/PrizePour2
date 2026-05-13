@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User, Ticket, Gift, LogOut, CheckCircle2, ArrowRight } from 'lucide-react';
-import { ACTIVE_GIVEAWAYS } from '@/data/giveaways';
+import { useListGiveaways } from '@workspace/api-client-react';
 
 export interface UserProfile {
   firstName: string;
@@ -41,6 +41,7 @@ export function Profile() {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState(false);
+  const { data: giveaways } = useListGiveaways();
 
   useEffect(() => {
     setProfile(getProfile());
@@ -133,7 +134,7 @@ export function Profile() {
                 >
                   <Ticket className="w-6 h-6 text-primary mb-3" />
                   <p className="font-serif text-lg mb-1">Browse Draws</p>
-                  <p className="text-xs text-muted-foreground">Enter one of {ACTIVE_GIVEAWAYS.length} live giveaways</p>
+                  <p className="text-xs text-muted-foreground">Enter one of {giveaways?.length ?? 1} live giveaways</p>
                   <div className="flex items-center gap-1 text-xs text-primary font-mono uppercase tracking-widest mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     Enter <ArrowRight className="w-3 h-3" />
                   </div>
