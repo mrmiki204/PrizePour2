@@ -1,8 +1,9 @@
-import { Menu, User, X } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import logoSrc from '@/assets/prizepour-logo.png';
+import { getProfile } from '@/pages/Profile';
 
 interface NavbarProps {
   onScrollTo?: (id: string) => void;
@@ -11,6 +12,22 @@ interface NavbarProps {
 export function Navbar({ onScrollTo }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [, setLocation] = useLocation();
+  const [initials, setInitials] = useState<string | null>(null);
+
+  function refreshProfile() {
+    const p = getProfile();
+    if (p) {
+      setInitials(`${p.firstName[0]}${p.lastName[0]}`.toUpperCase());
+    } else {
+      setInitials(null);
+    }
+  }
+
+  useEffect(() => {
+    refreshProfile();
+    window.addEventListener('prizepour:profile-changed', refreshProfile);
+    return () => window.removeEventListener('prizepour:profile-changed', refreshProfile);
+  }, []);
 
   const handleNav = (id: string) => {
     setMobileOpen(false);
@@ -48,15 +65,20 @@ export function Navbar({ onScrollTo }: NavbarProps) {
         </div>
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="text-foreground/80 hover:text-primary">
-            <User className="w-5 h-5" />
-          </Button>
-          <Button
-            className="hidden md:flex bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider"
-            onClick={() => handleNav('giveaways')}
+          <button
+            onClick={() => { setMobileOpen(false); setLocation('/profile'); }}
+            className="w-9 h-9 rounded-full border border-border hover:border-primary transition-colors flex items-center justify-center text-foreground/80 hover:text-primary"
+            aria-label="Profile"
           >
-            Join Club
-          </Button>
+            {initials ? (
+              <span className="text-xs font-serif font-medium text-primary">{initials}</span>
+            ) : (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+            )}
+          </button>
           <Button
             variant="ghost"
             size="icon"
@@ -80,12 +102,12 @@ export function Navbar({ onScrollTo }: NavbarProps) {
               {l.label}
             </button>
           ))}
-          <Button
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider"
-            onClick={() => handleNav('giveaways')}
+          <button
+            onClick={() => { setMobileOpen(false); setLocation('/profile'); }}
+            className="block w-full text-left text-sm font-medium tracking-widest text-foreground/80 hover:text-primary transition-colors uppercase py-2"
           >
-            Join Club
-          </Button>
+            {initials ? `My Profile (${initials})` : 'Create Profile'}
+          </button>
         </div>
       )}
     </nav>
