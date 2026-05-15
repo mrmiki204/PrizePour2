@@ -235,8 +235,8 @@ export function Home() {
 
                     <div className="space-y-1.5 pt-2">
                       {COLLECTION_BOTTLES.map((bottle, i) => (
-                        <div key={i} className="flex items-center text-xs font-mono py-1 border-b border-border/30 last:border-0">
-                          <span className="text-foreground/70">{bottle.name}</span>
+                        <div key={i} className="flex justify-center items-center text-xs font-mono py-1 border-b border-border/30 last:border-0">
+                          <span className="text-foreground/70 text-center">{bottle.name}</span>
                         </div>
                       ))}
                     </div>
