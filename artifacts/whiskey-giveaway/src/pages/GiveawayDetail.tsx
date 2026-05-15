@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw } from 'lucide-react';
+import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw, CreditCard, Lock, ShieldCheck } from 'lucide-react';
 import { useGetGiveaway, useCreateEntry } from '@workspace/api-client-react';
 import { getGiveawayImage, daysUntil, COLLECTION_BOTTLES } from '@/data/giveaways';
 
@@ -118,35 +118,39 @@ export function GiveawayDetail() {
 
   const currentQuiz = QUIZ_QUESTIONS[quizIndex % QUIZ_QUESTIONS.length];
 
-  const submitQuiz = async () => {
+  const submitQuiz = () => {
     if (quizSelected === currentQuiz.answer) {
       setQuizError(false);
-      if (!giveaway) return;
-      setEntryError('');
-      try {
-        const result = await createEntry({
-          data: {
-            giveawayId: giveaway.id,
-            firstName: details.firstName,
-            lastName: details.lastName,
-            email: details.email,
-            ticketQty: selectedPackage.qty,
-            referralCode: referredBy ?? undefined,
-          },
-        });
-        const tickets = (result as { ticketNumbers?: string[] }).ticketNumbers ?? [];
-        setAssignedTickets(tickets);
-        const code = `${details.firstName.toLowerCase().replace(/[^a-z]/g, '')}-${giveawayId}-${(tickets[0] ?? '').replace('#', '')}`;
-        setReferralLink(`${window.location.origin}/giveaway/${giveawayId}?ref=${code}`);
-        nextStep();
-      } catch {
-        setEntryError('Could not confirm your entry — please try again.');
-      }
+      nextStep();
     } else {
       setQuizError(true);
       setQuizAttempts(a => a + 1);
       setQuizSelected('');
       setQuizIndex(i => (i + 1) % QUIZ_QUESTIONS.length);
+    }
+  };
+
+  const handlePayment = async () => {
+    if (!giveaway) return;
+    setEntryError('');
+    try {
+      const result = await createEntry({
+        data: {
+          giveawayId: giveaway.id,
+          firstName: details.firstName,
+          lastName: details.lastName,
+          email: details.email,
+          ticketQty: selectedPackage.qty,
+          referralCode: referredBy ?? undefined,
+        },
+      });
+      const tickets = (result as { ticketNumbers?: string[] }).ticketNumbers ?? [];
+      setAssignedTickets(tickets);
+      const code = `${details.firstName.toLowerCase().replace(/[^a-z]/g, '')}-${giveawayId}-${(tickets[0] ?? '').replace('#', '')}`;
+      setReferralLink(`${window.location.origin}/giveaway/${giveawayId}?ref=${code}`);
+      nextStep();
+    } catch {
+      setEntryError('Could not process your entry — please try again.');
     }
   };
 
@@ -171,6 +175,8 @@ export function GiveawayDetail() {
   const pct = Math.min((entryCount / giveaway.maxEntries) * 100, 100);
   const remaining = giveaway.maxEntries - entryCount;
 
+  const TOTAL_STEPS = 5;
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
@@ -180,22 +186,24 @@ export function GiveawayDetail() {
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Giveaways
         </Button>
 
-        {/* Progress Bar */}
+        {/* Progress Bar — 5 steps */}
         <div className="mb-12">
-          <div className="flex justify-between items-center text-sm font-mono tracking-widest text-muted-foreground mb-4">
-            <span className={step >= 1 ? "text-primary" : ""}>Choose Tickets</span>
+          <div className="flex justify-between items-center text-xs font-mono tracking-widest text-muted-foreground mb-4">
+            <span className={step >= 1 ? "text-primary" : ""}>Tickets</span>
             <span className="hidden sm:inline">→</span>
-            <span className={step >= 2 ? "text-primary" : ""}>Your Details</span>
+            <span className={step >= 2 ? "text-primary" : ""}>Details</span>
             <span className="hidden sm:inline">→</span>
-            <span className={step >= 3 ? "text-primary" : ""}>Skill Question</span>
+            <span className={step >= 3 ? "text-primary" : ""}>Question</span>
             <span className="hidden sm:inline">→</span>
-            <span className={step >= 4 ? "text-primary" : ""}>Confirmed</span>
+            <span className={step >= 4 ? "text-primary" : ""}>Payment</span>
+            <span className="hidden sm:inline">→</span>
+            <span className={step >= 5 ? "text-primary" : ""}>Confirmed</span>
           </div>
-          <div className="h-1 bg-secondary rounded-full overflow-hidden flex">
+          <div className="h-1 bg-secondary rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-primary"
-              initial={{ width: "25%" }}
-              animate={{ width: `${(step / 4) * 100}%` }}
+              initial={{ width: `${(1 / TOTAL_STEPS) * 100}%` }}
+              animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
@@ -256,7 +264,7 @@ export function GiveawayDetail() {
                   <div className="absolute bottom-6 left-6 right-6 space-y-4">
                     <h2 className="text-3xl font-serif leading-tight">{giveaway.name}</h2>
                     <div className="flex justify-between items-center text-sm font-mono">
-                      <span className="text-primary">{giveaway.prizeValue} Value</span>
+                      <span className="text-primary">{giveaway.prizeValue}</span>
                       <span className="text-muted-foreground">{(entryCount + selectedPackage.qty).toLocaleString()} / {giveaway.maxEntries.toLocaleString()}</span>
                     </div>
                     <div className="mt-2">
@@ -434,7 +442,7 @@ export function GiveawayDetail() {
                 </div>
                 <h2 className="text-3xl font-serif text-primary">Skill-Testing Question</h2>
                 <p className="text-muted-foreground text-sm">
-                  As required by contest law, answer this whisky question correctly to confirm your entry — it's free.
+                  As required by contest law, answer this whisky question correctly to proceed to payment.
                 </p>
               </div>
 
@@ -481,44 +489,152 @@ export function GiveawayDetail() {
                   </motion.div>
                 </AnimatePresence>
 
-                {entryError && (
-                  <div className="flex items-center gap-2 text-red-400 text-sm font-mono bg-red-400/10 border border-red-400/20 rounded-sm p-3">
-                    <XCircle className="w-4 h-4 shrink-0" />
-                    {entryError}
-                  </div>
-                )}
-
-                <div className="pt-2 space-y-3">
-                  <Button
-                    className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base gap-2"
-                    onClick={submitQuiz}
-                    disabled={!quizSelected || isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <><Loader2 className="w-5 h-5 animate-spin" /> Confirming Entry…</>
-                    ) : (
-                      'Submit Answer'
-                    )}
-                  </Button>
-                  <p className="text-xs text-muted-foreground text-center">
-                    Entry is completely free — no payment required. One entry per question attempt.
-                  </p>
-                </div>
+                <Button
+                  className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base"
+                  onClick={submitQuiz}
+                  disabled={!quizSelected}
+                >
+                  Submit Answer
+                </Button>
               </div>
 
               <div className="flex justify-between">
                 <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
                 <div className="bg-card border border-border rounded-sm px-4 py-2 text-xs font-mono text-muted-foreground">
-                  {selectedPackage.qty} ticket{selectedPackage.qty !== 1 ? 's' : ''} · {giveaway.name}
+                  {selectedPackage.qty} ticket{selectedPackage.qty !== 1 ? 's' : ''} · £{selectedPackage.price}
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* ── STEP 4: CONFIRMATION ── */}
+          {/* ── STEP 4: PAYMENT ── */}
           {step === 4 && (
             <motion.div
               key="step4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="grid md:grid-cols-5 gap-8"
+            >
+              {/* Left: checkout panel */}
+              <div className="md:col-span-3 space-y-6">
+                <div className="space-y-1">
+                  <h2 className="text-3xl font-serif text-primary">Secure Checkout</h2>
+                  <p className="text-muted-foreground text-sm">Complete your entry purchase below.</p>
+                </div>
+
+                <div className="bg-card border border-border rounded-sm p-8 space-y-6">
+                  {/* Entrant summary */}
+                  <div className="flex items-center gap-3 pb-5 border-b border-border/50">
+                    <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                      <span className="text-primary font-serif text-sm">
+                        {details.firstName.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-serif">{details.firstName} {details.lastName}</p>
+                      <p className="text-xs text-muted-foreground font-mono">{details.email}</p>
+                    </div>
+                  </div>
+
+                  {/* Card placeholder */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CreditCard className="w-4 h-4 text-primary" />
+                      <p className="text-sm font-mono uppercase tracking-widest text-muted-foreground">Card Details</p>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-11 bg-secondary/40 border border-border/60 rounded-sm flex items-center px-4">
+                        <span className="text-muted-foreground/50 text-sm font-mono tracking-widest">•••• •••• •••• ••••</span>
+                        <div className="ml-auto flex gap-1.5">
+                          <div className="w-7 h-4 bg-muted-foreground/20 rounded-sm" />
+                          <div className="w-7 h-4 bg-muted-foreground/20 rounded-sm" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="h-11 bg-secondary/40 border border-border/60 rounded-sm flex items-center px-4">
+                          <span className="text-muted-foreground/50 text-sm font-mono">MM / YY</span>
+                        </div>
+                        <div className="h-11 bg-secondary/40 border border-border/60 rounded-sm flex items-center px-4">
+                          <span className="text-muted-foreground/50 text-sm font-mono">CVC</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground/60 font-mono flex items-center gap-1.5">
+                      <Lock className="w-3 h-3" />
+                      Payment processing will be enabled shortly
+                    </p>
+                  </div>
+
+                  {/* Order line */}
+                  <div className="space-y-2 border-t border-border/50 pt-5 text-sm">
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>{giveaway.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}</span>
+                      <span className="font-mono">£{selectedPackage.price}</span>
+                    </div>
+                    <div className="h-px bg-border/50 my-2" />
+                    <div className="flex justify-between font-serif text-lg text-primary">
+                      <span>Total</span>
+                      <span>£{selectedPackage.price}</span>
+                    </div>
+                  </div>
+
+                  {entryError && (
+                    <div className="flex items-center gap-2 text-red-400 text-sm font-mono bg-red-400/10 border border-red-400/20 rounded-sm p-3">
+                      <XCircle className="w-4 h-4 shrink-0" />
+                      {entryError}
+                    </div>
+                  )}
+
+                  <Button
+                    className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base gap-2"
+                    onClick={handlePayment}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <><Loader2 className="w-5 h-5 animate-spin" /> Processing…</>
+                    ) : (
+                      <><CreditCard className="w-5 h-5" /> Pay £{selectedPackage.price}</>
+                    )}
+                  </Button>
+
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
+                    256-bit SSL encryption · Secure checkout
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: order summary */}
+              <div className="md:col-span-2 space-y-6">
+                <div className="bg-card border border-border rounded-sm p-6 space-y-4">
+                  <h3 className="font-serif text-lg border-b border-border/50 pb-3">Order Summary</h3>
+                  <div className="aspect-[4/3] relative overflow-hidden rounded-sm">
+                    {img ? (
+                      <img src={img} alt={giveaway.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950" />
+                    )}
+                  </div>
+                  <p className="font-serif">{giveaway.name}</p>
+                  <div className="text-xs font-mono space-y-1.5 text-muted-foreground">
+                    <div className="flex justify-between"><span>Prize Value</span><span>{giveaway.prizeValue}</span></div>
+                    <div className="flex justify-between"><span>Max Entries</span><span>{giveaway.maxEntries}</span></div>
+                    <div className="flex justify-between"><span>Your Tickets</span><span>{selectedPackage.qty}</span></div>
+                  </div>
+                </div>
+                <Button variant="ghost" className="w-full" onClick={() => setStep(3)}>← Back</Button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── STEP 5: CONFIRMATION ── */}
+          {step === 5 && (
+            <motion.div
+              key="step5"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="max-w-2xl mx-auto text-center space-y-8"
