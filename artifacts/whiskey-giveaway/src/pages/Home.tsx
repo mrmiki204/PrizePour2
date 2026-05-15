@@ -127,7 +127,7 @@ export function Home() {
                   <div className="absolute bottom-4 left-4 right-4">
                     <h3 className="text-2xl font-serif text-white mb-2">{featured.name}</h3>
                     <div className="flex justify-between items-end">
-                      <p className="text-primary font-mono">{featured.prizeValue} Value</p>
+                      <p className="text-primary font-mono">{featured.prizeValue}</p>
                       <p className="text-sm text-gray-400 font-mono">{featured.entryCount.toLocaleString()} Entries</p>
                     </div>
                   </div>
@@ -183,7 +183,7 @@ export function Home() {
         <div className="mb-16">
           <p className="text-xs font-mono text-primary uppercase tracking-widest mb-3">Live Raffle</p>
           <h2 className="text-4xl font-serif mb-4">One Winner. The Whole Collection.</h2>
-          <p className="text-muted-foreground max-w-xl">Enter once for a chance to win all six Clonakilty expressions — worth £481 combined, shipped insured to your door.</p>
+          <p className="text-muted-foreground max-w-xl">Enter once for a chance to win all seven Clonakilty expressions — worth over £500, shipped insured to your door.</p>
         </div>
 
         {!featured ? (
@@ -217,7 +217,6 @@ export function Home() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-2">
-                        <p className="text-[10px] font-mono text-primary leading-tight">{bottle.value}</p>
                         <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name}</p>
                       </div>
                     </div>
@@ -236,9 +235,8 @@ export function Home() {
 
                     <div className="space-y-1.5 pt-2">
                       {COLLECTION_BOTTLES.map((bottle, i) => (
-                        <div key={i} className="flex justify-between items-center text-xs font-mono py-1 border-b border-border/30 last:border-0">
+                        <div key={i} className="flex items-center text-xs font-mono py-1 border-b border-border/30 last:border-0">
                           <span className="text-foreground/70">{bottle.name}</span>
-                          <span className="text-primary">{bottle.value}</span>
                         </div>
                       ))}
                     </div>

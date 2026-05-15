@@ -249,9 +249,6 @@ export function GiveawayDetail() {
                       >
                         <img src={bottle.image} alt={bottle.name} className="w-full h-full object-contain p-1 opacity-90" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute bottom-1 left-1 right-1">
-                          <p className="text-[8px] font-mono text-primary leading-tight truncate">{bottle.value}</p>
-                        </div>
                       </div>
                     ))}
                   </div>
