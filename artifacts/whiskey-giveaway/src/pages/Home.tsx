@@ -216,7 +216,7 @@ export function Home() {
                         className="w-full h-full object-contain p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-105 transition-all duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-2">
+                      <div className="absolute bottom-0 left-0 right-0 p-2 text-center">
                         <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name}</p>
                       </div>
                     </div>
