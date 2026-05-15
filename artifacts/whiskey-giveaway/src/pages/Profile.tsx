@@ -68,7 +68,8 @@ function isAtLeast18(day: string, month: string, year: string): boolean {
   return dob <= cutoff;
 }
 
-function formatDob(dob: string) {
+function formatDob(dob: string | undefined) {
+  if (!dob) return '—';
   const [y, m, d] = dob.split('-');
   return new Date(parseInt(y), parseInt(m) - 1, parseInt(d))
     .toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
