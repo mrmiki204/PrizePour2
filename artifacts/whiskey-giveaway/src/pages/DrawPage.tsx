@@ -82,7 +82,7 @@ export function DrawPage() {
               </div>
 
               <div className="w-56 h-40 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
-                <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
+                <div className="w-full h-full grid grid-cols-4 gap-px bg-border/20">
                   {COLLECTION_BOTTLES.map((bottle, i) => (
                     <div
                       key={i}

@@ -51,6 +51,12 @@ export const COLLECTION_BOTTLES: Bottle[] = [
     image: galleyHeadImg,
     description: "Light, coastal, and refreshingly approachable Atlantic expression."
   },
+  {
+    name: "Galley Head Single Malt 70cl",
+    value: "£42",
+    image: galleyHeadImg,
+    description: "The iconic coastal single malt in a full 70cl expression — sea-fresh and smooth."
+  },
 ];
 
 export const BUNDLED_IMAGE_MAP: Record<number, string> = {

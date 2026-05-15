@@ -240,7 +240,7 @@ export function GiveawayDetail() {
 
               <div className="grid md:grid-cols-2 gap-8 bg-card border border-border p-6 rounded-sm shadow-xl">
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
-                  <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
+                  <div className="w-full h-full grid grid-cols-4 gap-px bg-border/20">
                     {COLLECTION_BOTTLES.map((bottle, i) => (
                       <div
                         key={i}
