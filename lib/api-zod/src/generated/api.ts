@@ -50,8 +50,8 @@ export const CreateEntryBody = zod.object({
   lastName: zod.string().min(1),
   email: zod.string().email(),
   ticketQty: zod.number().min(1),
-  ticketNumbers: zod.array(zod.string()),
-  amountPaid: zod.string(),
+  ticketNumbers: zod.array(zod.string()).nullish(),
+  amountPaid: zod.string().nullish(),
   referralCode: zod.string().nullish(),
   stripeSessionId: zod.string().nullish(),
 });

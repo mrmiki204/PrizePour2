@@ -15,8 +15,8 @@ export interface EntryInput {
   email: string;
   /** @minimum 1 */
   ticketQty: number;
-  ticketNumbers: string[];
-  amountPaid: string;
+  ticketNumbers?: string[] | null;
+  amountPaid?: string | null;
   referralCode?: string | null;
   stripeSessionId?: string | null;
 }

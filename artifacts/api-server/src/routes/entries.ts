@@ -31,8 +31,23 @@ router.post("/entries", async (req, res): Promise<void> => {
     return;
   }
 
-  const [entry] = await db.insert(entriesTable).values(parsed.data).returning();
-  req.log.info({ entryId: entry.id, giveawayId: entry.giveawayId }, "Entry created");
+  const { ticketQty, ticketNumbers, amountPaid, ...rest } = parsed.data;
+
+  const tickets: string[] =
+    ticketNumbers && ticketNumbers.length > 0
+      ? ticketNumbers
+      : Array.from({ length: ticketQty }, () => "#" + Math.floor(1000 + Math.random() * 9000).toString());
+
+  const paid = amountPaid ?? "0.00";
+
+  const [entry] = await db.insert(entriesTable).values({
+    ...rest,
+    ticketQty,
+    ticketNumbers: tickets,
+    amountPaid: paid,
+  }).returning();
+
+  req.log.info({ entryId: entry.id, giveawayId: entry.giveawayId, tickets }, "Entry created");
   res.status(201).json(ListEntriesResponseItem.parse(entry));
 });
 
