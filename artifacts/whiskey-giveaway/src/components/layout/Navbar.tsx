@@ -47,9 +47,9 @@ export function Navbar({ onScrollTo }: NavbarProps) {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 h-28 flex items-center justify-between">
         <button onClick={() => setLocation('/')} className="flex items-center">
-          <img src={logoSrc} alt="PrizePour" className="h-20 w-auto object-contain" />
+          <img src={logoSrc} alt="PrizePour" className="h-28 w-auto object-contain" />
         </button>
 
         <div className="hidden md:flex items-center gap-8">
