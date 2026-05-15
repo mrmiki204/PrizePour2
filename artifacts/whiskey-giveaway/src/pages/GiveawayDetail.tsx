@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useRoute } from 'wouter';
 import { Navbar } from '@/components/layout/Navbar';
@@ -8,16 +8,77 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Ticket, CreditCard, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { useGetGiveaway } from '@workspace/api-client-react';
+import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw } from 'lucide-react';
+import { useGetGiveaway, useCreateEntry } from '@workspace/api-client-react';
 import { getGiveawayImage, daysUntil, COLLECTION_BOTTLES } from '@/data/giveaways';
 
 const TICKET_PACKAGES = [
   { id: 1, qty: 1,  price: 2.99,  badge: null },
   { id: 2, qty: 4,  price: 9.99,  badge: "Best Value" },
   { id: 3, qty: 10, price: 24.99, badge: "Most Popular" },
-  { id: 4, qty: 25, price: 64.99, badge: null },
+];
+
+const QUIZ_QUESTIONS = [
+  {
+    question: "Scotch whisky must be aged for a minimum of how many years?",
+    options: [
+      { val: 'a', label: '1 year' },
+      { val: 'b', label: '3 years' },
+      { val: 'c', label: '5 years' },
+      { val: 'd', label: '10 years' },
+    ],
+    answer: 'c',
+  },
+  {
+    question: "Which country is Clonakilty Distillery based in?",
+    options: [
+      { val: 'a', label: 'Scotland' },
+      { val: 'b', label: 'Ireland' },
+      { val: 'c', label: 'United States' },
+      { val: 'd', label: 'Japan' },
+    ],
+    answer: 'b',
+  },
+  {
+    question: "What type of cask is most commonly used to mature Irish whiskey?",
+    options: [
+      { val: 'a', label: 'Red wine cask' },
+      { val: 'b', label: 'Sherry butt' },
+      { val: 'c', label: 'Ex-bourbon barrel' },
+      { val: 'd', label: 'New oak cask' },
+    ],
+    answer: 'c',
+  },
+  {
+    question: "What is the minimum ABV for a spirit to be legally sold as whisky in the UK?",
+    options: [
+      { val: 'a', label: '30% ABV' },
+      { val: 'b', label: '37.5% ABV' },
+      { val: 'c', label: '40% ABV' },
+      { val: 'd', label: '45% ABV' },
+    ],
+    answer: 'c',
+  },
+  {
+    question: "Which of the following is NOT one of the five Scotch whisky regions?",
+    options: [
+      { val: 'a', label: 'Speyside' },
+      { val: 'b', label: 'Highland' },
+      { val: 'c', label: 'Leinster' },
+      { val: 'd', label: 'Islay' },
+    ],
+    answer: 'c',
+  },
+  {
+    question: "What does 'single malt' whisky mean?",
+    options: [
+      { val: 'a', label: 'Made from a single grain variety' },
+      { val: 'b', label: 'Made at one distillery using malted barley' },
+      { val: 'c', label: 'Aged in a single barrel' },
+      { val: 'd', label: 'Bottled by a single person' },
+    ],
+    answer: 'b',
+  },
 ];
 
 export function GiveawayDetail() {
@@ -25,138 +86,82 @@ export function GiveawayDetail() {
   const [, setLocation] = useLocation();
   const giveawayId = params?.id ? parseInt(params.id) : 1;
   const { data: giveaway, isLoading } = useGetGiveaway(giveawayId);
+  const { mutateAsync: createEntry, isPending: isSubmitting } = useCreateEntry();
 
   const [step, setStep] = useState(1);
   const [selectedPackage, setSelectedPackage] = useState(TICKET_PACKAGES[0]);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [assignedTickets, setAssignedTickets] = useState<string[]>([]);
   const [referralLink, setReferralLink] = useState('');
   const [referralCopied, setReferralCopied] = useState(false);
+  const [entryError, setEntryError] = useState('');
 
   const referredBy = new URLSearchParams(window.location.search).get('ref');
 
-  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizIndex, setQuizIndex] = useState(0);
   const [quizSelected, setQuizSelected] = useState('');
   const [quizError, setQuizError] = useState(false);
-  
+  const [quizAttempts, setQuizAttempts] = useState(0);
+
   const [details, setDetails] = useState({
     firstName: '',
     lastName: '',
     email: '',
     confirmEmail: '',
     ageVerified: false,
-    termsAccepted: false
+    termsAccepted: false,
   });
-
-  const [isRedirecting, setIsRedirecting] = useState(false);
-  const [sessionError, setSessionError] = useState('');
 
   const nextStep = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStep(s => s + 1);
   };
 
-  const submitQuiz = () => {
-    if (quizSelected === 'scotland') {
-      setShowQuiz(false);
-      setQuizSelected('');
+  const currentQuiz = QUIZ_QUESTIONS[quizIndex % QUIZ_QUESTIONS.length];
+
+  const submitQuiz = async () => {
+    if (quizSelected === currentQuiz.answer) {
       setQuizError(false);
-      nextStep();
+      if (!giveaway) return;
+      setEntryError('');
+      try {
+        const result = await createEntry({
+          data: {
+            giveawayId: giveaway.id,
+            firstName: details.firstName,
+            lastName: details.lastName,
+            email: details.email,
+            ticketQty: selectedPackage.qty,
+            referralCode: referredBy ?? undefined,
+          },
+        });
+        const tickets = (result as { ticketNumbers?: string[] }).ticketNumbers ?? [];
+        setAssignedTickets(tickets);
+        const code = `${details.firstName.toLowerCase().replace(/[^a-z]/g, '')}-${giveawayId}-${(tickets[0] ?? '').replace('#', '')}`;
+        setReferralLink(`${window.location.origin}/giveaway/${giveawayId}?ref=${code}`);
+        nextStep();
+      } catch {
+        setEntryError('Could not confirm your entry — please try again.');
+      }
     } else {
       setQuizError(true);
+      setQuizAttempts(a => a + 1);
+      setQuizSelected('');
+      setQuizIndex(i => (i + 1) % QUIZ_QUESTIONS.length);
     }
   };
 
-  useEffect(() => {
-    const sessionId = new URLSearchParams(window.location.search).get('session_id');
-    if (!sessionId) return;
-
-    setIsProcessing(true);
-    fetch(`/api/stripe/session/${sessionId}`)
-      .then(r => r.json())
-      .then((data: { entry?: { firstName: string; lastName: string; email: string }; ticketNumbers?: string[]; error?: string }) => {
-        if (data.error || !data.ticketNumbers) {
-          setSessionError(data.error ?? 'Payment verification failed');
-          setIsProcessing(false);
-          return;
-        }
-        const tickets = data.ticketNumbers;
-        localStorage.setItem(`giveaway_${giveawayId}_tickets`, JSON.stringify(tickets));
-        setAssignedTickets(tickets);
-        if (data.entry) {
-          setDetails(d => ({
-            ...d,
-            firstName: data.entry!.firstName,
-            lastName: data.entry!.lastName,
-            email: data.entry!.email,
-          }));
-        }
-        const code = `${(data.entry?.firstName ?? 'friend').toLowerCase().replace(/[^a-z]/g, '')}-${giveawayId}-${tickets[0].replace('#', '')}`;
-        setReferralLink(`${window.location.origin}/giveaway/${giveawayId}?ref=${code}`);
-        setIsProcessing(false);
-        window.history.replaceState({}, '', `/giveaway/${giveawayId}`);
-        setStep(4);
-      })
-      .catch(() => {
-        setSessionError('Could not verify your payment. Please contact support.');
-        setIsProcessing(false);
-      });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const initiateStripeCheckout = async () => {
-    if (!giveaway) return;
-    setIsRedirecting(true);
-    try {
-      const resp = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          giveawayId: giveaway.id,
-          firstName: details.firstName,
-          lastName: details.lastName,
-          email: details.email,
-          ticketQty: selectedPackage.qty,
-          amountCents: Math.round(selectedPackage.price * 100),
-          referralCode: referredBy ?? undefined,
-        }),
-      });
-      const { url, error } = await resp.json() as { url?: string; error?: string };
-      if (url) {
-        window.location.href = url;
-      } else {
-        setSessionError(error ?? 'Failed to start checkout');
-        setIsRedirecting(false);
-      }
-    } catch {
-      setSessionError('Network error — please try again');
-      setIsRedirecting(false);
-    }
-  };
-
-  const isDetailsValid = 
-    details.firstName.length > 0 && 
-    details.lastName.length > 0 && 
-    details.email.length > 0 && 
+  const isDetailsValid =
+    details.firstName.length > 0 &&
+    details.lastName.length > 0 &&
+    details.email.length > 0 &&
     details.email === details.confirmEmail &&
-    details.ageVerified && 
+    details.ageVerified &&
     details.termsAccepted;
 
   if (isLoading || !giveaway) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (isProcessing) {
-    return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto" />
-          <p className="text-muted-foreground font-mono text-sm">Verifying your payment…</p>
-        </div>
       </div>
     );
   }
@@ -169,8 +174,8 @@ export function GiveawayDetail() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
-      
-      <div className="flex-1 pt-24 pb-12 max-w-4xl mx-auto w-full px-6">
+
+      <div className="flex-1 pt-36 pb-12 max-w-4xl mx-auto w-full px-6">
         <Button variant="ghost" className="mb-6 -ml-4 text-muted-foreground hover:text-foreground" onClick={() => setLocation('/')}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Giveaways
         </Button>
@@ -182,12 +187,12 @@ export function GiveawayDetail() {
             <span className="hidden sm:inline">→</span>
             <span className={step >= 2 ? "text-primary" : ""}>Your Details</span>
             <span className="hidden sm:inline">→</span>
-            <span className={step >= 3 ? "text-primary" : ""}>Payment</span>
+            <span className={step >= 3 ? "text-primary" : ""}>Skill Question</span>
             <span className="hidden sm:inline">→</span>
             <span className={step >= 4 ? "text-primary" : ""}>Confirmed</span>
           </div>
           <div className="h-1 bg-secondary rounded-full overflow-hidden flex">
-            <motion.div 
+            <motion.div
               className="h-full bg-primary"
               initial={{ width: "25%" }}
               animate={{ width: `${(step / 4) * 100}%` }}
@@ -197,9 +202,10 @@ export function GiveawayDetail() {
         </div>
 
         <AnimatePresence mode="wait">
-          {/* STEP 1: TICKETS */}
+
+          {/* ── STEP 1: TICKETS ── */}
           {step === 1 && (
-            <motion.div 
+            <motion.div
               key="step1"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -225,7 +231,7 @@ export function GiveawayDetail() {
                         })()}
                       </p>
                       <p className="text-xs font-mono text-muted-foreground mt-0.5">
-                        You're viewing this draw through a personal referral link. Enter your tickets below.
+                        You're viewing this draw through a personal referral link.
                       </p>
                     </div>
                   </div>
@@ -275,7 +281,7 @@ export function GiveawayDetail() {
                     <h3 className="text-xl font-serif mb-2">Draw Ends In:</h3>
                     <CountdownTimer daysToAdd={daysUntil(giveaway.drawDate)} />
                   </div>
-                  
+
                   <div className="h-px w-full bg-border/50 my-2" />
 
                   <div className="flex-1 space-y-4">
@@ -285,8 +291,8 @@ export function GiveawayDetail() {
                         key={pkg.id}
                         onClick={() => setSelectedPackage(pkg)}
                         className={`w-full relative flex items-center justify-between p-4 border rounded-sm transition-all duration-200 ${
-                          selectedPackage.id === pkg.id 
-                            ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(234,146,55,0.15)]' 
+                          selectedPackage.id === pkg.id
+                            ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(234,146,55,0.15)]'
                             : 'border-border bg-card/50 hover:border-primary/50'
                         }`}
                       >
@@ -310,9 +316,9 @@ export function GiveawayDetail() {
                     {`Selecting ${selectedPackage.qty} ticket${selectedPackage.qty !== 1 ? 's' : ''} — odds: ${(selectedPackage.qty / (entryCount + selectedPackage.qty) * 100).toFixed(2)}%`}
                   </div>
 
-                  <Button 
+                  <Button
                     className="w-full h-14 text-lg bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest"
-                    onClick={() => { setQuizError(false); setQuizSelected(''); setShowQuiz(true); }}
+                    onClick={nextStep}
                   >
                     Continue to Details
                   </Button>
@@ -331,7 +337,7 @@ export function GiveawayDetail() {
                 </div>
                 <div className="grid sm:grid-cols-3 gap-4">
                   {[
-                    { icon: '🎟️', title: 'Enter the draw', desc: 'Purchase any ticket package to enter.' },
+                    { icon: '🎟️', title: 'Enter the draw', desc: 'Select a ticket package to enter.' },
                     { icon: '🔗', title: 'Get your link', desc: 'Receive a personal referral link on confirmation.' },
                     { icon: '📣', title: 'Share & grow', desc: 'Share with friends — every referral helps grow the community.' },
                   ].map((s) => (
@@ -348,9 +354,9 @@ export function GiveawayDetail() {
             </motion.div>
           )}
 
-          {/* STEP 2: DETAILS */}
+          {/* ── STEP 2: DETAILS ── */}
           {step === 2 && (
-            <motion.div 
+            <motion.div
               key="step2"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -382,6 +388,9 @@ export function GiveawayDetail() {
                 <div className="space-y-2">
                   <Label>Confirm Email</Label>
                   <Input type="email" value={details.confirmEmail} onChange={e => setDetails({...details, confirmEmail: e.target.value})} placeholder="james@example.com" />
+                  {details.confirmEmail && details.email !== details.confirmEmail && (
+                    <p className="text-xs text-destructive">Emails do not match</p>
+                  )}
                 </div>
 
                 <div className="pt-4 space-y-4 border-t border-border/50">
@@ -402,105 +411,114 @@ export function GiveawayDetail() {
 
               <div className="flex justify-between">
                 <Button variant="ghost" onClick={() => setStep(1)}>Back</Button>
-                <Button 
+                <Button
                   className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest px-8"
                   disabled={!isDetailsValid}
-                  onClick={nextStep}
+                  onClick={() => { setQuizIndex(0); setQuizSelected(''); setQuizError(false); setQuizAttempts(0); nextStep(); }}
                 >
-                  Continue to Payment
+                  Continue to Question
                 </Button>
               </div>
             </motion.div>
           )}
 
-          {/* STEP 3: PAYMENT */}
+          {/* ── STEP 3: SKILL-TESTING QUESTION ── */}
           {step === 3 && (
-            <motion.div 
+            <motion.div
               key="step3"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="grid md:grid-cols-5 gap-8"
+              className="max-w-2xl mx-auto space-y-8"
             >
-              <div className="md:col-span-3 space-y-8">
-                <div className="space-y-2">
-                  <h2 className="text-3xl font-serif text-primary">Secure Checkout</h2>
-                  <p className="text-muted-foreground text-sm">You'll be redirected to Stripe's secure payment page</p>
+              <div className="text-center space-y-2 mb-8">
+                <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-4">
+                  <HelpCircle className="w-7 h-7 text-primary" />
                 </div>
+                <h2 className="text-3xl font-serif text-primary">Skill-Testing Question</h2>
+                <p className="text-muted-foreground text-sm">
+                  As required by contest law, answer this whisky question correctly to confirm your entry — it's free.
+                </p>
+              </div>
 
-                <div className="bg-card border border-border p-8 rounded-sm space-y-6">
-                  <div className="flex items-center gap-3 pb-5 border-b border-border/50">
-                    <CreditCard className="w-5 h-5 text-primary" />
-                    <div>
-                      <p className="font-serif text-lg">{details.firstName} {details.lastName}</p>
-                      <p className="text-sm text-muted-foreground font-mono">{details.email}</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{giveaway.name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}</span>
-                      <span className="font-mono text-foreground">£{selectedPackage.price}</span>
-                    </div>
-                    <div className="h-px bg-border/50" />
-                    <div className="flex justify-between font-serif text-lg text-primary">
-                      <span>Total</span>
-                      <span>£{selectedPackage.price}</span>
-                    </div>
-                  </div>
-
-                  {sessionError && (
-                    <div className="flex items-center gap-2 text-red-400 text-sm font-mono bg-red-400/10 border border-red-400/20 rounded-sm p-3">
-                      <XCircle className="w-4 h-4 shrink-0" />
-                      {sessionError}
-                    </div>
-                  )}
-
-                  <Button 
-                    className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base"
-                    onClick={initiateStripeCheckout}
-                    disabled={isRedirecting}
+              <div className="bg-card border border-border p-8 rounded-sm space-y-6">
+                {quizAttempts > 0 && (
+                  <motion.div
+                    key={`attempt-${quizAttempts}`}
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/30 rounded-sm px-4 py-3 text-sm text-amber-400"
                   >
-                    {isRedirecting ? (
-                      <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Redirecting to Stripe...</>
+                    <RefreshCw className="w-4 h-4 shrink-0" />
+                    Incorrect — here's a new question. Have another go!
+                  </motion.div>
+                )}
+
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={quizIndex}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-5"
+                  >
+                    <p className="font-serif text-xl leading-snug">{currentQuiz.question}</p>
+
+                    <div className="space-y-3">
+                      {currentQuiz.options.map(opt => (
+                        <button
+                          key={opt.val}
+                          onClick={() => setQuizSelected(opt.val)}
+                          className={`w-full text-left px-5 py-4 border rounded-sm transition-all duration-200 font-mono text-sm ${
+                            quizSelected === opt.val
+                              ? 'border-primary bg-primary/10 text-primary shadow-[0_0_12px_rgba(234,146,55,0.12)]'
+                              : 'border-border hover:border-primary/50 bg-card/50'
+                          }`}
+                        >
+                          <span className="text-primary/60 mr-3 uppercase">{opt.val}.</span>
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+
+                {entryError && (
+                  <div className="flex items-center gap-2 text-red-400 text-sm font-mono bg-red-400/10 border border-red-400/20 rounded-sm p-3">
+                    <XCircle className="w-4 h-4 shrink-0" />
+                    {entryError}
+                  </div>
+                )}
+
+                <div className="pt-2 space-y-3">
+                  <Button
+                    className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base gap-2"
+                    onClick={submitQuiz}
+                    disabled={!quizSelected || isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <><Loader2 className="w-5 h-5 animate-spin" /> Confirming Entry…</>
                     ) : (
-                      <><CreditCard className="w-5 h-5 mr-2" /> Pay £{selectedPackage.price} with Stripe</>
+                      'Submit Answer'
                     )}
                   </Button>
-
-                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                    Secured by Stripe · 256-bit SSL
-                  </div>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Entry is completely free — no payment required. One entry per question attempt.
+                  </p>
                 </div>
               </div>
 
-              <div className="md:col-span-2 space-y-6">
-                <div className="bg-card border border-border rounded-sm p-6 space-y-4">
-                  <h3 className="font-serif text-lg border-b border-border/50 pb-3">Order Summary</h3>
-                  <div className="aspect-[4/3] relative overflow-hidden rounded-sm">
-                    {img ? (
-                      <img src={img} alt={giveaway.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950" />
-                    )}
-                  </div>
-                  <p className="font-serif">{giveaway.name}</p>
-                  <div className="text-xs font-mono space-y-1 text-muted-foreground">
-                    <div className="flex justify-between"><span>Prize Value</span><span>{giveaway.prizeValue}</span></div>
-                    <div className="flex justify-between"><span>Max Entries</span><span>{giveaway.maxEntries}</span></div>
-                    <div className="flex justify-between"><span>Your Tickets</span><span>{selectedPackage.qty}</span></div>
-                  </div>
+              <div className="flex justify-between">
+                <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
+                <div className="bg-card border border-border rounded-sm px-4 py-2 text-xs font-mono text-muted-foreground">
+                  {selectedPackage.qty} ticket{selectedPackage.qty !== 1 ? 's' : ''} · {giveaway.name}
                 </div>
-                <Button variant="ghost" className="w-full" onClick={() => setStep(2)}>← Back</Button>
               </div>
             </motion.div>
           )}
 
-          {/* STEP 4: CONFIRMATION */}
+          {/* ── STEP 4: CONFIRMATION ── */}
           {step === 4 && (
             <motion.div
               key="step4"
@@ -564,49 +582,9 @@ export function GiveawayDetail() {
               </div>
             </motion.div>
           )}
+
         </AnimatePresence>
       </div>
-
-      {/* Skill-testing question dialog */}
-      <Dialog open={showQuiz} onOpenChange={setShowQuiz}>
-        <DialogContent className="bg-card border border-border max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-serif text-xl">Skill-Testing Question</DialogTitle>
-            <DialogDescription className="text-muted-foreground text-sm">
-              As required by contest law, please answer this question correctly to proceed.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <p className="font-serif text-base">Scotch whisky must be aged for a minimum of how many years?</p>
-            <div className="space-y-2">
-              {[
-                { val: 'one', label: '1 year' },
-                { val: 'three', label: '3 years' },
-                { val: 'scotland', label: '5 years' },
-                { val: 'ten', label: '10 years' },
-              ].map(opt => (
-                <button
-                  key={opt.val}
-                  onClick={() => setQuizSelected(opt.val)}
-                  className={`w-full text-left px-4 py-3 border rounded-sm transition-colors font-mono text-sm ${
-                    quizSelected === opt.val ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            {quizError && <p className="text-red-400 text-xs font-mono">Incorrect — please try again.</p>}
-            <Button
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest"
-              onClick={submitQuiz}
-              disabled={!quizSelected}
-            >
-              Submit Answer
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <Footer />
     </div>
