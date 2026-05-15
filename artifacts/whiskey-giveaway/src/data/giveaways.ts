@@ -1,9 +1,9 @@
-import twentyOneYoImg from '@/assets/images/clonakilty-21yo.jpg';
-import singlePotStillImg from '@/assets/images/clonakilty-single-pot-still.jpg';
-import cognacCaskImg from '@/assets/images/clonakilty-cognac-cask.jpg';
-import doubleOakImg from '@/assets/images/clonakilty-double-oak.jpg';
-import portCaskImg from '@/assets/images/clonakilty-port-cask.jpg';
-import galleyHeadImg from '@/assets/images/clonakilty-galley-head.jpg';
+import twentyOneYoImg from '@/assets/images/clonakilty-21yo.png';
+import singlePotStillImg from '@/assets/images/clonakilty-single-pot-still.png';
+import cognacCaskImg from '@/assets/images/clonakilty-cognac-cask.png';
+import doubleOakImg from '@/assets/images/clonakilty-double-oak.png';
+import portCaskImg from '@/assets/images/clonakilty-port-cask.png';
+import galleyHeadImg from '@/assets/images/clonakilty-galley-head.png';
 
 export type { Giveaway } from '@workspace/api-client-react';
 

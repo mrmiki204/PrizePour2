@@ -236,9 +236,13 @@ export function GiveawayDetail() {
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
                   <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
                     {COLLECTION_BOTTLES.map((bottle, i) => (
-                      <div key={i} className="relative overflow-hidden bg-black">
-                        <img src={bottle.image} alt={bottle.name} className="w-full h-full object-cover opacity-80 mix-blend-screen" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                      <div
+                        key={i}
+                        className="relative overflow-hidden"
+                        style={{ background: 'radial-gradient(ellipse at 50% 25%, #3d1a05 0%, #1c0c03 50%, #080401 100%)' }}
+                      >
+                        <img src={bottle.image} alt={bottle.name} className="w-full h-full object-contain p-1 opacity-90" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                         <div className="absolute bottom-1 left-1 right-1">
                           <p className="text-[8px] font-mono text-primary leading-tight truncate">{bottle.value}</p>
                         </div>

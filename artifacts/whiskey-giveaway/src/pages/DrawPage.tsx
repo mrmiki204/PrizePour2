@@ -84,8 +84,12 @@ export function DrawPage() {
               <div className="w-56 h-40 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
                 <div className="w-full h-full grid grid-cols-3 grid-rows-2 gap-px bg-border/20">
                   {COLLECTION_BOTTLES.map((bottle, i) => (
-                    <div key={i} className="relative overflow-hidden bg-black">
-                      <img src={bottle.image} alt={bottle.name} className="w-full h-full object-cover opacity-80" />
+                    <div
+                      key={i}
+                      className="relative overflow-hidden"
+                      style={{ background: 'radial-gradient(ellipse at 50% 25%, #3d1a05 0%, #1c0c03 50%, #080401 100%)' }}
+                    >
+                      <img src={bottle.image} alt={bottle.name} className="w-full h-full object-contain p-1 opacity-90" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     </div>
                   ))}

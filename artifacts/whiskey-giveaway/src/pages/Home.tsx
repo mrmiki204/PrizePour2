@@ -205,13 +205,17 @@ export function Home() {
                 {/* Left: 2×3 bottle grid */}
                 <div className="grid grid-cols-3 gap-px bg-border/30">
                   {COLLECTION_BOTTLES.map((bottle, i) => (
-                    <div key={i} className="aspect-[3/4] relative overflow-hidden bg-black group/bottle">
+                    <div
+                      key={i}
+                      className="aspect-[3/4] relative overflow-hidden group/bottle"
+                      style={{ background: 'radial-gradient(ellipse at 50% 25%, #3d1a05 0%, #1c0c03 50%, #080401 100%)' }}
+                    >
                       <img
                         src={bottle.image}
                         alt={bottle.name}
-                        className="w-full h-full object-cover opacity-75 group-hover/bottle:opacity-100 transition-opacity duration-500"
+                        className="w-full h-full object-contain p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-105 transition-all duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-2">
                         <p className="text-[10px] font-mono text-primary leading-tight">{bottle.value}</p>
                         <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name}</p>
