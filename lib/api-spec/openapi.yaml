@@ -14,6 +14,8 @@ tags:
     description: Giveaway entry operations
   - name: giveaways
     description: Giveaway draw management
+  - name: stripe
+    description: Stripe payment operations
 paths:
   /healthz:
     get:
@@ -34,6 +36,13 @@ paths:
       operationId: listEntries
       tags: [entries]
       summary: List all entries
+      parameters:
+        - name: email
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter entries by email address
       responses:
         "200":
           description: List of entries
@@ -205,6 +214,56 @@ paths:
                 $ref: "#/components/schemas/Giveaway"
         "404":
           description: Giveaway not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /stripe/checkout:
+    post:
+      operationId: createStripeCheckout
+      tags: [stripe]
+      summary: Create a Stripe Checkout session for ticket purchase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StripeCheckoutRequest"
+      responses:
+        "200":
+          description: Checkout session URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeCheckoutResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /stripe/session/{sessionId}:
+    get:
+      operationId: getStripeSession
+      tags: [stripe]
+      summary: Verify a completed Stripe session and create entry
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Entry created from session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeSessionEntry"
+        "402":
+          description: Payment not completed
           content:
             application/json:
               schema:
@@ -410,3 +469,4 @@ components:
       properties:
         error:
           type: string
+

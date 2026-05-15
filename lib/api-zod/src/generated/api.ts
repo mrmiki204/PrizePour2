@@ -18,6 +18,13 @@ export const HealthCheckResponse = zod.object({
 /**
  * @summary List all entries
  */
+export const ListEntriesQueryParams = zod.object({
+  email: zod.coerce
+    .string()
+    .optional()
+    .describe("Filter entries by email address"),
+});
+
 export const ListEntriesResponseItem = zod.object({
   id: zod.number(),
   giveawayId: zod.number(),
@@ -185,4 +192,45 @@ export const DeleteGiveawayResponse = zod.object({
   isActive: zod.boolean(),
   entryCount: zod.number(),
   createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Create a Stripe Checkout session for ticket purchase
+ */
+export const CreateStripeCheckoutBody = zod.object({
+  giveawayId: zod.number(),
+  ticketQty: zod.number(),
+  firstName: zod.string(),
+  lastName: zod.string(),
+  email: zod.string(),
+  amountCents: zod.number(),
+  referralCode: zod.string().nullish(),
+});
+
+export const CreateStripeCheckoutResponse = zod.object({
+  url: zod.string(),
+});
+
+/**
+ * @summary Verify a completed Stripe session and create entry
+ */
+export const GetStripeSessionParams = zod.object({
+  sessionId: zod.coerce.string(),
+});
+
+export const GetStripeSessionResponse = zod.object({
+  entry: zod.object({
+    id: zod.number(),
+    giveawayId: zod.number(),
+    firstName: zod.string(),
+    lastName: zod.string(),
+    email: zod.string(),
+    ticketQty: zod.number(),
+    ticketNumbers: zod.array(zod.string()),
+    amountPaid: zod.string(),
+    referralCode: zod.string().nullish(),
+    stripeSessionId: zod.string().nullish(),
+    createdAt: zod.coerce.date(),
+  }),
+  ticketNumbers: zod.array(zod.string()),
 });

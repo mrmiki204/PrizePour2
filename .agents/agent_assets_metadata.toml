@@ -12,6 +12,12 @@ uri = "file://artifacts/whiskey-giveaway/src/assets/images/pappy.png"
 type = "image"
 title = "antique bourbon bottle"
 
+[[generated]]
+id = "0TZnUfb8ArF7JjjZ7d805"
+uri = "file://attached_assets/generated_images/prizepour_icon.png"
+type = "image"
+title = "prizepour mobile icon"
+
 [[outputs]]
 id = "yOGJkLWPn4cLMR4PGFt0K"
 uri = "file://attached_assets/image_search/clonakilty32_2.jpg"

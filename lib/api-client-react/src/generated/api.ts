@@ -24,7 +24,11 @@ import type {
   GiveawayInput,
   GiveawayUpdate,
   HealthStatus,
+  ListEntriesParams,
   ListGiveawaysParams,
+  StripeCheckoutRequest,
+  StripeCheckoutResponse,
+  StripeSessionEntry,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -115,39 +119,57 @@ export function useHealthCheck<
 /**
  * @summary List all entries
  */
-export const getListEntriesUrl = () => {
-  return `/api/entries`;
+export const getListEntriesUrl = (params?: ListEntriesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/entries?${stringifiedParams}`
+    : `/api/entries`;
 };
 
-export const listEntries = async (options?: RequestInit): Promise<Entry[]> => {
-  return customFetch<Entry[]>(getListEntriesUrl(), {
+export const listEntries = async (
+  params?: ListEntriesParams,
+  options?: RequestInit,
+): Promise<Entry[]> => {
+  return customFetch<Entry[]>(getListEntriesUrl(params), {
     ...options,
     method: "GET",
   });
 };
 
-export const getListEntriesQueryKey = () => {
-  return [`/api/entries`] as const;
+export const getListEntriesQueryKey = (params?: ListEntriesParams) => {
+  return [`/api/entries`, ...(params ? [params] : [])] as const;
 };
 
 export const getListEntriesQueryOptions = <
   TData = Awaited<ReturnType<typeof listEntries>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: UseQueryOptions<
-    Awaited<ReturnType<typeof listEntries>>,
-    TError,
-    TData
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
+>(
+  params?: ListEntriesParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listEntries>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getListEntriesQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getListEntriesQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof listEntries>>> = ({
     signal,
-  }) => listEntries({ signal, ...requestOptions });
+  }) => listEntries(params, { signal, ...requestOptions });
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof listEntries>>,
@@ -168,15 +190,18 @@ export type ListEntriesQueryError = ErrorType<unknown>;
 export function useListEntries<
   TData = Awaited<ReturnType<typeof listEntries>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: UseQueryOptions<
-    Awaited<ReturnType<typeof listEntries>>,
-    TError,
-    TData
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getListEntriesQueryOptions(options);
+>(
+  params?: ListEntriesParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listEntries>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListEntriesQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
@@ -800,3 +825,178 @@ export const useDeleteGiveaway = <
 > => {
   return useMutation(getDeleteGiveawayMutationOptions(options));
 };
+
+/**
+ * @summary Create a Stripe Checkout session for ticket purchase
+ */
+export const getCreateStripeCheckoutUrl = () => {
+  return `/api/stripe/checkout`;
+};
+
+export const createStripeCheckout = async (
+  stripeCheckoutRequest: StripeCheckoutRequest,
+  options?: RequestInit,
+): Promise<StripeCheckoutResponse> => {
+  return customFetch<StripeCheckoutResponse>(getCreateStripeCheckoutUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(stripeCheckoutRequest),
+  });
+};
+
+export const getCreateStripeCheckoutMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createStripeCheckout>>,
+    TError,
+    { data: BodyType<StripeCheckoutRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createStripeCheckout>>,
+  TError,
+  { data: BodyType<StripeCheckoutRequest> },
+  TContext
+> => {
+  const mutationKey = ["createStripeCheckout"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createStripeCheckout>>,
+    { data: BodyType<StripeCheckoutRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createStripeCheckout(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateStripeCheckoutMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createStripeCheckout>>
+>;
+export type CreateStripeCheckoutMutationBody = BodyType<StripeCheckoutRequest>;
+export type CreateStripeCheckoutMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Create a Stripe Checkout session for ticket purchase
+ */
+export const useCreateStripeCheckout = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createStripeCheckout>>,
+    TError,
+    { data: BodyType<StripeCheckoutRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createStripeCheckout>>,
+  TError,
+  { data: BodyType<StripeCheckoutRequest> },
+  TContext
+> => {
+  return useMutation(getCreateStripeCheckoutMutationOptions(options));
+};
+
+/**
+ * @summary Verify a completed Stripe session and create entry
+ */
+export const getGetStripeSessionUrl = (sessionId: string) => {
+  return `/api/stripe/session/${sessionId}`;
+};
+
+export const getStripeSession = async (
+  sessionId: string,
+  options?: RequestInit,
+): Promise<StripeSessionEntry> => {
+  return customFetch<StripeSessionEntry>(getGetStripeSessionUrl(sessionId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetStripeSessionQueryKey = (sessionId: string) => {
+  return [`/api/stripe/session/${sessionId}`] as const;
+};
+
+export const getGetStripeSessionQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStripeSession>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  sessionId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getStripeSession>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetStripeSessionQueryKey(sessionId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getStripeSession>>
+  > = ({ signal }) =>
+    getStripeSession(sessionId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!sessionId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStripeSession>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetStripeSessionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStripeSession>>
+>;
+export type GetStripeSessionQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Verify a completed Stripe session and create entry
+ */
+
+export function useGetStripeSession<
+  TData = Awaited<ReturnType<typeof getStripeSession>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  sessionId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getStripeSession>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetStripeSessionQueryOptions(sessionId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}

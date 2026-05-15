@@ -11,8 +11,15 @@ import {
 const router: IRouter = Router();
 
 router.get("/entries", async (req, res): Promise<void> => {
-  const entries = await db.select().from(entriesTable).orderBy(entriesTable.createdAt);
-  req.log.info({ count: entries.length }, "Listed entries");
+  const { email } = req.query as { email?: string };
+
+  const entries = await db
+    .select()
+    .from(entriesTable)
+    .where(email ? eq(entriesTable.email, email) : undefined)
+    .orderBy(entriesTable.createdAt);
+
+  req.log.info({ count: entries.length, emailFilter: email }, "Listed entries");
   res.json(ListEntriesResponse.parse(entries));
 });
 

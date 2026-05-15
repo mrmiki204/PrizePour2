@@ -105,6 +105,13 @@ export interface ErrorResponse {
   error: string;
 }
 
+export type ListEntriesParams = {
+  /**
+   * Filter entries by email address
+   */
+  email?: string;
+};
+
 export type ListGiveawaysParams = {
   /**
    * If true, include inactive giveaways (admin use)

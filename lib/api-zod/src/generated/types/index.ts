@@ -13,6 +13,7 @@ export * from "./giveaway";
 export * from "./giveawayInput";
 export * from "./giveawayUpdate";
 export * from "./healthStatus";
+export * from "./listEntriesParams";
 export * from "./listGiveawaysParams";
 export * from "./stripeCheckoutRequest";
 export * from "./stripeCheckoutResponse";
