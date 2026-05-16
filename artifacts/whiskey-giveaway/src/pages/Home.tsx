@@ -51,9 +51,6 @@ export function Home() {
   }, []);
 
   const featured = giveaways?.[0];
-  const liveEntries = entries.length;
-  const liveRevenue = entries.reduce((s, e) => s + parseFloat(e.amountPaid), 0);
-  const liveTickets = entries.reduce((s, e) => s + e.ticketQty, 0);
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
@@ -160,40 +157,6 @@ export function Home() {
               </div>
             </div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* ── Live Stats ── */}
-      <section className="border-y border-border bg-card/50 py-12">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-border/50">
-          <div className="text-center px-4">
-            <p className="text-3xl md:text-4xl font-serif text-primary mb-2">
-              {liveEntries > 0 ? liveEntries.toLocaleString() : '47k+'}
-            </p>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">
-              {liveEntries > 0 ? 'Live Entries' : 'Members'}
-            </p>
-          </div>
-          <div className="text-center px-4">
-            <p className="text-3xl md:text-4xl font-serif text-primary mb-2">
-              {liveRevenue > 0 ? `£${liveRevenue.toFixed(0)}` : '£2.1M'}
-            </p>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">
-              {liveRevenue > 0 ? 'Revenue' : 'Prizes Awarded'}
-            </p>
-          </div>
-          <div className="text-center px-4">
-            <p className="text-3xl md:text-4xl font-serif text-primary mb-2">
-              {liveTickets > 0 ? liveTickets.toLocaleString() : '850+'}
-            </p>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">
-              {liveTickets > 0 ? 'Tickets Sold' : 'Past Draws'}
-            </p>
-          </div>
-          <div className="text-center px-4">
-            <p className="text-3xl md:text-4xl font-serif text-primary mb-2">£2.99</p>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Avg Entry</p>
-          </div>
         </div>
       </section>
 
