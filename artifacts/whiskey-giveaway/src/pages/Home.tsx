@@ -246,7 +246,7 @@ export function Home() {
                 <div className="p-8 lg:p-10 flex flex-col justify-between gap-8">
                   <div className="space-y-4">
                     <div>
-                      <span className="text-xs font-mono text-primary uppercase tracking-widest">Combined Prize</span>
+                      <span className="text-xs font-mono text-primary uppercase tracking-widest">Prize Selection</span>
                       <h3 className="text-3xl font-serif mt-2 mb-1">{featured.name}</h3>
                       <p className="text-4xl font-serif text-primary">{featured.prizeValue}</p>
                     </div>
