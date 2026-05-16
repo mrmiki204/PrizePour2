@@ -13,6 +13,8 @@ import {
   DeleteGiveawayParams,
   DeleteGiveawayResponse,
 } from "@workspace/api-zod";
+import { sendWinnerEmail } from "../emailService.js";
+import { logger } from "../lib/logger.js";
 
 const router: IRouter = Router();
 
@@ -84,16 +86,37 @@ router.get("/giveaways/:id/winner", async (req, res): Promise<void> => {
     return;
   }
 
-  const pool: { ticketNumber: string; firstName: string; lastName: string }[] = [];
+  const pool: { ticketNumber: string; firstName: string; lastName: string; email: string }[] = [];
   for (const entry of entries) {
     for (const ticket of entry.ticketNumbers as string[]) {
-      pool.push({ ticketNumber: ticket, firstName: entry.firstName, lastName: entry.lastName });
+      pool.push({ ticketNumber: ticket, firstName: entry.firstName, lastName: entry.lastName, email: entry.email });
     }
   }
 
-  const winner = pool[Math.floor(Math.random() * pool.length)];
-  req.log.info({ giveawayId: id, winner: winner.ticketNumber }, "Winner selected");
-  res.json(winner);
+  const winnerEntry = pool[Math.floor(Math.random() * pool.length)];
+  req.log.info({ giveawayId: id, winner: winnerEntry.ticketNumber }, "Winner selected");
+
+  const [giveaway] = await db.select().from(giveawaysTable).where(eq(giveawaysTable.id, id));
+
+  setImmediate(async () => {
+    try {
+      await sendWinnerEmail({
+        to: winnerEntry.email,
+        toName: `${winnerEntry.firstName} ${winnerEntry.lastName}`,
+        ticketNumber: winnerEntry.ticketNumber,
+        giveawayName: giveaway?.name ?? "PrizePour Draw",
+        prizeValue: giveaway?.prizeValue ?? "an exclusive prize",
+      });
+    } catch (err) {
+      logger.error({ err, to: winnerEntry.email }, "Failed to send winner email");
+    }
+  });
+
+  res.json({
+    ticketNumber: winnerEntry.ticketNumber,
+    firstName: winnerEntry.firstName,
+    lastName: winnerEntry.lastName,
+  });
 });
 
 router.get("/giveaways/:id", async (req, res): Promise<void> => {
