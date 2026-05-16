@@ -9,12 +9,6 @@ import heroImg from '@/assets/images/hero.png';
 import { getGiveawayImage, daysUntil, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { useListEntries, useListGiveaways } from '@workspace/api-client-react';
 
-const WINNERS = [
-  { name: "Sarah M.", location: "Austin, TX", prize: "Blanton's Gold Edition", date: "Apr 2026" },
-  { name: "James K.", location: "Nashville, TN", prize: "Yamazaki 18", date: "Mar 2026" },
-  { name: "Linda P.", location: "Denver, CO", prize: "Knob Creek 25th Anniv.", date: "Mar 2026" },
-  { name: "Marcus R.", location: "Chicago, IL", prize: "Dalmore King Alexander III", date: "Feb 2026" }
-];
 
 const FAQS = [
   {
@@ -47,9 +41,9 @@ const fadeIn = {
 export function Home() {
   const [, setLocation] = useLocation();
   const { data: entries = [] } = useListEntries();
-  const { data: giveaways = [] } = useListGiveaways();
+  const { data: giveaways, isLoading: giveawaysLoading } = useListGiveaways();
 
-  const featured = giveaways[0];
+  const featured = giveaways?.[0];
   const liveEntries = entries.length;
   const liveRevenue = entries.reduce((s, e) => s + parseFloat(e.amountPaid), 0);
   const liveTickets = entries.reduce((s, e) => s + e.ticketQty, 0);
@@ -310,39 +304,60 @@ export function Home() {
         </div>
       </section>
 
-      {/* ── Winners ── */}
+      {/* ── Recent Additions ── */}
       <section id="winners" className="py-24 max-w-7xl mx-auto px-6">
         <div className="flex items-center gap-4 mb-4">
           <div className="h-px bg-border flex-1" />
-          <p className="text-xs font-mono text-primary uppercase tracking-widest px-4">Hall of Winners</p>
+          <p className="text-xs font-mono text-primary uppercase tracking-widest px-4">Latest Draws</p>
           <div className="h-px bg-border flex-1" />
         </div>
         <h2 className="text-3xl font-serif text-center mb-16">Recent Additions to Collections</h2>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {WINNERS.map((winner, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="p-6 bg-card border border-border/50 rounded-sm text-center space-y-4 relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-primary/20 to-transparent opacity-50" />
-              <Trophy className="w-8 h-8 text-primary/60 mx-auto" />
-              <div>
-                <p className="font-serif text-lg text-primary leading-tight">{winner.prize}</p>
-                <p className="text-sm text-foreground mt-2 font-medium">{winner.name}</p>
-                <p className="text-xs text-muted-foreground font-mono mt-1">{winner.location}</p>
-                <p className="text-xs text-muted-foreground/60 font-mono mt-1">{winner.date}</p>
-              </div>
-              <div className="flex justify-center gap-0.5">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-primary text-primary" />)}
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {(() => {
+          const recentGiveaways = [...(giveaways ?? [])].reverse().slice(0, 4);
+          if (giveawaysLoading) return (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-48 bg-card border border-border/30 rounded-sm animate-pulse" />
+              ))}
+            </div>
+          );
+          return (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {recentGiveaways.map((g, idx) => {
+                const days = daysUntil(g.drawDate);
+                const img = getGiveawayImage(g.id);
+                return (
+                  <motion.div
+                    key={g.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="p-6 bg-card border border-border/50 rounded-sm text-center space-y-4 relative overflow-hidden cursor-pointer hover:border-primary/40 transition-colors"
+                    onClick={() => setLocation(`/giveaway/${g.id}`)}
+                  >
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-primary/20 to-transparent opacity-50" />
+                    {img
+                      ? <img src={img} alt={g.name} className="w-16 h-16 object-contain mx-auto opacity-80" />
+                      : <Trophy className="w-8 h-8 text-primary/60 mx-auto" />
+                    }
+                    <div>
+                      <p className="font-serif text-base text-primary leading-tight line-clamp-2">{g.name}</p>
+                      <p className="text-sm text-foreground mt-2 font-medium">{g.prizeValue}</p>
+                      <p className="text-xs text-muted-foreground font-mono mt-1">
+                        {days > 0 ? `Draw in ${days} day${days === 1 ? '' : 's'}` : 'Draw complete'}
+                      </p>
+                    </div>
+                    <div className="flex justify-center gap-0.5">
+                      {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-primary text-primary" />)}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          );
+        })()}
       </section>
 
       {/* ── Why PrizePour ── */}
@@ -388,7 +403,7 @@ export function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-sm border border-border rounded-sm p-4">
                   <p className="text-xs font-mono text-primary uppercase tracking-widest mb-1">Currently Live</p>
-                  <p className="font-serif text-lg">{giveaways.length} Active {giveaways.length === 1 ? 'Draw' : 'Draws'}</p>
+                  <p className="font-serif text-lg">{giveaways?.length ?? 0} Active {(giveaways?.length ?? 0) === 1 ? 'Draw' : 'Draws'}</p>
                   <p className="text-xs text-muted-foreground mt-1">From £2.99 entry · Draw closes soon</p>
                 </div>
               </div>
