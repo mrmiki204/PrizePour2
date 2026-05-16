@@ -95,12 +95,12 @@ export function Home() {
             </motion.div>
 
             <motion.h1 variants={fadeIn} className="text-5xl md:text-7xl font-serif leading-tight">
-              Hunt the <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Unattainable.</span>
+              Win More. <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Pour Better.</span>
             </motion.h1>
 
             <motion.p variants={fadeIn} className="text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed">
-              Exclusive giveaways for the world's most sought-after whiskies. Join the club of collectors securing the impossible.
+              Exclusive giveaways for rare spirits, premium bar equipment, glassware, and more. Enter for your chance to elevate your collection.
             </motion.p>
 
             <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4">
