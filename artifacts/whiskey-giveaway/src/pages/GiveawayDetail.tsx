@@ -188,8 +188,9 @@ export function GiveawayDetail() {
       const code = `${details.firstName.toLowerCase().replace(/[^a-z]/g, '')}-${giveawayId}-${(tickets[0] ?? '').replace('#', '')}`;
       setReferralLink(`${window.location.origin}/giveaway/${giveawayId}?ref=${code}`);
       nextStep();
-    } catch {
-      setEntryError('Could not process your entry — please try again.');
+    } catch (err: unknown) {
+      const body = (err as { response?: { data?: { error?: string } } })?.response?.data;
+      setEntryError(body?.error ?? 'Could not process your entry — please try again.');
     }
   };
 

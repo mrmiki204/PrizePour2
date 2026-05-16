@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
-import { db, entriesTable } from "@workspace/db";
+import { eq, and, sql } from "drizzle-orm";
+import { db, entriesTable, giveawaysTable } from "@workspace/db";
 import {
   CreateEntryBody,
   ListEntriesResponse,
@@ -32,6 +32,41 @@ router.post("/entries", async (req, res): Promise<void> => {
   }
 
   const { ticketQty, ticketNumbers, amountPaid, ...rest } = parsed.data;
+
+  const [giveaway] = await db
+    .select({
+      maxEntries: giveawaysTable.maxEntries,
+      isActive: giveawaysTable.isActive,
+    })
+    .from(giveawaysTable)
+    .where(eq(giveawaysTable.id, rest.giveawayId))
+    .limit(1);
+
+  if (!giveaway || !giveaway.isActive) {
+    res.status(409).json({ error: "This draw is not currently active." });
+    return;
+  }
+
+  const [{ totalTickets }] = await db
+    .select({ totalTickets: sql<number>`coalesce(cast(sum(ticket_qty) as int), 0)` })
+    .from(entriesTable)
+    .where(eq(entriesTable.giveawayId, rest.giveawayId));
+
+  if (totalTickets + ticketQty > giveaway.maxEntries) {
+    res.status(409).json({ error: "This draw has sold out. No more tickets are available." });
+    return;
+  }
+
+  const [existing] = await db
+    .select({ id: entriesTable.id })
+    .from(entriesTable)
+    .where(and(eq(entriesTable.giveawayId, rest.giveawayId), eq(entriesTable.email, rest.email)))
+    .limit(1);
+
+  if (existing) {
+    res.status(409).json({ error: "This email address has already entered this draw. Each person may enter once." });
+    return;
+  }
 
   const tickets: string[] =
     ticketNumbers && ticketNumbers.length > 0
