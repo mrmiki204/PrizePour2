@@ -32,7 +32,7 @@ function buildWinnerEmailRaw(opts: {
           <tr>
             <td style="background:linear-gradient(135deg,#3d1a05,#1c0c03);padding:40px 48px;text-align:center;border-bottom:2px solid #ea9237;">
               <p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:11px;letter-spacing:0.3em;color:#ea9237;text-transform:uppercase;">PrizePour · Official Draw Result</p>
-              <h1 style="margin:0;font-size:36px;color:#ea9237;font-weight:normal;">You Won!</h1>
+              <h1 style="margin:0;font-size:36px;color:#ea9237;font-weight:normal;">Congratulations On Winning</h1>
             </td>
           </tr>
 
