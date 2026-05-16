@@ -142,6 +142,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /giveaways/{id}/winner:
+    get:
+      operationId: getGiveawayWinner
+      tags: [giveaways]
+      summary: Pick a random winner from the full entry pool for a giveaway
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Random winner selected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Winner"
+        "404":
+          description: No entries found for this giveaway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /giveaways/{id}:
     get:
       operationId: getGiveaway
@@ -464,6 +489,17 @@ components:
           type: array
           items:
             type: string
+
+    Winner:
+      type: object
+      required: [ticketNumber, firstName, lastName]
+      properties:
+        ticketNumber:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
 
     ErrorResponse:
       type: object

@@ -67,6 +67,35 @@ router.post("/giveaways", async (req, res): Promise<void> => {
   res.status(201).json(GetGiveawayResponse.parse(withCount));
 });
 
+router.get("/giveaways/:id/winner", async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid giveaway id" });
+    return;
+  }
+
+  const entries = await db
+    .select()
+    .from(entriesTable)
+    .where(eq(entriesTable.giveawayId, id));
+
+  if (entries.length === 0) {
+    res.status(404).json({ error: "No entries found for this giveaway" });
+    return;
+  }
+
+  const pool: { ticketNumber: string; firstName: string; lastName: string }[] = [];
+  for (const entry of entries) {
+    for (const ticket of entry.ticketNumbers as string[]) {
+      pool.push({ ticketNumber: ticket, firstName: entry.firstName, lastName: entry.lastName });
+    }
+  }
+
+  const winner = pool[Math.floor(Math.random() * pool.length)];
+  req.log.info({ giveawayId: id, winner: winner.ticketNumber }, "Winner selected");
+  res.json(winner);
+});
+
 router.get("/giveaways/:id", async (req, res): Promise<void> => {
   const params = GetGiveawayParams.safeParse(req.params);
   if (!params.success) {

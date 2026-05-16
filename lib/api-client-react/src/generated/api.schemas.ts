@@ -101,6 +101,12 @@ export interface StripeSessionEntry {
   ticketNumbers: string[];
 }
 
+export interface Winner {
+  ticketNumber: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface ErrorResponse {
   error: string;
 }

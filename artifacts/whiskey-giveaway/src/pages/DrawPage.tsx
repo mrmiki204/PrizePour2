@@ -1,24 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRoute, useLocation } from 'wouter';
-import { useGetGiveaway } from '@workspace/api-client-react';
+import { useGetGiveaway, useGetGiveawayWinner } from '@workspace/api-client-react';
 import { getGiveawayImage, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { Button } from '@/components/ui/button';
-import { Trophy, ArrowLeft } from 'lucide-react';
+import { Trophy, ArrowLeft, Loader2 } from 'lucide-react';
 
 export function DrawPage() {
   const [, params] = useRoute("/draw/:id");
   const [, setLocation] = useLocation();
   const giveawayId = params?.id ? parseInt(params.id) : 1;
   const { data: giveaway } = useGetGiveaway(giveawayId);
-
-  const storedTickets = localStorage.getItem(`giveaway_${giveawayId}_tickets`);
-  const userTickets: string[] = storedTickets ? JSON.parse(storedTickets) : ["#8472", "#9311"];
-  const winningTicket = userTickets[0];
+  const { data: winner, isLoading: winnerLoading } = useGetGiveawayWinner(giveawayId);
 
   const [phase, setPhase] = useState<'lobby' | 'draw' | 'reveal'>('lobby');
   const [lobbyCount, setLobbyCount] = useState(0);
-  const targetEntries = (giveaway?.entryCount ?? 0) + userTickets.length;
+  const entryCount = giveaway?.entryCount ?? 0;
 
   const img = giveaway ? getGiveawayImage(giveaway.id, giveaway.imageUrl) : undefined;
 
@@ -29,11 +26,11 @@ export function DrawPage() {
     if (phase === 'lobby') {
       intervalId = setInterval(() => {
         setLobbyCount(prev => {
-          if (prev >= targetEntries) {
+          if (prev >= entryCount) {
             clearInterval(intervalId);
-            return targetEntries;
+            return entryCount;
           }
-          return prev + Math.floor(targetEntries / 30);
+          return prev + Math.max(1, Math.floor(entryCount / 30));
         });
       }, 50);
       timeoutId = setTimeout(() => setPhase('draw'), 3500);
@@ -45,12 +42,16 @@ export function DrawPage() {
       if (intervalId) clearInterval(intervalId);
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [phase, targetEntries]);
+  }, [phase, entryCount]);
 
-  const spinnerItems = Array.from({ length: 50 }).map((_, i) => {
-    if (i === 48) return winningTicket;
-    return "#" + Math.floor(1000 + Math.random() * 9000).toString();
-  });
+  const winningTicket = winner?.ticketNumber ?? '#????';
+
+  const spinnerItems = useMemo(() => {
+    return Array.from({ length: 50 }).map((_, i) => {
+      if (i === 48) return winningTicket;
+      return "#" + Math.floor(1000 + Math.random() * 9000).toString();
+    });
+  }, [winningTicket]);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center overflow-hidden relative">
@@ -99,7 +100,7 @@ export function DrawPage() {
               <div className="space-y-2">
                 <p className="text-muted-foreground uppercase tracking-widest text-xs font-mono">Total Verified Entries</p>
                 <p className="text-6xl font-mono text-primary font-bold">
-                  {Math.min(lobbyCount, targetEntries).toLocaleString()}
+                  {Math.min(lobbyCount, entryCount).toLocaleString()}
                 </p>
               </div>
 
@@ -187,11 +188,40 @@ export function DrawPage() {
                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
                   
                   <div className="relative z-10 space-y-6">
-                    <p className="text-xl text-muted-foreground uppercase tracking-widest font-mono">Ticket Number</p>
-                    <p className="text-6xl md:text-8xl font-mono text-primary font-bold">{winningTicket}</p>
-                    <div className="h-px w-24 bg-border mx-auto my-8" />
-                    <p className="text-3xl font-serif">Sarah M. from Austin, TX</p>
-                    <p className="text-muted-foreground">Winner of the {giveaway?.name ?? 'draw'}</p>
+                    {winnerLoading ? (
+                      <div className="flex items-center justify-center gap-3 text-muted-foreground py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                        <span className="font-mono text-sm">Verifying draw result…</span>
+                      </div>
+                    ) : winner ? (
+                      <>
+                        <p className="text-xl text-muted-foreground uppercase tracking-widest font-mono">Winning Ticket</p>
+                        <motion.p
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: "spring", bounce: 0.4, delay: 0.3 }}
+                          className="text-6xl md:text-8xl font-mono text-primary font-bold"
+                        >
+                          {winner.ticketNumber}
+                        </motion.p>
+                        <div className="h-px w-24 bg-border mx-auto my-8" />
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.6 }}
+                        >
+                          <p className="text-3xl font-serif">
+                            {winner.firstName} {winner.lastName.charAt(0)}.
+                          </p>
+                          <p className="text-muted-foreground mt-2">Winner of the {giveaway?.name ?? 'draw'}</p>
+                        </motion.div>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-xl text-muted-foreground uppercase tracking-widest font-mono">No Entries Yet</p>
+                        <p className="text-muted-foreground mt-2">This draw has no entries to select a winner from.</p>
+                      </>
+                    )}
                   </div>
                 </div>
 

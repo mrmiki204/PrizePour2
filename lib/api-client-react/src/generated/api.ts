@@ -29,6 +29,7 @@ import type {
   StripeCheckoutRequest,
   StripeCheckoutResponse,
   StripeSessionEntry,
+  Winner,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -567,6 +568,93 @@ export const useCreateGiveaway = <
 > => {
   return useMutation(getCreateGiveawayMutationOptions(options));
 };
+
+/**
+ * @summary Pick a random winner from the full entry pool for a giveaway
+ */
+export const getGetGiveawayWinnerUrl = (id: number) => {
+  return `/api/giveaways/${id}/winner`;
+};
+
+export const getGiveawayWinner = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Winner> => {
+  return customFetch<Winner>(getGetGiveawayWinnerUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetGiveawayWinnerQueryKey = (id: number) => {
+  return [`/api/giveaways/${id}/winner`] as const;
+};
+
+export const getGetGiveawayWinnerQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGiveawayWinner>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getGiveawayWinner>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetGiveawayWinnerQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getGiveawayWinner>>
+  > = ({ signal }) => getGiveawayWinner(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getGiveawayWinner>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetGiveawayWinnerQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGiveawayWinner>>
+>;
+export type GetGiveawayWinnerQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Pick a random winner from the full entry pool for a giveaway
+ */
+
+export function useGetGiveawayWinner<
+  TData = Awaited<ReturnType<typeof getGiveawayWinner>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getGiveawayWinner>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetGiveawayWinnerQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Get a single giveaway by ID

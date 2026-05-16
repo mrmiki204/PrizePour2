@@ -121,6 +121,19 @@ export const CreateGiveawayBody = zod.object({
 });
 
 /**
+ * @summary Pick a random winner from the full entry pool for a giveaway
+ */
+export const GetGiveawayWinnerParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetGiveawayWinnerResponse = zod.object({
+  ticketNumber: zod.string(),
+  firstName: zod.string(),
+  lastName: zod.string(),
+});
+
+/**
  * @summary Get a single giveaway by ID
  */
 export const GetGiveawayParams = zod.object({

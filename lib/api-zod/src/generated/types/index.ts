@@ -18,3 +18,4 @@ export * from "./listGiveawaysParams";
 export * from "./stripeCheckoutRequest";
 export * from "./stripeCheckoutResponse";
 export * from "./stripeSessionEntry";
+export * from "./winner";
