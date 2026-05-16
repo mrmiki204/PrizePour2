@@ -140,7 +140,7 @@ export function Home() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                 <div className="absolute top-4 left-4">
-                  <span className="bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded-sm">Full Collection · 7 Expressions</span>
+                  <span className="bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded-sm">Selected Bottles · 7 Expressions</span>
                 </div>
                 {featured && (
                   <div className="absolute bottom-4 left-4 right-4">
