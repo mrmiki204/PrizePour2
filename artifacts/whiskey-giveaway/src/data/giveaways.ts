@@ -4,6 +4,7 @@ import cognacCaskImg from '@/assets/images/clonakilty-cognac-cask.png';
 import doubleOakImg from '@/assets/images/clonakilty-double-oak.png';
 import portCaskImg from '@/assets/images/clonakilty-port-cask.png';
 import galleyHeadImg from '@/assets/images/clonakilty-galley-head.png';
+import galleyHeadBlueImg from '@/assets/images/clonakilty-galley-head-blue.png';
 
 export type { Giveaway } from '@workspace/api-client-react';
 
@@ -52,10 +53,10 @@ export const COLLECTION_BOTTLES: Bottle[] = [
     description: "Light, coastal, and refreshingly approachable Atlantic expression."
   },
   {
-    name: "Galley Head Single Malt 70cl",
+    name: "Galley Head Single Malt",
     value: "£42",
-    image: galleyHeadImg,
-    description: "The iconic coastal single malt in a full 70cl expression — sea-fresh and smooth."
+    image: galleyHeadBlueImg,
+    description: "The iconic coastal single malt in its original blue-label expression — sea-fresh and smooth."
   },
 ];
 
