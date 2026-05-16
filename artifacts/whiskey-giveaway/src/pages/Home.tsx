@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -42,6 +43,12 @@ export function Home() {
   const [, setLocation] = useLocation();
   const { data: entries = [] } = useListEntries();
   const { data: giveaways, isLoading: giveawaysLoading } = useListGiveaways();
+  const [showBanner, setShowBanner] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowBanner(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
 
   const featured = giveaways?.[0];
   const liveEntries = entries.length;
@@ -50,6 +57,24 @@ export function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
+      <AnimatePresence>
+        {showBanner && (
+          <motion.div
+            initial={{ y: '-100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '-100%' }}
+            transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+            className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center py-5 px-6"
+            style={{ background: 'linear-gradient(135deg, #3d1a05 0%, #1c0c03 100%)', borderBottom: '2px solid #ea9237' }}
+          >
+            <div className="text-center">
+              <p className="font-mono text-xs tracking-widest text-amber-500/70 uppercase mb-1">Draw Status</p>
+              <p className="font-serif text-3xl md:text-5xl text-amber-400 tracking-wide">No Active Auctions</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Navbar onScrollTo={scrollTo} />
 
       {/* ── Hero ── */}
