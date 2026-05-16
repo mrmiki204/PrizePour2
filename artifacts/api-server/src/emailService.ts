@@ -95,7 +95,7 @@ function buildWinnerEmailRaw(opts: {
   const rawParts = [
     `From: PrizePour Draws <me>`,
     `To: ${toName} <${to}>`,
-    `Subject: ${subject}`,
+    `Subject: =?UTF-8?B?${Buffer.from(subject).toString("base64")}?=`,
     `MIME-Version: 1.0`,
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
     ``,
