@@ -83,11 +83,11 @@ export function DrawPage() {
               </div>
 
               <div className="w-56 h-40 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
-                <div className="w-full h-full grid grid-cols-8 gap-px bg-border/20">
+                <div className="w-full h-full grid grid-cols-4 gap-px bg-border/20">
                   {COLLECTION_BOTTLES.map((bottle, i) => (
                     <div
                       key={i}
-                      className={`relative overflow-hidden col-span-2${i === 4 ? ' col-start-2' : i === 5 ? ' col-start-4' : i === 6 ? ' col-start-6' : ''}`}
+                      className="relative overflow-hidden"
                       style={{ background: 'radial-gradient(ellipse at 50% 25%, #3d1a05 0%, #1c0c03 50%, #080401 100%)' }}
                     >
                       <img src={bottle.image} alt={bottle.name} className="w-full h-full object-contain p-1 opacity-90" />

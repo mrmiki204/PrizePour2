@@ -222,11 +222,11 @@ export function Home() {
                 className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 hover:border-primary/40 transition-colors"
               >
                 {/* Left: bottle grid */}
-                <div className="grid grid-cols-8 gap-px bg-border/30">
+                <div className="grid grid-cols-4 gap-px bg-border/30">
                   {COLLECTION_BOTTLES.map((bottle, i) => (
                     <div
                       key={i}
-                      className={`aspect-[3/4] relative overflow-hidden group/bottle col-span-2${i === 4 ? ' col-start-2' : i === 5 ? ' col-start-4' : i === 6 ? ' col-start-6' : ''}`}
+                      className="aspect-[3/4] relative overflow-hidden group/bottle"
                       style={{ background: 'radial-gradient(ellipse at 50% 25%, #3d1a05 0%, #1c0c03 50%, #080401 100%)' }}
                     >
                       <img
