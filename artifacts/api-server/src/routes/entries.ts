@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, entriesTable, giveawaysTable } from "@workspace/db";
 import {
   CreateEntryBody,
@@ -54,17 +54,6 @@ router.post("/entries", async (req, res): Promise<void> => {
 
   if (totalTickets + ticketQty > giveaway.maxEntries) {
     res.status(409).json({ error: "This draw has sold out. No more tickets are available." });
-    return;
-  }
-
-  const [existing] = await db
-    .select({ id: entriesTable.id })
-    .from(entriesTable)
-    .where(and(eq(entriesTable.giveawayId, rest.giveawayId), eq(entriesTable.email, rest.email)))
-    .limit(1);
-
-  if (existing) {
-    res.status(409).json({ error: "This email address has already entered this draw. Each person may enter once." });
     return;
   }
 
