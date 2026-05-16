@@ -47,7 +47,7 @@ export const COLLECTION_BOTTLES: Bottle[] = [
     description: "Lush red berries and dark chocolate from ruby port cask finishing."
   },
   {
-    name: "Galley Head Single Malt",
+    name: "Galley Head Rhum Cask",
     value: "£42",
     image: galleyHeadImg,
     description: "Light, coastal, and refreshingly approachable Atlantic expression."
