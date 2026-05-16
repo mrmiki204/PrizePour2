@@ -17,7 +17,7 @@ export function Rules() {
 
             <section className="space-y-3">
               <h2 className="text-xl font-serif text-foreground">1. Sponsor</h2>
-              <p>PrizePour ("Sponsor") operates exclusive whisky giveaway draws on the PrizePour platform. Each draw is a separate promotional contest governed by these Official Rules.</p>
+              <p>PrizePour ("Sponsor") operates skill-based prize competitions on the PrizePour platform. Each draw is a separate promotional contest governed by these Official Rules.</p>
             </section>
 
             <section className="space-y-3">
@@ -33,7 +33,7 @@ export function Rules() {
             <section className="space-y-3">
               <h2 className="text-xl font-serif text-foreground">4. How to Enter</h2>
               <p><strong className="text-foreground">Method A — Purchase:</strong> Visit prizepour.com, select a draw, choose a ticket package, complete the entry form, answer the skill-testing question correctly, and complete payment via Stripe. Each ticket purchased earns one entry.</p>
-              <p><strong className="text-foreground">Method B — No Purchase:</strong> Mail a 3" × 5" card with your full name, address, email, and the draw name to: PrizePour, Attn: Free Entry, [Address]. Limit one (1) free mail-in entry per person per draw. Mail-in entries must be postmarked before the draw close date.</p>
+              <p><strong className="text-foreground">Method B — No Purchase:</strong> Mail a 3" × 5" card with your full name, address, email, and the draw name to: PrizePour, Attn: Free Entry, at the postal address listed on the relevant competition page. Limit one (1) free mail-in entry per person per draw. Mail-in entries must be postmarked before the draw close date.</p>
             </section>
 
             <section className="space-y-3">
@@ -58,7 +58,7 @@ export function Rules() {
 
             <section className="space-y-3">
               <h2 className="text-xl font-serif text-foreground">9. Prize Details</h2>
-              <p>Each draw's prize is the specific whisky bottle described on the draw page. All bottles are verified authentic, sealed, and shipped insured and tracked within 14 business days of winner confirmation. Prize values shown are approximate retail/auction values. No cash equivalent will be offered. Prizes are non-transferable. Winners are responsible for applicable taxes, duties, and import fees.</p>
+              <p>Each draw's prize is the specific item described on the draw page. All prizes are verified, sealed where applicable, and shipped insured and tracked within 14 business days of winner confirmation. Prize values shown are approximate retail values. No cash equivalent will be offered. Prizes are non-transferable. Winners are responsible for applicable taxes, duties, and import fees.</p>
             </section>
 
             <section className="space-y-3">

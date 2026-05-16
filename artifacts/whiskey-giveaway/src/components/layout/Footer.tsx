@@ -1,4 +1,3 @@
-import { Instagram, Twitter, Facebook } from 'lucide-react';
 import { useLocation } from 'wouter';
 import logoSrc from '@/assets/prizepour-logo.png';
 
@@ -15,19 +14,8 @@ export function Footer() {
             <img src={logoSrc} alt="PrizePour" className="h-16 w-auto object-contain" />
           </div>
           <p className="text-muted-foreground max-w-sm">
-            Curating the finest, rarest, and most sought-after whiskies for those who appreciate the craft. An exclusive club for serious collectors.
+            Exclusive prize draws for rare spirits, premium bar equipment, glassware, and more. A transparent, honest platform for collectors and enthusiasts.
           </p>
-          <div className="flex gap-4">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
-              <Instagram className="w-5 h-5" />
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
-              <Twitter className="w-5 h-5" />
-            </a>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
-              <Facebook className="w-5 h-5" />
-            </a>
-          </div>
         </div>
         
         <div>

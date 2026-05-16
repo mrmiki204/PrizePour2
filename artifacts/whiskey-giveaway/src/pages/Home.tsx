@@ -8,25 +8,25 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
 import { getGiveawayImage, daysUntil, COLLECTION_BOTTLES } from '@/data/giveaways';
-import { useListEntries, useListGiveaways } from '@workspace/api-client-react';
+import { useListGiveaways } from '@workspace/api-client-react';
 
 
 const FAQS = [
   {
     q: "Is this legal?",
-    a: "Yes. All draws are skill-testing question giveaways, fully compliant with Canadian and UK promotional contest law. No purchase necessary — free entry by mail-in is always available."
+    a: "Yes. All draws are skill-testing question competitions, fully compliant with UK promotional contest law. No purchase necessary — free entry by mail-in is always available."
   },
   {
     q: "How are winners selected?",
     a: "Winners are selected via a cryptographically secure RNG at the exact draw close time. The process is independently witnessed and recorded."
   },
   {
-    q: "How is the bottle delivered?",
-    a: "Every bottle is professionally packed with insurance and shipped via tracked courier. We cover all applicable duties and taxes to your door."
+    q: "How is my prize delivered?",
+    a: "Every prize is professionally packed with insurance and shipped via tracked courier. We cover all applicable duties and taxes to your door."
   },
   {
-    q: "How do I know the bottle is authentic?",
-    a: "Every bottle in our inventory is sourced directly from distilleries or authorised retailers and verified by our expert authentication team before listing."
+    q: "How do I know the prize is genuine?",
+    a: "Every item in our inventory is sourced from authorised retailers and verified by our team before listing. We never ship grey-market goods."
   }
 ];
 
@@ -41,7 +41,6 @@ const fadeIn = {
 
 export function Home() {
   const [, setLocation] = useLocation();
-  const { data: entries = [] } = useListEntries();
   const { data: giveaways, isLoading: giveawaysLoading } = useListGiveaways();
   const [showBanner, setShowBanner] = useState(true);
 
@@ -66,7 +65,7 @@ export function Home() {
           >
             <div className="text-center">
               <p className="font-mono text-xs tracking-widest text-amber-500/70 uppercase mb-1">Draw Status</p>
-              <p className="font-serif text-3xl md:text-5xl text-amber-400 tracking-wide">No Active Auctions</p>
+              <p className="font-serif text-3xl md:text-5xl text-amber-400 tracking-wide">No Active Draws</p>
             </div>
           </motion.div>
         )}
@@ -275,9 +274,9 @@ export function Home() {
 
           <div className="grid md:grid-cols-3 gap-12">
             {[
-              { icon: Ticket, step: '1', title: 'Secure Entry', body: 'Choose your coveted bottle and secure your entries. Each draw has a strict capacity limit to protect your odds.' },
+              { icon: Ticket, step: '1', title: 'Secure Entry', body: 'Choose your prize and secure your entries. Each draw has a strict capacity limit to protect your odds.' },
               { icon: ShieldCheck, step: '2', title: 'Verified Draw', body: 'Winners are selected via a cryptographically secure RNG upon timer expiry, independently witnessed and recorded.' },
-              { icon: Package, step: '3', title: 'Doorstep Delivery', body: 'Bottles are professionally packed with full insurance and shipped tracked to your door. Duties covered.' },
+              { icon: Package, step: '3', title: 'Doorstep Delivery', body: 'Your prize is professionally packed with full insurance and shipped tracked to your door. Duties covered.' },
             ].map(({ icon: Icon, step, title, body }) => (
               <div key={step} className="text-center space-y-4 relative">
                 <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center relative">
@@ -356,14 +355,14 @@ export function Home() {
               <p className="text-xs font-mono text-primary uppercase tracking-widest mb-3">Why Us</p>
               <h2 className="text-4xl font-serif mb-6 leading-tight">The collector's edge you've been looking for.</h2>
               <p className="text-muted-foreground leading-relaxed mb-10">
-                PrizePour was built by collectors for collectors. We source direct from distilleries and authorised retailers — no grey-market bottles, ever. Every draw is independently verified and every winner notified within 24 hours.
+                PrizePour was built by enthusiasts for enthusiasts. We source direct from authorised retailers — no grey-market prizes, ever. Every draw is independently verified and every winner notified within 24 hours.
               </p>
               <div className="grid sm:grid-cols-2 gap-6">
                 {[
                   { icon: Lock, title: 'Cryptographic Draws', body: 'Winners selected by auditable RNG — no human involvement possible.' },
-                  { icon: ShieldCheck, title: 'Authenticated Bottles', body: 'Every bottle verified by our expert team before it enters the draw.' },
+                  { icon: ShieldCheck, title: 'Verified Prizes', body: 'Every prize sourced from authorised retailers and checked before entering the draw.' },
                   { icon: Package, title: 'Fully Insured Shipping', body: 'Door-to-door tracked shipping with full replacement value covered.' },
-                  { icon: Users, title: 'Community of Collectors', body: 'Join 47,000+ enthusiasts who take their collections seriously.' },
+                  { icon: Users, title: 'Community of Enthusiasts', body: 'Join collectors and spirits lovers who take their passion seriously.' },
                 ].map(({ icon: Icon, title, body }) => (
                   <div key={title} className="flex gap-4">
                     <div className="shrink-0 w-10 h-10 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center">
