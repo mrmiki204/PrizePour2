@@ -201,8 +201,8 @@ export function Home() {
       <section id="giveaways" className="py-24 max-w-7xl mx-auto px-6">
         <div className="mb-16">
           <p className="text-xs font-mono text-primary uppercase tracking-widest mb-3">Live Raffle</p>
-          <h2 className="text-4xl font-serif mb-4">One Winner. The Whole Collection.</h2>
-          <p className="text-muted-foreground max-w-xl">Enter once for a chance to win all seven Clonakilty expressions — worth over £500, shipped insured to your door.</p>
+          <h2 className="text-4xl font-serif mb-4">One Winner. A Rare Selection.</h2>
+          <p className="text-muted-foreground max-w-xl">Enter for a chance to win an exclusive Clonakilty whiskey selection — worth over £500, shipped insured to your door.</p>
         </div>
 
         {!featured ? (
