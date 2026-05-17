@@ -12,6 +12,7 @@ import { Rules } from "@/pages/Rules";
 import { MyReferrals } from "@/pages/MyReferrals";
 import { Profile } from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
+import { AgeGate } from "@/components/AgeGate";
 
 const queryClient = new QueryClient();
 
@@ -36,10 +37,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
+        <AgeGate>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </AgeGate>
       </TooltipProvider>
     </QueryClientProvider>
   );
