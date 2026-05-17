@@ -6,10 +6,10 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
   View,
 } from "react-native";
+import { AppText as Text } from "@/components/AppText";
+import { AppTextInput as TextInput } from "@/components/AppTextInput";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   referralCode: {
     flex: 1,
     fontSize: 12,
-    fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
+    fontFamily: "PlayfairDisplay_400Regular",
   },
   copyBtn: {
     width: 34,

@@ -34,7 +34,7 @@ export function CountdownTimer({ daysToAdd }: CountdownTimerProps) {
   }, [daysToAdd]);
 
   return (
-    <div className="flex items-center gap-3 font-mono text-sm tracking-wider">
+    <div className="flex items-center gap-3 font-serif text-sm tracking-wider">
       <div className="flex flex-col items-center">
         <span className="text-primary font-bold text-lg">{timeLeft.days.toString().padStart(2, '0')}</span>
         <span className="text-[10px] uppercase text-muted-foreground">Days</span>

@@ -228,7 +228,7 @@ export function GiveawayDetail() {
 
         {/* Progress Bar — 5 steps */}
         <div className="mb-12">
-          <div className="flex justify-between items-center text-xs font-mono tracking-widest text-muted-foreground mb-4">
+          <div className="flex justify-between items-center text-xs font-serif tracking-widest text-muted-foreground mb-4">
             <span className={step >= 1 ? "text-primary" : ""}>Tickets</span>
             <span className="hidden sm:inline">→</span>
             <span className={step >= 2 ? "text-primary" : ""}>Details</span>
@@ -278,7 +278,7 @@ export function GiveawayDetail() {
                           return name ? `${name.charAt(0).toUpperCase() + name.slice(1)} invited you!` : 'A friend invited you!';
                         })()}
                       </p>
-                      <p className="text-xs font-mono text-muted-foreground mt-0.5">
+                      <p className="text-xs font-serif text-muted-foreground mt-0.5">
                         You're viewing this draw through a personal referral link.
                       </p>
                     </div>
@@ -303,7 +303,7 @@ export function GiveawayDetail() {
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent pointer-events-none" />
                   <div className="absolute bottom-6 left-6 right-6 space-y-4">
                     <h2 className="text-3xl font-serif leading-tight">{giveaway.name}</h2>
-                    <div className="flex justify-between items-center text-sm font-mono">
+                    <div className="flex justify-between items-center text-sm font-serif">
                       <span className="text-primary">{giveaway.prizeValue}</span>
                       <span className="text-muted-foreground">{(entryCount + selectedPackage.qty).toLocaleString()} / {giveaway.maxEntries.toLocaleString()}</span>
                     </div>
@@ -314,7 +314,7 @@ export function GiveawayDetail() {
                           style={{ width: `${Math.min(((entryCount + selectedPackage.qty) / giveaway.maxEntries) * 100, 100)}%` }}
                         />
                       </div>
-                      <p className={`text-xs font-mono mt-1 ${remaining <= 5 ? 'text-red-400' : 'text-muted-foreground'}`}>
+                      <p className={`text-xs font-serif mt-1 ${remaining <= 5 ? 'text-red-400' : 'text-muted-foreground'}`}>
                         {remaining > 0 ? `${remaining} tickets remaining` : 'SOLD OUT'}
                       </p>
                     </div>
@@ -342,7 +342,7 @@ export function GiveawayDetail() {
                         }`}
                       >
                         {pkg.badge && (
-                          <div className="absolute -top-3 left-4 bg-primary text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-sm">
+                          <div className="absolute -top-3 left-4 bg-primary text-primary-foreground text-[10px] font-serif uppercase tracking-widest px-2 py-0.5 rounded-sm">
                             {pkg.badge}
                           </div>
                         )}
@@ -352,7 +352,7 @@ export function GiveawayDetail() {
                             {pkg.qty} {pkg.qty === 1 ? 'Ticket' : 'Tickets'}
                           </span>
                         </div>
-                        <span className="font-mono text-primary">£{pkg.price}</span>
+                        <span className="font-serif text-primary">£{pkg.price}</span>
                       </button>
                     ))}
                   </div>
@@ -515,7 +515,7 @@ export function GiveawayDetail() {
                         <button
                           key={opt.val}
                           onClick={() => setQuizSelected(opt.val)}
-                          className={`w-full text-left px-5 py-4 border rounded-sm transition-all duration-200 font-mono text-sm ${
+                          className={`w-full text-left px-5 py-4 border rounded-sm transition-all duration-200 font-serif text-sm ${
                             quizSelected === opt.val
                               ? 'border-primary bg-primary/10 text-primary shadow-[0_0_12px_rgba(234,146,55,0.12)]'
                               : 'border-border hover:border-primary/50 bg-card/50'
@@ -540,7 +540,7 @@ export function GiveawayDetail() {
 
               <div className="flex justify-between">
                 <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
-                <div className="bg-card border border-border rounded-sm px-4 py-2 text-xs font-mono text-muted-foreground">
+                <div className="bg-card border border-border rounded-sm px-4 py-2 text-xs font-serif text-muted-foreground">
                   {selectedPackage.qty} ticket{selectedPackage.qty !== 1 ? 's' : ''} · £{selectedPackage.price}
                 </div>
               </div>
@@ -573,7 +573,7 @@ export function GiveawayDetail() {
                     </div>
                     <div>
                       <p className="font-serif">{details.firstName} {details.lastName}</p>
-                      <p className="text-xs text-muted-foreground font-mono">{details.email}</p>
+                      <p className="text-xs text-muted-foreground font-serif">{details.email}</p>
                     </div>
                   </div>
 
@@ -582,7 +582,7 @@ export function GiveawayDetail() {
                     <div className="grid grid-cols-2 gap-2 p-1 bg-secondary/40 rounded-sm">
                       <button
                         onClick={() => setPaymentMethod('card')}
-                        className={`flex items-center justify-center gap-2 py-2.5 rounded-sm text-sm font-mono transition-all duration-200 ${
+                        className={`flex items-center justify-center gap-2 py-2.5 rounded-sm text-sm font-serif transition-all duration-200 ${
                           paymentMethod === 'card'
                             ? 'bg-card border border-border text-foreground shadow-sm'
                             : 'text-muted-foreground hover:text-foreground'
@@ -592,7 +592,7 @@ export function GiveawayDetail() {
                       </button>
                       <button
                         onClick={() => setPaymentMethod('bank')}
-                        className={`flex items-center justify-center gap-2 py-2.5 rounded-sm text-sm font-mono transition-all duration-200 ${
+                        className={`flex items-center justify-center gap-2 py-2.5 rounded-sm text-sm font-serif transition-all duration-200 ${
                           paymentMethod === 'bank'
                             ? 'bg-card border border-border text-foreground shadow-sm'
                             : 'text-muted-foreground hover:text-foreground'
@@ -613,23 +613,23 @@ export function GiveawayDetail() {
                           className="space-y-3"
                         >
                           <div className="space-y-1.5">
-                            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Cardholder Name</Label>
+                            <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Cardholder Name</Label>
                             <Input
                               placeholder="James Bond"
                               value={cardDetails.name}
                               onChange={e => setCardDetails({ ...cardDetails, name: e.target.value })}
-                              className="font-mono"
+                              className="font-serif"
                               autoComplete="cc-name"
                             />
                           </div>
                           <div className="space-y-1.5">
-                            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Card Number</Label>
+                            <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Card Number</Label>
                             <div className="relative">
                               <Input
                                 placeholder="1234 5678 9012 3456"
                                 value={cardDetails.number}
                                 onChange={e => setCardDetails({ ...cardDetails, number: formatCardNumber(e.target.value) })}
-                                className="font-mono tracking-widest pr-20"
+                                className="font-serif tracking-widest pr-20"
                                 inputMode="numeric"
                                 autoComplete="cc-number"
                                 maxLength={19}
@@ -649,25 +649,25 @@ export function GiveawayDetail() {
                           </div>
                           <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1.5">
-                              <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Expiry</Label>
+                              <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Expiry</Label>
                               <Input
                                 placeholder="MM / YY"
                                 value={cardDetails.expiry}
                                 onChange={e => setCardDetails({ ...cardDetails, expiry: formatExpiry(e.target.value) })}
-                                className="font-mono"
+                                className="font-serif"
                                 inputMode="numeric"
                                 autoComplete="cc-exp"
                                 maxLength={7}
                               />
                             </div>
                             <div className="space-y-1.5">
-                              <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">CVC</Label>
+                              <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">CVC</Label>
                               <div className="relative">
                                 <Input
                                   placeholder="123"
                                   value={cardDetails.cvc}
                                   onChange={e => setCardDetails({ ...cardDetails, cvc: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                                  className="font-mono pr-9"
+                                  className="font-serif pr-9"
                                   inputMode="numeric"
                                   autoComplete="cc-csc"
                                   maxLength={4}
@@ -687,38 +687,38 @@ export function GiveawayDetail() {
                           transition={{ duration: 0.2 }}
                           className="space-y-3"
                         >
-                          <div className="bg-amber-500/10 border border-amber-500/20 rounded-sm px-4 py-3 text-xs text-amber-400 font-mono">
+                          <div className="bg-amber-500/10 border border-amber-500/20 rounded-sm px-4 py-3 text-xs text-amber-400 font-serif">
                             Funds will be transferred directly to our secure prize account. Draw entry is confirmed on receipt.
                           </div>
                           <div className="space-y-1.5">
-                            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Account Holder Name</Label>
+                            <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Account Holder Name</Label>
                             <Input
                               placeholder="James Bond"
                               value={bankDetails.accountHolder}
                               onChange={e => setBankDetails({ ...bankDetails, accountHolder: e.target.value })}
-                              className="font-mono"
+                              className="font-serif"
                               autoComplete="name"
                             />
                           </div>
                           <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1.5">
-                              <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Sort Code</Label>
+                              <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Sort Code</Label>
                               <Input
                                 placeholder="12-34-56"
                                 value={bankDetails.sortCode}
                                 onChange={e => setBankDetails({ ...bankDetails, sortCode: formatSortCode(e.target.value) })}
-                                className="font-mono tracking-widest"
+                                className="font-serif tracking-widest"
                                 inputMode="numeric"
                                 maxLength={8}
                               />
                             </div>
                             <div className="space-y-1.5">
-                              <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Account Number</Label>
+                              <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Account Number</Label>
                               <Input
                                 placeholder="12345678"
                                 value={bankDetails.accountNumber}
                                 onChange={e => setBankDetails({ ...bankDetails, accountNumber: e.target.value.replace(/\D/g, '').slice(0, 8) })}
-                                className="font-mono tracking-widest"
+                                className="font-serif tracking-widest"
                                 inputMode="numeric"
                                 maxLength={8}
                               />
@@ -728,7 +728,7 @@ export function GiveawayDetail() {
                       )}
                     </AnimatePresence>
 
-                    <p className="text-xs text-muted-foreground/60 font-mono flex items-center gap-1.5">
+                    <p className="text-xs text-muted-foreground/60 font-serif flex items-center gap-1.5">
                       <Lock className="w-3 h-3" />
                       Your details are encrypted and never stored on our servers
                     </p>
@@ -741,7 +741,7 @@ export function GiveawayDetail() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">{selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}</span>
-                      <span className="font-mono">£{selectedPackage.price}</span>
+                      <span className="font-serif">£{selectedPackage.price}</span>
                     </div>
                     <div className="h-px bg-border/50 my-2" />
                     <div className="flex justify-between font-serif text-lg text-primary">
@@ -751,7 +751,7 @@ export function GiveawayDetail() {
                   </div>
 
                   {entryError && (
-                    <div className="flex items-center gap-2 text-red-400 text-sm font-mono bg-red-400/10 border border-red-400/20 rounded-sm p-3">
+                    <div className="flex items-center gap-2 text-red-400 text-sm font-serif bg-red-400/10 border border-red-400/20 rounded-sm p-3">
                       <XCircle className="w-4 h-4 shrink-0" />
                       {entryError}
                     </div>
@@ -788,7 +788,7 @@ export function GiveawayDetail() {
                     )}
                   </div>
                   <p className="font-serif">{giveaway.name}</p>
-                  <div className="text-xs font-mono space-y-1.5 text-muted-foreground">
+                  <div className="text-xs font-serif space-y-1.5 text-muted-foreground">
                     <div className="flex justify-between"><span>Prize Value</span><span>{giveaway.prizeValue}</span></div>
                     <div className="flex justify-between"><span>Max Entries</span><span>{giveaway.maxEntries}</span></div>
                     <div className="flex justify-between"><span>Your Tickets</span><span>{selectedPackage.qty}</span></div>
@@ -823,10 +823,10 @@ export function GiveawayDetail() {
 
               {assignedTickets.length > 0 && (
                 <div className="bg-card border border-border rounded-sm p-6 space-y-4">
-                  <p className="text-sm font-mono uppercase tracking-widest text-muted-foreground">Your Ticket Numbers</p>
+                  <p className="text-sm font-serif uppercase tracking-widest text-muted-foreground">Your Ticket Numbers</p>
                   <div className="flex flex-wrap gap-2 justify-center">
                     {assignedTickets.map(t => (
-                      <span key={t} className="bg-primary/10 border border-primary/30 text-primary font-mono text-lg px-4 py-2 rounded-sm">{t}</span>
+                      <span key={t} className="bg-primary/10 border border-primary/30 text-primary font-serif text-lg px-4 py-2 rounded-sm">{t}</span>
                     ))}
                   </div>
                 </div>
@@ -840,7 +840,7 @@ export function GiveawayDetail() {
                   </div>
                   <p className="text-xs text-muted-foreground">Share this link — when a friend enters, you'll both benefit.</p>
                   <div className="flex gap-2">
-                    <Input value={referralLink} readOnly className="font-mono text-xs bg-secondary/30 border-border" />
+                    <Input value={referralLink} readOnly className="font-serif text-xs bg-secondary/30 border-border" />
                     <Button
                       variant="outline"
                       size="sm"

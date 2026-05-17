@@ -5,9 +5,9 @@ import {
   Platform,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
+import { AppText as Text } from "@/components/AppText";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";

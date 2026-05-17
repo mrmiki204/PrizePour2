@@ -7,10 +7,10 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   View,
 } from "react-native";
+import { AppText as Text } from "@/components/AppText";
+import { AppTextInput as TextInput } from "@/components/AppTextInput";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
   codeValue: {
     flex: 1,
     fontSize: 12,
-    fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
+    fontFamily: "PlayfairDisplay_400Regular",
   },
   saveBtn: {
     flexDirection: "row",

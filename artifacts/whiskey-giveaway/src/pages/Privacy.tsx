@@ -8,9 +8,9 @@ export function Privacy() {
       <main className="flex-1 pt-32 pb-24">
         <div className="max-w-3xl mx-auto px-6 space-y-10">
           <div className="space-y-3">
-            <p className="text-xs font-mono text-primary uppercase tracking-widest">Legal</p>
+            <p className="text-xs font-serif text-primary uppercase tracking-widest">Legal</p>
             <h1 className="text-4xl font-serif">Privacy Policy</h1>
-            <p className="text-muted-foreground text-sm font-mono">Last updated: May 2026</p>
+            <p className="text-muted-foreground text-sm font-serif">Last updated: May 2026</p>
           </div>
 
           <div className="prose prose-invert max-w-none space-y-8 text-muted-foreground leading-relaxed">

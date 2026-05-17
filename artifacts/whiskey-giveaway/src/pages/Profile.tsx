@@ -87,7 +87,7 @@ function SectionHeading({ icon, label }: { icon: React.ReactNode; label: string 
       <div className="w-8 h-8 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
         {icon}
       </div>
-      <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="text-xs font-serif uppercase tracking-widest text-muted-foreground">{label}</p>
       <div className="flex-1 h-px bg-border" />
     </div>
   );
@@ -193,7 +193,7 @@ export function Profile() {
                   <span className="text-2xl font-serif text-primary">{initials}</span>
                 </div>
                 <div>
-                  <p className="text-xs font-mono text-primary uppercase tracking-widest mb-1">Your Profile</p>
+                  <p className="text-xs font-serif text-primary uppercase tracking-widest mb-1">Your Profile</p>
                   <h1 className="text-3xl font-serif">{profile.firstName} {profile.lastName}</h1>
                   <p className="text-muted-foreground text-sm mt-1">{profile.email}</p>
                 </div>
@@ -207,7 +207,7 @@ export function Profile() {
                   <Gift className="w-6 h-6 text-primary mb-3" />
                   <p className="font-serif text-lg mb-1">My Rewards</p>
                   <p className="text-xs text-muted-foreground">Check and claim free tickets from referrals</p>
-                  <div className="flex items-center gap-1 text-xs text-primary font-mono uppercase tracking-widest mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 text-xs text-primary font-serif uppercase tracking-widest mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     View <ArrowRight className="w-3 h-3" />
                   </div>
                 </button>
@@ -218,7 +218,7 @@ export function Profile() {
                   <Ticket className="w-6 h-6 text-primary mb-3" />
                   <p className="font-serif text-lg mb-1">Browse Draws</p>
                   <p className="text-xs text-muted-foreground">Enter one of {giveaways?.length ?? 0} live giveaways</p>
-                  <div className="flex items-center gap-1 text-xs text-primary font-mono uppercase tracking-widest mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 text-xs text-primary font-serif uppercase tracking-widest mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     Enter <ArrowRight className="w-3 h-3" />
                   </div>
                 </button>
@@ -227,20 +227,20 @@ export function Profile() {
               {/* Personal info */}
               <div className="bg-card border border-border rounded-sm divide-y divide-border mb-4">
                 <div className="px-5 py-3 flex justify-between items-center">
-                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Name</span>
+                  <span className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Name</span>
                   <span className="text-sm font-serif">{profile.firstName} {profile.lastName}</span>
                 </div>
                 <div className="px-5 py-3 flex justify-between items-center">
-                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Email</span>
-                  <span className="text-sm font-mono">{profile.email}</span>
+                  <span className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Email</span>
+                  <span className="text-sm font-serif">{profile.email}</span>
                 </div>
                 <div className="px-5 py-3 flex justify-between items-center">
-                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Date of birth</span>
-                  <span className="text-sm font-mono">{formatDob(profile.dateOfBirth)}</span>
+                  <span className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Date of birth</span>
+                  <span className="text-sm font-serif">{formatDob(profile.dateOfBirth)}</span>
                 </div>
                 <div className="px-5 py-3 flex justify-between items-center">
-                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Member since</span>
-                  <span className="text-sm font-mono">
+                  <span className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Member since</span>
+                  <span className="text-sm font-serif">
                     {new Date(profile.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
                 </div>
@@ -249,8 +249,8 @@ export function Profile() {
               {/* Address */}
               <div className="bg-card border border-border rounded-sm divide-y divide-border mb-8">
                 <div className="px-5 py-3 flex items-start justify-between gap-4">
-                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground shrink-0 pt-0.5">Address</span>
-                  <div className="text-sm font-mono text-right space-y-0.5">
+                  <span className="text-xs font-serif uppercase tracking-widest text-muted-foreground shrink-0 pt-0.5">Address</span>
+                  <div className="text-sm font-serif text-right space-y-0.5">
                     <p>{profile.addressLine1}</p>
                     {profile.addressLine2 && <p>{profile.addressLine2}</p>}
                     <p>{profile.city}</p>
@@ -262,7 +262,7 @@ export function Profile() {
 
               <Button
                 variant="outline"
-                className="border-destructive/40 hover:border-destructive text-destructive hover:text-destructive gap-2 font-mono text-xs uppercase tracking-widest h-10"
+                className="border-destructive/40 hover:border-destructive text-destructive hover:text-destructive gap-2 font-serif text-xs uppercase tracking-widest h-10"
                 onClick={handleSignOut}
               >
                 <LogOut className="w-4 h-4" /> Sign Out
@@ -283,7 +283,7 @@ export function Profile() {
                 <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mb-6">
                   <User className="w-7 h-7 text-primary" />
                 </div>
-                <p className="text-xs font-mono text-primary uppercase tracking-widest mb-3">Create Account</p>
+                <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Create Account</p>
                 <h1 className="text-4xl font-serif mb-3">Join PrizePour</h1>
                 <p className="text-muted-foreground max-w-sm">
                   Save your details, track rewards, and enter draws faster. Must be 18 or older to register.
@@ -298,37 +298,37 @@ export function Profile() {
                   <div className="space-y-5">
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div className="space-y-2">
-                        <Label htmlFor="firstName" className="font-mono text-xs uppercase tracking-widest text-muted-foreground">First Name</Label>
+                        <Label htmlFor="firstName" className="font-serif text-xs uppercase tracking-widest text-muted-foreground">First Name</Label>
                         <Input
                           id="firstName"
                           value={form.firstName}
                           onChange={e => set('firstName', e.target.value)}
                           placeholder="James"
-                          className={`bg-card border-border font-mono ${errors.firstName ? 'border-destructive' : ''}`}
+                          className={`bg-card border-border font-serif ${errors.firstName ? 'border-destructive' : ''}`}
                         />
                         <FieldError msg={errors.firstName} />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="lastName" className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Last Name</Label>
+                        <Label htmlFor="lastName" className="font-serif text-xs uppercase tracking-widest text-muted-foreground">Last Name</Label>
                         <Input
                           id="lastName"
                           value={form.lastName}
                           onChange={e => set('lastName', e.target.value)}
                           placeholder="MacAllister"
-                          className={`bg-card border-border font-mono ${errors.lastName ? 'border-destructive' : ''}`}
+                          className={`bg-card border-border font-serif ${errors.lastName ? 'border-destructive' : ''}`}
                         />
                         <FieldError msg={errors.lastName} />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Email Address</Label>
+                      <Label htmlFor="email" className="font-serif text-xs uppercase tracking-widest text-muted-foreground">Email Address</Label>
                       <Input
                         id="email"
                         type="email"
                         value={form.email}
                         onChange={e => set('email', e.target.value)}
                         placeholder="james@example.com"
-                        className={`bg-card border-border font-mono ${errors.email ? 'border-destructive' : ''}`}
+                        className={`bg-card border-border font-serif ${errors.email ? 'border-destructive' : ''}`}
                       />
                       <FieldError msg={errors.email} />
                     </div>
@@ -345,40 +345,40 @@ export function Profile() {
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Date of Birth</Label>
+                    <Label className="font-serif text-xs uppercase tracking-widest text-muted-foreground">Date of Birth</Label>
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <Select value={form.dobDay} onValueChange={v => set('dobDay', v)}>
-                          <SelectTrigger className={`bg-card border-border font-mono ${errors.dob ? 'border-destructive' : ''}`}>
+                          <SelectTrigger className={`bg-card border-border font-serif ${errors.dob ? 'border-destructive' : ''}`}>
                             <SelectValue placeholder="Day" />
                           </SelectTrigger>
                           <SelectContent className="max-h-60">
                             {DAYS.map(d => (
-                              <SelectItem key={d} value={d} className="font-mono">{d}</SelectItem>
+                              <SelectItem key={d} value={d} className="font-serif">{d}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
                         <Select value={form.dobMonth} onValueChange={v => set('dobMonth', v)}>
-                          <SelectTrigger className={`bg-card border-border font-mono ${errors.dob ? 'border-destructive' : ''}`}>
+                          <SelectTrigger className={`bg-card border-border font-serif ${errors.dob ? 'border-destructive' : ''}`}>
                             <SelectValue placeholder="Month" />
                           </SelectTrigger>
                           <SelectContent className="max-h-60">
                             {MONTHS.map(m => (
-                              <SelectItem key={m.value} value={m.value} className="font-mono">{m.label}</SelectItem>
+                              <SelectItem key={m.value} value={m.value} className="font-serif">{m.label}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
                         <Select value={form.dobYear} onValueChange={v => set('dobYear', v)}>
-                          <SelectTrigger className={`bg-card border-border font-mono ${errors.dob ? 'border-destructive' : ''}`}>
+                          <SelectTrigger className={`bg-card border-border font-serif ${errors.dob ? 'border-destructive' : ''}`}>
                             <SelectValue placeholder="Year" />
                           </SelectTrigger>
                           <SelectContent className="max-h-60">
                             {YEARS.map(y => (
-                              <SelectItem key={y} value={y} className="font-mono">{y}</SelectItem>
+                              <SelectItem key={y} value={y} className="font-serif">{y}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -396,18 +396,18 @@ export function Profile() {
                   </p>
                   <div className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="addressLine1" className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Address Line 1</Label>
+                      <Label htmlFor="addressLine1" className="font-serif text-xs uppercase tracking-widest text-muted-foreground">Address Line 1</Label>
                       <Input
                         id="addressLine1"
                         value={form.addressLine1}
                         onChange={e => set('addressLine1', e.target.value)}
                         placeholder="12 Distillery Lane"
-                        className={`bg-card border-border font-mono ${errors.addressLine1 ? 'border-destructive' : ''}`}
+                        className={`bg-card border-border font-serif ${errors.addressLine1 ? 'border-destructive' : ''}`}
                       />
                       <FieldError msg={errors.addressLine1} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="addressLine2" className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                      <Label htmlFor="addressLine2" className="font-serif text-xs uppercase tracking-widest text-muted-foreground">
                         Address Line 2 <span className="normal-case tracking-normal text-muted-foreground/60">(optional)</span>
                       </Label>
                       <Input
@@ -415,42 +415,42 @@ export function Profile() {
                         value={form.addressLine2}
                         onChange={e => set('addressLine2', e.target.value)}
                         placeholder="Apartment, suite, etc."
-                        className="bg-card border-border font-mono"
+                        className="bg-card border-border font-serif"
                       />
                     </div>
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div className="space-y-2">
-                        <Label htmlFor="city" className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Town / City</Label>
+                        <Label htmlFor="city" className="font-serif text-xs uppercase tracking-widest text-muted-foreground">Town / City</Label>
                         <Input
                           id="city"
                           value={form.city}
                           onChange={e => set('city', e.target.value)}
                           placeholder="Cork"
-                          className={`bg-card border-border font-mono ${errors.city ? 'border-destructive' : ''}`}
+                          className={`bg-card border-border font-serif ${errors.city ? 'border-destructive' : ''}`}
                         />
                         <FieldError msg={errors.city} />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="postcode" className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Postcode</Label>
+                        <Label htmlFor="postcode" className="font-serif text-xs uppercase tracking-widest text-muted-foreground">Postcode</Label>
                         <Input
                           id="postcode"
                           value={form.postcode}
                           onChange={e => set('postcode', e.target.value.toUpperCase())}
                           placeholder="SW1A 1AA"
-                          className={`bg-card border-border font-mono ${errors.postcode ? 'border-destructive' : ''}`}
+                          className={`bg-card border-border font-serif ${errors.postcode ? 'border-destructive' : ''}`}
                         />
                         <FieldError msg={errors.postcode} />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Country</Label>
+                      <Label className="font-serif text-xs uppercase tracking-widest text-muted-foreground">Country</Label>
                       <Select value={form.country} onValueChange={v => set('country', v)}>
-                        <SelectTrigger className={`bg-card border-border font-mono ${errors.country ? 'border-destructive' : ''}`}>
+                        <SelectTrigger className={`bg-card border-border font-serif ${errors.country ? 'border-destructive' : ''}`}>
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
                         <SelectContent>
                           {COUNTRIES.map(c => (
-                            <SelectItem key={c} value={c} className="font-mono">{c}</SelectItem>
+                            <SelectItem key={c} value={c} className="font-serif">{c}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -463,7 +463,7 @@ export function Profile() {
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest font-mono text-sm gap-2"
+                    className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest font-serif text-sm gap-2"
                   >
                     Create Account <ArrowRight className="w-4 h-4" />
                   </Button>

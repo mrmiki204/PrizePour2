@@ -64,7 +64,7 @@ export function Home() {
             style={{ background: 'linear-gradient(135deg, #3d1a05 0%, #1c0c03 100%)', borderBottom: '2px solid #ea9237' }}
           >
             <div className="text-center">
-              <p className="font-mono text-xs tracking-widest text-amber-500/70 uppercase mb-1">Draw Status</p>
+              <p className="font-serif text-xs tracking-widest text-amber-500/70 uppercase mb-1">Draw Status</p>
               <p className="font-serif text-3xl md:text-5xl text-amber-400 tracking-wide">No Active Draws</p>
             </div>
           </motion.div>
@@ -90,7 +90,7 @@ export function Home() {
           >
             <motion.div variants={fadeIn} className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-mono text-primary uppercase tracking-widest">Featured Draw Ends Soon</span>
+              <span className="text-xs font-serif text-primary uppercase tracking-widest">Featured Draw Ends Soon</span>
             </motion.div>
 
             <motion.h1 variants={fadeIn} className="text-5xl md:text-7xl font-serif leading-tight">
@@ -136,14 +136,14 @@ export function Home() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                 <div className="absolute top-4 left-4">
-                  <span className="bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded-sm">Selected Bottles · 7 Expressions</span>
+                  <span className="bg-primary/90 text-primary-foreground text-[10px] font-serif uppercase tracking-widest px-2 py-1 rounded-sm">Selected Bottles · 7 Expressions</span>
                 </div>
                 {featured && (
                   <div className="absolute bottom-4 left-4 right-4">
                     <h3 className="text-2xl font-serif text-white mb-2">{featured.name}</h3>
                     <div className="flex justify-between items-end">
-                      <p className="text-primary font-mono">{featured.prizeValue}</p>
-                      <p className="text-sm text-gray-400 font-mono">{featured.entryCount.toLocaleString()} Entries</p>
+                      <p className="text-primary font-serif">{featured.prizeValue}</p>
+                      <p className="text-sm text-gray-400 font-serif">{featured.entryCount.toLocaleString()} Entries</p>
                     </div>
                   </div>
                 )}
@@ -162,13 +162,13 @@ export function Home() {
       {/* ── The Draw ── */}
       <section id="giveaways" className="py-24 max-w-7xl mx-auto px-6">
         <div className="mb-16">
-          <p className="text-xs font-mono text-primary uppercase tracking-widest mb-3">Live Raffle</p>
+          <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Live Raffle</p>
           <h2 className="text-4xl font-serif mb-4">One Winner. A Rare Selection.</h2>
           <p className="text-muted-foreground max-w-xl">Enter for a chance to win an exclusive Clonakilty whiskey selection — worth over £500, shipped insured to your door.</p>
         </div>
 
         {!featured ? (
-          <div className="text-center py-20 text-muted-foreground font-mono text-sm">
+          <div className="text-center py-20 text-muted-foreground font-serif text-sm">
             No active draws at the moment. Check back soon.
           </div>
         ) : (
@@ -208,7 +208,7 @@ export function Home() {
                 <div className="p-8 lg:p-10 flex flex-col justify-between gap-8">
                   <div className="space-y-4">
                     <div>
-                      <span className="text-xs font-mono text-primary uppercase tracking-widest">Prize Selection</span>
+                      <span className="text-xs font-serif text-primary uppercase tracking-widest">Prize Selection</span>
                       <h3 className="text-3xl font-serif mt-2 mb-1">{featured.name}</h3>
                       <p className="text-4xl font-serif text-primary">{featured.prizeValue}</p>
                     </div>
@@ -216,7 +216,7 @@ export function Home() {
 
                     <div className="space-y-1.5 pt-2">
                       {COLLECTION_BOTTLES.map((bottle, i) => (
-                        <div key={i} className="flex justify-center items-center text-xs font-mono py-1 border-b border-border/30 last:border-0">
+                        <div key={i} className="flex justify-center items-center text-xs font-serif py-1 border-b border-border/30 last:border-0">
                           <span className="text-foreground/70 text-center">{bottle.name}</span>
                         </div>
                       ))}
@@ -225,7 +225,7 @@ export function Home() {
 
                   <div className="space-y-6">
                     <div>
-                      <div className="flex justify-between items-center text-xs font-mono mb-2">
+                      <div className="flex justify-between items-center text-xs font-serif mb-2">
                         <span className="text-muted-foreground">{featured.entryCount} / {featured.maxEntries} tickets sold</span>
                         <span className={remaining <= 20 ? 'text-red-400' : 'text-primary'}>{remaining} remaining</span>
                       </div>
@@ -242,7 +242,7 @@ export function Home() {
 
                     <div className="flex items-center justify-between">
                       <CountdownTimer daysToAdd={daysUntil(featured.drawDate)} />
-                      <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+                      <div className="flex items-center gap-2 text-xs font-serif text-muted-foreground">
                         <Ticket className="w-3.5 h-3.5 text-primary" />
                         {pct.toFixed(0)}% sold
                       </div>
@@ -250,7 +250,7 @@ export function Home() {
 
                     <Button
                       size="lg"
-                      className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-sm font-mono"
+                      className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-sm font-serif"
                       onClick={() => setLocation(`/giveaway/${featured.id}`)}
                     >
                       Enter the Draw — from £2.99
@@ -267,7 +267,7 @@ export function Home() {
       <section id="how-it-works" className="py-24 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <p className="text-xs font-mono text-primary uppercase tracking-widest mb-3">The Process</p>
+            <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">The Process</p>
             <h2 className="text-4xl font-serif mb-4">Simple. Transparent. Fair.</h2>
             <p className="text-muted-foreground max-w-md mx-auto">Every draw follows the same iron-clad process, independently verified at each step.</p>
           </div>
@@ -281,7 +281,7 @@ export function Home() {
               <div key={step} className="text-center space-y-4 relative">
                 <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center relative">
                   <Icon className="w-8 h-8 text-primary" />
-                  <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-mono flex items-center justify-center">{step}</span>
+                  <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-serif flex items-center justify-center">{step}</span>
                 </div>
                 <h3 className="text-xl font-serif">{title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{body}</p>
@@ -295,7 +295,7 @@ export function Home() {
       <section id="winners" className="py-24 max-w-7xl mx-auto px-6">
         <div className="flex items-center gap-4 mb-4">
           <div className="h-px bg-border flex-1" />
-          <p className="text-xs font-mono text-primary uppercase tracking-widest px-4">Latest Draws</p>
+          <p className="text-xs font-serif text-primary uppercase tracking-widest px-4">Latest Draws</p>
           <div className="h-px bg-border flex-1" />
         </div>
         <h2 className="text-3xl font-serif text-center mb-16">Recent Additions to Collections</h2>
@@ -332,7 +332,7 @@ export function Home() {
                     <div>
                       <p className="font-serif text-base text-primary leading-tight line-clamp-2">{g.name}</p>
                       <p className="text-sm text-foreground mt-2 font-medium">{g.prizeValue}</p>
-                      <p className="text-xs text-muted-foreground font-mono mt-1">
+                      <p className="text-xs text-muted-foreground font-serif mt-1">
                         {days > 0 ? `Draw in ${days} day${days === 1 ? '' : 's'}` : 'Draw complete'}
                       </p>
                     </div>
@@ -352,7 +352,7 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <p className="text-xs font-mono text-primary uppercase tracking-widest mb-3">Why Us</p>
+              <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Why Us</p>
               <h2 className="text-4xl font-serif mb-6 leading-tight">The collector's edge you've been looking for.</h2>
               <p className="text-muted-foreground leading-relaxed mb-10">
                 PrizePour was built by enthusiasts for enthusiasts. We source direct from authorised retailers — no grey-market prizes, ever. Every draw is independently verified and every winner notified within 24 hours.
@@ -389,7 +389,7 @@ export function Home() {
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-sm border border-border rounded-sm p-4">
-                  <p className="text-xs font-mono text-primary uppercase tracking-widest mb-1">Currently Live</p>
+                  <p className="text-xs font-serif text-primary uppercase tracking-widest mb-1">Currently Live</p>
                   <p className="font-serif text-lg">{giveaways?.length ?? 0} Active {(giveaways?.length ?? 0) === 1 ? 'Draw' : 'Draws'}</p>
                   <p className="text-xs text-muted-foreground mt-1">From £2.99 entry · Draw closes soon</p>
                 </div>
@@ -402,7 +402,7 @@ export function Home() {
       {/* ── About / FAQ ── */}
       <section id="about" className="py-24 max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <p className="text-xs font-mono text-primary uppercase tracking-widest mb-3">About PrizePour</p>
+          <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">About PrizePour</p>
           <h2 className="text-4xl font-serif mb-4">Frequently Asked Questions</h2>
           <p className="text-muted-foreground max-w-md mx-auto">Everything you need to know before entering your first draw.</p>
         </div>

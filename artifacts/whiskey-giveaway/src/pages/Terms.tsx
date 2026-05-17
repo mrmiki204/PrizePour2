@@ -8,9 +8,9 @@ export function Terms() {
       <main className="flex-1 pt-32 pb-24">
         <div className="max-w-3xl mx-auto px-6 space-y-10">
           <div className="space-y-3">
-            <p className="text-xs font-mono text-primary uppercase tracking-widest">Legal</p>
+            <p className="text-xs font-serif text-primary uppercase tracking-widest">Legal</p>
             <h1 className="text-4xl font-serif">Competition Terms &amp; Conditions</h1>
-            <p className="text-muted-foreground text-sm font-mono">Effective Date: 16 May 2026</p>
+            <p className="text-muted-foreground text-sm font-serif">Effective Date: 16 May 2026</p>
             <p className="text-muted-foreground text-sm leading-relaxed">
               These Terms &amp; Conditions govern participation in competitions operated by Prize Pour ("Prize Pour", "we", "our", "us").
               By entering any competition on Prize Pour, you agree to these Terms &amp; Conditions.

@@ -78,7 +78,7 @@ export function DrawPage() {
               className="text-center space-y-12 w-full"
             >
               <div className="space-y-4">
-                <p className="text-primary font-mono tracking-[0.2em] uppercase text-sm animate-pulse">Official Draw</p>
+                <p className="text-primary font-serif tracking-[0.2em] uppercase text-sm animate-pulse">Official Draw</p>
                 <h1 className="text-5xl md:text-7xl font-serif">{giveaway?.name ?? '...'}</h1>
               </div>
 
@@ -98,13 +98,13 @@ export function DrawPage() {
               </div>
 
               <div className="space-y-2">
-                <p className="text-muted-foreground uppercase tracking-widest text-xs font-mono">Total Verified Entries</p>
-                <p className="text-6xl font-mono text-primary font-bold">
+                <p className="text-muted-foreground uppercase tracking-widest text-xs font-serif">Total Verified Entries</p>
+                <p className="text-6xl font-serif text-primary font-bold">
                   {Math.min(lobbyCount, entryCount).toLocaleString()}
                 </p>
               </div>
 
-              <div className="text-xl tracking-[0.3em] font-mono text-muted-foreground animate-pulse mt-12">
+              <div className="text-xl tracking-[0.3em] font-serif text-muted-foreground animate-pulse mt-12">
                 DRAW STARTING...
               </div>
             </motion.div>
@@ -138,7 +138,7 @@ export function DrawPage() {
                   }}
                 >
                   {spinnerItems.map((item, idx) => (
-                    <div key={idx} className="h-16 flex items-center justify-center text-4xl md:text-5xl font-mono font-bold text-foreground">
+                    <div key={idx} className="h-16 flex items-center justify-center text-4xl md:text-5xl font-serif font-bold text-foreground">
                       {item}
                     </div>
                   ))}
@@ -178,7 +178,7 @@ export function DrawPage() {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="inline-flex items-center gap-3 px-6 py-2 rounded-full border border-primary/50 bg-primary/10 shadow-[0_0_30px_rgba(234,146,55,0.3)] text-primary uppercase tracking-[0.3em] font-mono text-sm"
+                  className="inline-flex items-center gap-3 px-6 py-2 rounded-full border border-primary/50 bg-primary/10 shadow-[0_0_30px_rgba(234,146,55,0.3)] text-primary uppercase tracking-[0.3em] font-serif text-sm"
                 >
                   <Trophy className="w-5 h-5" /> Official Winner
                 </motion.div>
@@ -191,16 +191,16 @@ export function DrawPage() {
                     {winnerLoading ? (
                       <div className="flex items-center justify-center gap-3 text-muted-foreground py-8">
                         <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                        <span className="font-mono text-sm">Verifying draw result…</span>
+                        <span className="font-serif text-sm">Verifying draw result…</span>
                       </div>
                     ) : winner ? (
                       <>
-                        <p className="text-xl text-muted-foreground uppercase tracking-widest font-mono">Winning Ticket</p>
+                        <p className="text-xl text-muted-foreground uppercase tracking-widest font-serif">Winning Ticket</p>
                         <motion.p
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ type: "spring", bounce: 0.4, delay: 0.3 }}
-                          className="text-6xl md:text-8xl font-mono text-primary font-bold"
+                          className="text-6xl md:text-8xl font-serif text-primary font-bold"
                         >
                           {winner.ticketNumber}
                         </motion.p>
@@ -218,7 +218,7 @@ export function DrawPage() {
                       </>
                     ) : (
                       <>
-                        <p className="text-xl text-muted-foreground uppercase tracking-widest font-mono">No Entries Yet</p>
+                        <p className="text-xl text-muted-foreground uppercase tracking-widest font-serif">No Entries Yet</p>
                         <p className="text-muted-foreground mt-2">This draw has no entries to select a winner from.</p>
                       </>
                     )}
@@ -248,7 +248,7 @@ export function DrawPage() {
         {phase === 'lobby' && (
           <button
             onClick={() => setLocation('/')}
-            className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-mono text-sm"
+            className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-serif text-sm"
           >
             <ArrowLeft className="w-4 h-4" /> Back
           </button>

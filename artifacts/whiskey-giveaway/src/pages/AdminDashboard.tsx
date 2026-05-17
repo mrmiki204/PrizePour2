@@ -27,7 +27,7 @@ function StatCard({
         <Icon className="w-5 h-5 text-primary" />
       </div>
       <div>
-        <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
+        <p className="text-xs font-serif uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
         <p className="text-2xl font-serif text-foreground">{value}</p>
         {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
       </div>
@@ -118,11 +118,11 @@ function GiveawayForm({ initial, onSubmit, onCancel, submitLabel, isSubmitting }
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2 space-y-1">
-          <Label className="text-xs font-mono uppercase tracking-widest">Name *</Label>
+          <Label className="text-xs font-serif uppercase tracking-widest">Name *</Label>
           <Input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Clonakilty 21 Year Old Single Malt" required />
         </div>
         <div className="md:col-span-2 space-y-1">
-          <Label className="text-xs font-mono uppercase tracking-widest">Description *</Label>
+          <Label className="text-xs font-serif uppercase tracking-widest">Description *</Label>
           <textarea
             value={form.description}
             onChange={e => set('description', e.target.value)}
@@ -133,11 +133,11 @@ function GiveawayForm({ initial, onSubmit, onCancel, submitLabel, isSubmitting }
           />
         </div>
         <div className="space-y-1">
-          <Label className="text-xs font-mono uppercase tracking-widest">Prize Value Label *</Label>
+          <Label className="text-xs font-serif uppercase tracking-widest">Prize Value Label *</Label>
           <Input value={form.prizeValue} onChange={e => set('prizeValue', e.target.value)} placeholder="€220" required />
         </div>
         <div className="space-y-1">
-          <Label className="text-xs font-mono uppercase tracking-widest">Prize Value (numeric) *</Label>
+          <Label className="text-xs font-serif uppercase tracking-widest">Prize Value (numeric) *</Label>
           <Input
             type="number"
             step="0.01"
@@ -149,7 +149,7 @@ function GiveawayForm({ initial, onSubmit, onCancel, submitLabel, isSubmitting }
           />
         </div>
         <div className="space-y-1">
-          <Label className="text-xs font-mono uppercase tracking-widest">
+          <Label className="text-xs font-serif uppercase tracking-widest">
             Max Entries *{' '}
             <span className="text-muted-foreground normal-case">(auto-computed)</span>
           </Label>
@@ -163,7 +163,7 @@ function GiveawayForm({ initial, onSubmit, onCancel, submitLabel, isSubmitting }
           />
         </div>
         <div className="space-y-1">
-          <Label className="text-xs font-mono uppercase tracking-widest">Draw Date &amp; Time *</Label>
+          <Label className="text-xs font-serif uppercase tracking-widest">Draw Date &amp; Time *</Label>
           <Input
             type="datetime-local"
             value={form.drawDate}
@@ -172,12 +172,12 @@ function GiveawayForm({ initial, onSubmit, onCancel, submitLabel, isSubmitting }
           />
         </div>
         <div className="md:col-span-2 space-y-1">
-          <Label className="text-xs font-mono uppercase tracking-widest">Image URL <span className="text-muted-foreground normal-case">(optional)</span></Label>
+          <Label className="text-xs font-serif uppercase tracking-widest">Image URL <span className="text-muted-foreground normal-case">(optional)</span></Label>
           <Input value={form.imageUrl} onChange={e => set('imageUrl', e.target.value)} placeholder="https://example.com/bottle.jpg" />
         </div>
       </div>
 
-      {error && <p className="text-red-400 text-xs font-mono">{error}</p>}
+      {error && <p className="text-red-400 text-xs font-serif">{error}</p>}
 
       <div className="flex gap-3 pt-2">
         <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest gap-2" disabled={isSubmitting}>
@@ -323,14 +323,14 @@ export function AdminDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-serif tracking-tight">Admin Dashboard</h1>
-            <p className="text-muted-foreground text-sm font-mono mt-1 uppercase tracking-widest">Draw & Entry Management</p>
+            <p className="text-muted-foreground text-sm font-serif mt-1 uppercase tracking-widest">Draw & Entry Management</p>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={() => { refetchEntries(); refetchGiveaways(); }}
             disabled={isFetching}
-            className="gap-2 font-mono text-xs uppercase tracking-widest"
+            className="gap-2 font-serif text-xs uppercase tracking-widest"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
             Refresh
@@ -351,7 +351,7 @@ export function AdminDashboard() {
             <h2 className="text-lg font-serif">Giveaway Draws</h2>
             <Button
               size="sm"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest font-mono text-xs gap-2"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest font-serif text-xs gap-2"
               onClick={() => { setShowCreateForm(v => !v); setEditingId(null); }}
             >
               {showCreateForm ? <><X className="w-3.5 h-3.5" /> Cancel</> : <><Plus className="w-3.5 h-3.5" /> New Draw</>}
@@ -383,11 +383,11 @@ export function AdminDashboard() {
 
           <div className="bg-card border border-border rounded-sm overflow-hidden">
             {isLoading ? (
-              <div className="flex items-center justify-center py-16 text-muted-foreground font-mono text-sm">
+              <div className="flex items-center justify-center py-16 text-muted-foreground font-serif text-sm">
                 <Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading…
               </div>
             ) : giveaways.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground font-mono text-sm">
+              <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground font-serif text-sm">
                 <p>No giveaways yet.</p>
                 <Button size="sm" variant="outline" onClick={() => setShowCreateForm(true)}>Create first draw</Button>
               </div>
@@ -395,13 +395,13 @@ export function AdminDashboard() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/20">
-                    <th className="text-left px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Draw</th>
-                    <th className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Prize</th>
-                    <th className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Entries</th>
-                    <th className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Capacity</th>
-                    <th className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Draw Date</th>
-                    <th className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Status</th>
-                    <th className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Actions</th>
+                    <th className="text-left px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Draw</th>
+                    <th className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Prize</th>
+                    <th className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Entries</th>
+                    <th className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Capacity</th>
+                    <th className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Draw Date</th>
+                    <th className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Status</th>
+                    <th className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -413,8 +413,8 @@ export function AdminDashboard() {
                         <td className="px-5 py-3.5 font-serif max-w-[200px]">
                           <span className="block truncate">{g.name}</span>
                         </td>
-                        <td className="px-5 py-3.5 text-right font-mono text-primary">{g.prizeValue}</td>
-                        <td className="px-5 py-3.5 text-right font-mono">{g.entryCount} / {g.maxEntries}</td>
+                        <td className="px-5 py-3.5 text-right font-serif text-primary">{g.prizeValue}</td>
+                        <td className="px-5 py-3.5 text-right font-serif">{g.entryCount} / {g.maxEntries}</td>
                         <td className="px-5 py-3.5 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <div className="w-16 h-1.5 bg-secondary rounded-full overflow-hidden">
@@ -423,14 +423,14 @@ export function AdminDashboard() {
                                 style={{ width: `${Math.min((g.entryCount / g.maxEntries) * 100, 100)}%` }}
                               />
                             </div>
-                            <span className="font-mono text-xs text-muted-foreground">{Math.round((g.entryCount / g.maxEntries) * 100)}%</span>
+                            <span className="font-serif text-xs text-muted-foreground">{Math.round((g.entryCount / g.maxEntries) * 100)}%</span>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 text-right text-muted-foreground font-mono text-xs">
+                        <td className="px-5 py-3.5 text-right text-muted-foreground font-serif text-xs">
                           {daysUntil(g.drawDate)}d left
                         </td>
                         <td className="px-5 py-3.5 text-right">
-                          <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${
+                          <span className={`text-xs font-serif px-2 py-0.5 rounded-full border ${
                             g.isActive
                               ? 'border-green-500/40 bg-green-500/10 text-green-400'
                               : 'border-border bg-secondary/50 text-muted-foreground'
@@ -457,7 +457,7 @@ export function AdminDashboard() {
                             <button
                               title="Filter entries"
                               onClick={() => setFilterGiveaway(filterGiveaway === g.id ? null : g.id)}
-                              className={`p-1.5 rounded-sm transition-colors text-xs font-mono border ${
+                              className={`p-1.5 rounded-sm transition-colors text-xs font-serif border ${
                                 filterGiveaway === g.id
                                   ? 'border-primary bg-primary/10 text-primary'
                                   : 'border-border text-muted-foreground hover:border-primary/50'
@@ -498,19 +498,19 @@ export function AdminDashboard() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-secondary/20">
-                  <th className="text-left px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Giveaway</th>
-                  <th className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Entries</th>
-                  <th className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Revenue</th>
-                  <th className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Days Left</th>
+                  <th className="text-left px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Giveaway</th>
+                  <th className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Entries</th>
+                  <th className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Revenue</th>
+                  <th className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Days Left</th>
                 </tr>
               </thead>
               <tbody>
                 {giveawayStats.map((g, i) => (
                   <tr key={g.id} className={`border-b border-border/50 hover:bg-primary/5 transition-colors ${i === giveawayStats.length - 1 ? 'border-none' : ''}`}>
                     <td className="px-5 py-3.5 font-serif">{g.name}</td>
-                    <td className="px-5 py-3.5 text-right font-mono text-primary">{g.dbEntryCount}</td>
-                    <td className="px-5 py-3.5 text-right font-mono">${g.revenue.toFixed(2)}</td>
-                    <td className="px-5 py-3.5 text-right text-muted-foreground font-mono">{daysUntil(g.drawDate)}d</td>
+                    <td className="px-5 py-3.5 text-right font-serif text-primary">{g.dbEntryCount}</td>
+                    <td className="px-5 py-3.5 text-right font-serif">${g.revenue.toFixed(2)}</td>
+                    <td className="px-5 py-3.5 text-right text-muted-foreground font-serif">{daysUntil(g.drawDate)}d</td>
                   </tr>
                 ))}
               </tbody>
@@ -524,7 +524,7 @@ export function AdminDashboard() {
             <h2 className="text-lg font-serif shrink-0">
               All Entries
               {filterGiveaway && (
-                <span className="ml-2 text-sm text-primary font-mono">
+                <span className="ml-2 text-sm text-primary font-serif">
                   — {giveawayMap[filterGiveaway]?.name}
                 </span>
               )}
@@ -535,18 +535,18 @@ export function AdminDashboard() {
                 placeholder="Search name, email, ticket…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="pl-9 h-9 text-sm font-mono bg-card border-border"
+                className="pl-9 h-9 text-sm font-serif bg-card border-border"
               />
             </div>
           </div>
 
           <div className="bg-card border border-border rounded-sm overflow-hidden">
             {entriesLoading ? (
-              <div className="flex items-center justify-center py-20 text-muted-foreground font-mono text-sm">
+              <div className="flex items-center justify-center py-20 text-muted-foreground font-serif text-sm">
                 Loading entries…
               </div>
             ) : filtered.length === 0 ? (
-              <div className="flex items-center justify-center py-20 text-muted-foreground font-mono text-sm">
+              <div className="flex items-center justify-center py-20 text-muted-foreground font-serif text-sm">
                 {entries.length === 0 ? 'No entries yet.' : 'No entries match your search.'}
               </div>
             ) : (
@@ -554,30 +554,30 @@ export function AdminDashboard() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-secondary/20">
-                      <th className="text-left px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">#</th>
+                      <th className="text-left px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">#</th>
                       <th
-                        className="text-left px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
+                        className="text-left px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => toggleSort('firstName')}
                       >Name <SortIcon k="firstName" /></th>
                       <th
-                        className="text-left px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
+                        className="text-left px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => toggleSort('email')}
                       >Email <SortIcon k="email" /></th>
                       <th
-                        className="text-left px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
+                        className="text-left px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => toggleSort('giveawayId')}
                       >Giveaway <SortIcon k="giveawayId" /></th>
                       <th
-                        className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
+                        className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => toggleSort('ticketQty')}
                       >Tickets <SortIcon k="ticketQty" /></th>
-                      <th className="text-left px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">Numbers</th>
+                      <th className="text-left px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Numbers</th>
                       <th
-                        className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
+                        className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => toggleSort('amountPaid')}
                       >Paid <SortIcon k="amountPaid" /></th>
                       <th
-                        className="text-right px-5 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
+                        className="text-right px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => toggleSort('createdAt')}
                       >Date <SortIcon k="createdAt" /></th>
                     </tr>
@@ -591,24 +591,24 @@ export function AdminDashboard() {
                         transition={{ delay: i * 0.02 }}
                         className="border-b border-border/40 hover:bg-primary/5 transition-colors"
                       >
-                        <td className="px-5 py-3.5 text-muted-foreground font-mono text-xs">{entry.id}</td>
+                        <td className="px-5 py-3.5 text-muted-foreground font-serif text-xs">{entry.id}</td>
                         <td className="px-5 py-3.5 font-serif whitespace-nowrap">{entry.firstName} {entry.lastName}</td>
-                        <td className="px-5 py-3.5 text-muted-foreground font-mono text-xs whitespace-nowrap">{entry.email}</td>
+                        <td className="px-5 py-3.5 text-muted-foreground font-serif text-xs whitespace-nowrap">{entry.email}</td>
                         <td className="px-5 py-3.5 text-xs whitespace-nowrap">
-                          <span className="bg-secondary/50 text-muted-foreground px-2 py-0.5 rounded-sm font-mono">
+                          <span className="bg-secondary/50 text-muted-foreground px-2 py-0.5 rounded-sm font-serif">
                             {giveawayMap[entry.giveawayId]?.name ?? `#${entry.giveawayId}`}
                           </span>
                         </td>
-                        <td className="px-5 py-3.5 text-right font-mono text-primary">{entry.ticketQty}</td>
-                        <td className="px-5 py-3.5 font-mono text-xs text-muted-foreground max-w-[180px]">
+                        <td className="px-5 py-3.5 text-right font-serif text-primary">{entry.ticketQty}</td>
+                        <td className="px-5 py-3.5 font-serif text-xs text-muted-foreground max-w-[180px]">
                           <div className="flex flex-wrap gap-1">
                             {entry.ticketNumbers.map(t => (
                               <span key={t} className="bg-primary/10 text-primary px-1.5 py-0.5 rounded-sm text-[10px]">{t}</span>
                             ))}
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 text-right font-mono whitespace-nowrap">${entry.amountPaid}</td>
-                        <td className="px-5 py-3.5 text-right font-mono text-xs text-muted-foreground whitespace-nowrap">
+                        <td className="px-5 py-3.5 text-right font-serif whitespace-nowrap">${entry.amountPaid}</td>
+                        <td className="px-5 py-3.5 text-right font-serif text-xs text-muted-foreground whitespace-nowrap">
                           {new Date(entry.createdAt).toLocaleString('en-GB', {
                             day: '2-digit', month: 'short', year: 'numeric',
                             hour: '2-digit', minute: '2-digit'
@@ -621,7 +621,7 @@ export function AdminDashboard() {
               </div>
             )}
             {filtered.length > 0 && (
-              <div className="px-5 py-3 border-t border-border/50 flex justify-between items-center text-xs font-mono text-muted-foreground">
+              <div className="px-5 py-3 border-t border-border/50 flex justify-between items-center text-xs font-serif text-muted-foreground">
                 <span>Showing {filtered.length} of {entries.length} entries</span>
                 {filterGiveaway && (
                   <button onClick={() => setFilterGiveaway(null)} className="hover:text-primary transition-colors">

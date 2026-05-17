@@ -3,13 +3,12 @@ import { reloadAppAsync } from "expo";
 import React, { useState } from "react";
 import {
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
+import { AppText as Text } from "@/components/AppText";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
@@ -42,11 +41,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
     return details;
   };
 
-  const monoFont = Platform.select({
-    ios: "Menlo",
-    android: "monospace",
-    default: "monospace",
-  });
+  const monoFont = "PlayfairDisplay_400Regular";
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

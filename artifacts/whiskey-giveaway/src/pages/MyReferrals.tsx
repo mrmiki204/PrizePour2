@@ -110,30 +110,30 @@ export function MyReferrals() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm px-6 py-4 flex items-center justify-between">
         <button onClick={() => setLocation('/')} className="font-serif text-xl text-primary tracking-widest">PRIZEPOUR</button>
-        <Button variant="ghost" size="sm" onClick={() => setLocation('/')} className="font-mono text-xs uppercase tracking-widest">← Back to Draws</Button>
+        <Button variant="ghost" size="sm" onClick={() => setLocation('/')} className="font-serif text-xs uppercase tracking-widest">← Back to Draws</Button>
       </header>
 
       <div className="max-w-2xl mx-auto px-6 py-14 space-y-10">
         <div className="space-y-2">
-          <p className="font-mono text-xs uppercase tracking-widest text-primary">Referral Rewards</p>
+          <p className="font-serif text-xs uppercase tracking-widest text-primary">Referral Rewards</p>
           <h1 className="font-serif text-4xl">My Rewards</h1>
           <p className="text-muted-foreground text-sm">When someone enters a draw using your referral link, you earn 1–5 free tickets to use on any draw.</p>
         </div>
 
         <form onSubmit={handleLookup} className="bg-card border border-border rounded-sm p-6 space-y-4">
-          <Label className="text-sm font-mono uppercase tracking-widest">Your Referral Code</Label>
+          <Label className="text-sm font-serif uppercase tracking-widest">Your Referral Code</Label>
           <div className="flex gap-2">
             <Input
               value={inputCode}
               onChange={e => setInputCode(e.target.value)}
               placeholder="e.g. james-1-4321"
-              className="font-mono text-sm"
+              className="font-serif text-sm"
             />
             <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest px-5 shrink-0" disabled={loading}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Check'}
             </Button>
           </div>
-          {error && <p className="text-red-400 text-xs font-mono">{error}</p>}
+          {error && <p className="text-red-400 text-xs font-serif">{error}</p>}
         </form>
 
         {code && !loading && (
@@ -146,7 +146,7 @@ export function MyReferrals() {
                   <p className="text-xs text-muted-foreground mt-0.5">Your free tickets for <span className="text-foreground">{claimResult.giveawayName}</span>:</p>
                   <div className="flex flex-wrap gap-2 mt-3">
                     {claimResult.tickets.map(t => (
-                      <span key={t} className="bg-green-400/10 border border-green-400/20 text-green-400 font-mono text-sm px-3 py-1 rounded-sm">{t}</span>
+                      <span key={t} className="bg-green-400/10 border border-green-400/20 text-green-400 font-serif text-sm px-3 py-1 rounded-sm">{t}</span>
                     ))}
                   </div>
                 </div>
@@ -158,7 +158,7 @@ export function MyReferrals() {
                 <h2 className="font-serif text-xl flex items-center gap-2">
                   <Gift className="w-5 h-5 text-primary" />
                   Unclaimed Rewards
-                  <span className="ml-1 bg-primary text-primary-foreground text-xs font-mono px-2 py-0.5 rounded-full">{unclaimed.length}</span>
+                  <span className="ml-1 bg-primary text-primary-foreground text-xs font-serif px-2 py-0.5 rounded-full">{unclaimed.length}</span>
                 </h2>
                 {unclaimed.map(reward => (
                   <motion.div key={reward.id} layout className="bg-gradient-to-br from-primary/10 to-card border border-primary/30 rounded-sm overflow-hidden">
@@ -169,11 +169,11 @@ export function MyReferrals() {
                         </div>
                         <div>
                           <p className="font-serif text-2xl text-primary">{reward.freeTickets} Free {reward.freeTickets === 1 ? 'Ticket' : 'Tickets'}</p>
-                          <p className="text-xs font-mono text-muted-foreground mt-0.5">Earned {new Date(reward.createdAt).toLocaleDateString()}</p>
+                          <p className="text-xs font-serif text-muted-foreground mt-0.5">Earned {new Date(reward.createdAt).toLocaleDateString()}</p>
                         </div>
                       </div>
                       <Button
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest font-mono text-xs h-9 px-5 gap-2"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest font-serif text-xs h-9 px-5 gap-2"
                         onClick={() => setClaim(c => ({ ...c, rewardId: c.rewardId === reward.id ? null : reward.id, giveawayId: '', firstName: '', lastName: '', email: '' }))}
                       >
                         {claim.rewardId === reward.id ? 'Cancel' : <><span>Claim</span><ArrowRight className="w-3 h-3" /></>}
@@ -194,7 +194,7 @@ export function MyReferrals() {
                           <p className="text-sm text-muted-foreground">Choose a draw and enter your details to claim your <span className="text-primary font-serif">{reward.freeTickets} free {reward.freeTickets === 1 ? 'ticket' : 'tickets'}</span>.</p>
 
                           <div className="space-y-1">
-                            <Label className="text-xs font-mono uppercase tracking-widest">Select Draw</Label>
+                            <Label className="text-xs font-serif uppercase tracking-widest">Select Draw</Label>
                             <select
                               value={claim.giveawayId}
                               onChange={e => setClaim(c => ({ ...c, giveawayId: e.target.value }))}
@@ -210,21 +210,21 @@ export function MyReferrals() {
 
                           <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                              <Label className="text-xs font-mono uppercase tracking-widest">First Name</Label>
+                              <Label className="text-xs font-serif uppercase tracking-widest">First Name</Label>
                               <Input value={claim.firstName} onChange={e => setClaim(c => ({ ...c, firstName: e.target.value }))} placeholder="James" required />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs font-mono uppercase tracking-widest">Last Name</Label>
+                              <Label className="text-xs font-serif uppercase tracking-widest">Last Name</Label>
                               <Input value={claim.lastName} onChange={e => setClaim(c => ({ ...c, lastName: e.target.value }))} placeholder="Bond" required />
                             </div>
                           </div>
 
                           <div className="space-y-1">
-                            <Label className="text-xs font-mono uppercase tracking-widest">Email</Label>
+                            <Label className="text-xs font-serif uppercase tracking-widest">Email</Label>
                             <Input type="email" value={claim.email} onChange={e => setClaim(c => ({ ...c, email: e.target.value }))} placeholder="james@example.com" required />
                           </div>
 
-                          {claimError && <p className="text-red-400 text-xs font-mono">{claimError}</p>}
+                          {claimError && <p className="text-red-400 text-xs font-serif">{claimError}</p>}
 
                           <Button
                             type="submit"
@@ -254,10 +254,10 @@ export function MyReferrals() {
                         <CheckCircle2 className="w-4 h-4 text-green-400" />
                         <div>
                           <p className="text-sm font-serif">{reward.freeTickets} ticket{reward.freeTickets !== 1 ? 's' : ''} — {g?.name ?? `Draw #${reward.claimedGiveawayId}`}</p>
-                          <p className="text-xs font-mono text-muted-foreground">{reward.claimedAt ? new Date(reward.claimedAt).toLocaleDateString() : ''}</p>
+                          <p className="text-xs font-serif text-muted-foreground">{reward.claimedAt ? new Date(reward.claimedAt).toLocaleDateString() : ''}</p>
                         </div>
                       </div>
-                      <span className="text-xs font-mono text-green-400 uppercase tracking-widest">Claimed</span>
+                      <span className="text-xs font-serif text-green-400 uppercase tracking-widest">Claimed</span>
                     </div>
                   );
                 })}
@@ -273,7 +273,7 @@ export function MyReferrals() {
                   <p className="font-serif text-xl">No rewards yet</p>
                   <p className="text-sm text-muted-foreground mt-1">Share your referral link — when someone enters a draw using it, you'll earn 1–5 free tickets here.</p>
                 </div>
-                <Button variant="outline" onClick={() => setLocation('/')} className="font-mono text-xs uppercase tracking-widest mt-4">
+                <Button variant="outline" onClick={() => setLocation('/')} className="font-serif text-xs uppercase tracking-widest mt-4">
                   Browse Draws
                 </Button>
               </motion.div>
