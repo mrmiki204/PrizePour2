@@ -94,8 +94,8 @@ export function Home() {
             </motion.div>
 
             <motion.h1 variants={fadeIn} className="text-5xl md:text-7xl font-serif leading-tight">
-              Enter the Draw. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Win the Rare.</span>
+              The Home of <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways.</span>
             </motion.h1>
 
             <motion.p variants={fadeIn} className="text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed">
