@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw, CreditCard, Lock, ShieldCheck, Building2 } from 'lucide-react';
+import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useGetGiveaway, useCreateEntry } from '@workspace/api-client-react';
 import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
 
@@ -111,44 +111,6 @@ export function GiveawayDetail() {
     termsAccepted: false,
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank'>('card');
-  const [cardDetails, setCardDetails] = useState({
-    name: '',
-    number: '',
-    expiry: '',
-    cvc: '',
-  });
-  const [bankDetails, setBankDetails] = useState({
-    accountHolder: '',
-    sortCode: '',
-    accountNumber: '',
-  });
-
-  const formatCardNumber = (v: string) =>
-    v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
-
-  const formatExpiry = (v: string) => {
-    const d = v.replace(/\D/g, '').slice(0, 4);
-    return d.length >= 3 ? `${d.slice(0, 2)} / ${d.slice(2)}` : d;
-  };
-
-  const formatSortCode = (v: string) => {
-    const d = v.replace(/\D/g, '').slice(0, 6);
-    return d.replace(/(\d{2})(?=\d)/g, '$1-').replace(/-$/, '');
-  };
-
-  const isCardValid =
-    cardDetails.name.trim().length > 0 &&
-    cardDetails.number.replace(/\s/g, '').length === 16 &&
-    cardDetails.expiry.replace(/\s/g, '').length === 5 &&
-    cardDetails.cvc.length >= 3;
-
-  const isBankValid =
-    bankDetails.accountHolder.trim().length > 0 &&
-    bankDetails.sortCode.replace(/-/g, '').length === 6 &&
-    bankDetails.accountNumber.replace(/\D/g, '').length === 8;
-
-  const isPaymentValid = paymentMethod === 'card' ? isCardValid : isBankValid;
 
   const nextStep = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -352,7 +314,7 @@ export function GiveawayDetail() {
                             {pkg.qty} {pkg.qty === 1 ? 'Ticket' : 'Tickets'}
                           </span>
                         </div>
-                        <span className="font-serif text-primary">£{pkg.price}</span>
+                        <span className="font-serif text-primary">Free</span>
                       </button>
                     ))}
                   </div>
@@ -541,261 +503,78 @@ export function GiveawayDetail() {
               <div className="flex justify-between">
                 <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
                 <div className="bg-card border border-border rounded-sm px-4 py-2 text-xs font-serif text-muted-foreground">
-                  {selectedPackage.qty} ticket{selectedPackage.qty !== 1 ? 's' : ''} · £{selectedPackage.price}
+                  {selectedPackage.qty} ticket{selectedPackage.qty !== 1 ? 's' : ''} · Free
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* ── STEP 4: PAYMENT ── */}
+          {/* ── STEP 4: CONFIRM ENTRY ── */}
           {step === 4 && (
             <motion.div
               key="step4"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="grid md:grid-cols-5 gap-8"
+              className="max-w-xl mx-auto w-full space-y-6"
             >
-              {/* Left: checkout panel */}
-              <div className="md:col-span-3 space-y-6">
-                <div className="space-y-1">
-                  <h2 className="text-3xl font-serif text-primary">Secure Checkout</h2>
-                  <p className="text-muted-foreground text-sm">Complete your entry purchase below.</p>
+              <div className="space-y-1">
+                <h2 className="text-3xl font-serif text-primary">Confirm Your Entry</h2>
+                <p className="text-muted-foreground text-sm">Review your details and confirm your free entry below.</p>
+              </div>
+
+              <div className="bg-card border border-border rounded-sm p-8 space-y-6">
+                {/* Entrant summary */}
+                <div className="flex items-center gap-3 pb-5 border-b border-border/50">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                    <span className="text-primary font-serif">{details.firstName.charAt(0).toUpperCase()}</span>
+                  </div>
+                  <div>
+                    <p className="font-serif">{details.firstName} {details.lastName}</p>
+                    <p className="text-xs text-muted-foreground font-serif">{details.email}</p>
+                  </div>
                 </div>
 
-                <div className="bg-card border border-border rounded-sm p-8 space-y-6">
-                  {/* Entrant summary */}
-                  <div className="flex items-center gap-3 pb-5 border-b border-border/50">
-                    <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-                      <span className="text-primary font-serif text-sm">
-                        {details.firstName.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-serif">{details.firstName} {details.lastName}</p>
-                      <p className="text-xs text-muted-foreground font-serif">{details.email}</p>
-                    </div>
+                {/* Entry summary */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span className="font-serif">Draw</span>
+                    <span className="font-serif text-foreground">{giveaway.name}</span>
                   </div>
-
-                  {/* Payment method tabs */}
-                  <div className="space-y-5">
-                    <div className="grid grid-cols-2 gap-2 p-1 bg-secondary/40 rounded-sm">
-                      <button
-                        onClick={() => setPaymentMethod('card')}
-                        className={`flex items-center justify-center gap-2 py-2.5 rounded-sm text-sm font-serif transition-all duration-200 ${
-                          paymentMethod === 'card'
-                            ? 'bg-card border border-border text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        <CreditCard className="w-4 h-4" /> Card
-                      </button>
-                      <button
-                        onClick={() => setPaymentMethod('bank')}
-                        className={`flex items-center justify-center gap-2 py-2.5 rounded-sm text-sm font-serif transition-all duration-200 ${
-                          paymentMethod === 'bank'
-                            ? 'bg-card border border-border text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        <Building2 className="w-4 h-4" /> Bank Transfer
-                      </button>
-                    </div>
-
-                    <AnimatePresence mode="wait">
-                      {paymentMethod === 'card' ? (
-                        <motion.div
-                          key="card-form"
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -6 }}
-                          transition={{ duration: 0.2 }}
-                          className="space-y-3"
-                        >
-                          <div className="space-y-1.5">
-                            <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Cardholder Name</Label>
-                            <Input
-                              placeholder="James Bond"
-                              value={cardDetails.name}
-                              onChange={e => setCardDetails({ ...cardDetails, name: e.target.value })}
-                              className="font-serif"
-                              autoComplete="cc-name"
-                            />
-                          </div>
-                          <div className="space-y-1.5">
-                            <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Card Number</Label>
-                            <div className="relative">
-                              <Input
-                                placeholder="1234 5678 9012 3456"
-                                value={cardDetails.number}
-                                onChange={e => setCardDetails({ ...cardDetails, number: formatCardNumber(e.target.value) })}
-                                className="font-serif tracking-widest pr-20"
-                                inputMode="numeric"
-                                autoComplete="cc-number"
-                                maxLength={19}
-                              />
-                              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1.5">
-                                <div className="w-8 h-5 bg-blue-500/20 border border-blue-500/30 rounded-sm flex items-center justify-center">
-                                  <span className="text-[8px] font-bold text-blue-400 leading-none">VISA</span>
-                                </div>
-                                <div className="w-8 h-5 bg-orange-500/20 border border-orange-500/30 rounded-sm flex items-center justify-center">
-                                  <div className="flex">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-red-400/70" />
-                                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400/70 -ml-1.5" />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Expiry</Label>
-                              <Input
-                                placeholder="MM / YY"
-                                value={cardDetails.expiry}
-                                onChange={e => setCardDetails({ ...cardDetails, expiry: formatExpiry(e.target.value) })}
-                                className="font-serif"
-                                inputMode="numeric"
-                                autoComplete="cc-exp"
-                                maxLength={7}
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">CVC</Label>
-                              <div className="relative">
-                                <Input
-                                  placeholder="123"
-                                  value={cardDetails.cvc}
-                                  onChange={e => setCardDetails({ ...cardDetails, cvc: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                                  className="font-serif pr-9"
-                                  inputMode="numeric"
-                                  autoComplete="cc-csc"
-                                  maxLength={4}
-                                  type="password"
-                                />
-                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40" />
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="bank-form"
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -6 }}
-                          transition={{ duration: 0.2 }}
-                          className="space-y-3"
-                        >
-                          <div className="bg-amber-500/10 border border-amber-500/20 rounded-sm px-4 py-3 text-xs text-amber-400 font-serif">
-                            Funds will be transferred directly to our secure prize account. Draw entry is confirmed on receipt.
-                          </div>
-                          <div className="space-y-1.5">
-                            <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Account Holder Name</Label>
-                            <Input
-                              placeholder="James Bond"
-                              value={bankDetails.accountHolder}
-                              onChange={e => setBankDetails({ ...bankDetails, accountHolder: e.target.value })}
-                              className="font-serif"
-                              autoComplete="name"
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Sort Code</Label>
-                              <Input
-                                placeholder="12-34-56"
-                                value={bankDetails.sortCode}
-                                onChange={e => setBankDetails({ ...bankDetails, sortCode: formatSortCode(e.target.value) })}
-                                className="font-serif tracking-widest"
-                                inputMode="numeric"
-                                maxLength={8}
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">Account Number</Label>
-                              <Input
-                                placeholder="12345678"
-                                value={bankDetails.accountNumber}
-                                onChange={e => setBankDetails({ ...bankDetails, accountNumber: e.target.value.replace(/\D/g, '').slice(0, 8) })}
-                                className="font-serif tracking-widest"
-                                inputMode="numeric"
-                                maxLength={8}
-                              />
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    <p className="text-xs text-muted-foreground/60 font-serif flex items-center gap-1.5">
-                      <Lock className="w-3 h-3" />
-                      Your details are encrypted and never stored on our servers
-                    </p>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span className="font-serif">Tickets</span>
+                    <span className="font-serif text-foreground">{selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}</span>
                   </div>
-
-                  {/* Order line */}
-                  <div className="space-y-2 border-t border-border/50 pt-5 text-sm">
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>{giveaway.name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{selectedPackage.qty} ticket{selectedPackage.qty > 1 ? 's' : ''}</span>
-                      <span className="font-serif">£{selectedPackage.price}</span>
-                    </div>
-                    <div className="h-px bg-border/50 my-2" />
-                    <div className="flex justify-between font-serif text-lg text-primary">
-                      <span>Total</span>
-                      <span>£{selectedPackage.price}</span>
-                    </div>
+                  <div className="h-px bg-border/50 my-1" />
+                  <div className="flex justify-between font-serif text-lg text-primary">
+                    <span>Cost</span>
+                    <span>Free</span>
                   </div>
+                </div>
 
-                  {entryError && (
-                    <div className="flex items-center gap-2 text-red-400 text-sm font-serif bg-red-400/10 border border-red-400/20 rounded-sm p-3">
-                      <XCircle className="w-4 h-4 shrink-0" />
-                      {entryError}
-                    </div>
+                {entryError && (
+                  <div className="flex items-center gap-2 text-red-400 text-sm font-serif bg-red-400/10 border border-red-400/20 rounded-sm p-3">
+                    <XCircle className="w-4 h-4 shrink-0" />
+                    {entryError}
+                  </div>
+                )}
+
+                <Button
+                  className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base gap-2 disabled:opacity-50"
+                  onClick={handlePayment}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Confirming…</>
+                  ) : (
+                    <><ShieldCheck className="w-5 h-5" /> Confirm Entry</>
                   )}
+                </Button>
 
-                  <Button
-                    className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base gap-2 disabled:opacity-50"
-                    onClick={handlePayment}
-                    disabled={isSubmitting || !isPaymentValid}
-                  >
-                    {isSubmitting ? (
-                      <><Loader2 className="w-5 h-5 animate-spin" /> Processing…</>
-                    ) : (
-                      <><CreditCard className="w-5 h-5" /> Pay £{selectedPackage.price}</>
-                    )}
-                  </Button>
-
-                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                    <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
-                    256-bit SSL encryption · Secure checkout
-                  </div>
-                </div>
+                <p className="text-center text-xs text-muted-foreground font-serif">Free entry · No payment required</p>
               </div>
 
-              {/* Right: order summary */}
-              <div className="md:col-span-2 space-y-6">
-                <div className="bg-card border border-border rounded-sm p-6 space-y-4">
-                  <h3 className="font-serif text-lg border-b border-border/50 pb-3">Order Summary</h3>
-                  <div className="aspect-[4/3] relative overflow-hidden rounded-sm">
-                    {img ? (
-                      <img src={img} alt={giveaway.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/60 to-stone-950" />
-                    )}
-                  </div>
-                  <p className="font-serif">{giveaway.name}</p>
-                  <div className="text-xs font-serif space-y-1.5 text-muted-foreground">
-                    <div className="flex justify-between"><span>Prize Value</span><span>{giveaway.prizeValue}</span></div>
-                    <div className="flex justify-between"><span>Max Entries</span><span>{giveaway.maxEntries}</span></div>
-                    <div className="flex justify-between"><span>Your Tickets</span><span>{selectedPackage.qty}</span></div>
-                  </div>
-                </div>
-                <Button variant="ghost" className="w-full" onClick={() => setStep(3)}>← Back</Button>
-              </div>
+              <Button variant="ghost" className="w-full" onClick={() => setStep(3)}>← Back</Button>
             </motion.div>
           )}
 
