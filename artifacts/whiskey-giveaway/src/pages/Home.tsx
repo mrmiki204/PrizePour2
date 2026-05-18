@@ -93,7 +93,12 @@ export function Home() {
               <span className="text-xs font-serif text-primary uppercase tracking-widest">Featured Draw Ends Soon</span>
             </motion.div>
 
-            <motion.h1 variants={fadeIn} className="text-5xl md:text-7xl font-serif leading-tight">
+            <motion.h1
+              initial={{ opacity: 0, x: -80 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.2 }}
+              className="text-5xl md:text-7xl font-serif leading-tight text-center"
+            >
               The Home of <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways.</span>
             </motion.h1>
