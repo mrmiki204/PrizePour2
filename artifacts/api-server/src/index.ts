@@ -2,6 +2,7 @@ import app from "./app.js";
 import { logger } from "./lib/logger.js";
 import { runMigrations } from "stripe-replit-sync";
 import { getStripeSync } from "./stripeClient.js";
+import { db, giveawaysTable } from "@workspace/db";
 
 const rawPort = process.env["PORT"];
 
@@ -15,6 +16,43 @@ const port = Number(rawPort);
 
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
+}
+
+async function seedGiveaways() {
+  try {
+    const existing = await db.select().from(giveawaysTable);
+    if (existing.length > 0) {
+      logger.info({ count: existing.length }, "Giveaways already seeded — skipping");
+      return;
+    }
+
+    const rows = await db.insert(giveawaysTable).values([
+      {
+        name: "The Clonakilty Collection",
+        description: "One winner takes home a selected range of Clonakilty Distillery expressions — professionally packed and shipped insured to your door.",
+        prizeValue: "Worth Over £500",
+        prizeValueNumeric: "481.00",
+        maxEntries: 147,
+        drawDate: new Date("2026-05-27T15:07:27.766Z"),
+        imageUrl: null,
+        isActive: true,
+      },
+      {
+        name: "The Patrón Collection",
+        description: "Seven iconic expressions from the world-renowned Patrón distillery — from crisp Silver to the ultra-rare Gran Patrón Burdeos, professionally packed and shipped insured to your door.",
+        prizeValue: "Worth Over £1,200",
+        prizeValueNumeric: "1281.28",
+        maxEntries: 360,
+        drawDate: new Date("2026-06-13T18:00:00.000Z"),
+        imageUrl: null,
+        isActive: true,
+      },
+    ]).returning();
+
+    logger.info({ count: rows.length }, "Giveaways seeded on startup");
+  } catch (err) {
+    logger.warn({ err }, "Giveaway seed failed (non-fatal)");
+  }
 }
 
 async function initStripe() {
@@ -41,6 +79,7 @@ async function initStripe() {
   }
 }
 
+await seedGiveaways();
 await initStripe();
 
 app.listen(port, (err) => {
