@@ -159,107 +159,122 @@ export function Home() {
         </div>
       </section>
 
-      {/* ── The Draw ── */}
+      {/* ── All Draws ── */}
       <section id="giveaways" className="py-24 max-w-7xl mx-auto px-6">
         <div className="mb-16">
-          <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Live Raffle</p>
-          <h2 className="text-4xl font-serif mb-4">One Winner. A Rare Selection.</h2>
-          <p className="text-muted-foreground max-w-xl">{featured ? `Enter for a chance to win ${featured.name} — ${featured.prizeValue}, shipped insured to your door.` : 'Check back soon for upcoming draws.'}</p>
+          <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Live Raffles</p>
+          <h2 className="text-4xl font-serif mb-4">Active Draws</h2>
+          <p className="text-muted-foreground max-w-xl">
+            {giveaways && giveaways.length > 0
+              ? `${giveaways.length} draw${giveaways.length === 1 ? '' : 's'} open now — one winner takes the full collection, shipped insured to your door.`
+              : 'Check back soon for upcoming draws.'}
+          </p>
         </div>
 
-        {!featured ? (
+        {giveawaysLoading ? (
+          <div className="space-y-8">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="h-64 bg-card border border-border/30 rounded-sm animate-pulse" />
+            ))}
+          </div>
+        ) : !giveaways || giveaways.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground font-serif text-sm">
             No active draws at the moment. Check back soon.
           </div>
         ) : (
-          (() => {
-            const pct = Math.min((featured.entryCount / featured.maxEntries) * 100, 100);
-            const remaining = featured.maxEntries - featured.entryCount;
-            return (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 hover:border-primary/40 transition-colors"
-              >
-                {/* Left: bottle grid */}
-                <div className="grid grid-cols-4 gap-px bg-border/30">
-                  {(featured ? getGiveawayBottles(featured.id) : []).map((bottle, i) => (
-                    <div
-                      key={i}
-                      className="aspect-[3/4] relative overflow-hidden group/bottle"
-                      style={{ background: bottle.background }}
-                    >
-                      <img
-                        src={bottle.image}
-                        alt={bottle.name}
-                        className="w-full h-full object-contain p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-105 transition-all duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-2 text-center">
-                        <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Right: info panel */}
-                <div className="p-8 lg:p-10 flex flex-col justify-between gap-8">
-                  <div className="space-y-4">
-                    <div>
-                      <span className="text-xs font-serif text-primary uppercase tracking-widest">Prize Selection</span>
-                      <h3 className="text-3xl font-serif mt-2 mb-1">{featured.name}</h3>
-                      <p className="text-4xl font-serif text-primary">{featured.prizeValue}</p>
-                    </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{featured.description}</p>
-
-                    <div className="space-y-1.5 pt-2">
-                      {getGiveawayBottles(featured.id).map((bottle, i) => (
-                        <div key={i} className="flex justify-center items-center text-xs font-serif py-1 border-b border-border/30 last:border-0">
-                          <span className="text-foreground/70 text-center">{bottle.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div>
-                      <div className="flex justify-between items-center text-xs font-serif mb-2">
-                        <span className="text-muted-foreground">{featured.entryCount} / {featured.maxEntries} tickets sold</span>
-                        <span className={remaining <= 20 ? 'text-red-400' : 'text-primary'}>{remaining} remaining</span>
-                      </div>
-                      <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                        <motion.div
-                          className={`h-full rounded-full ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
-                          initial={{ width: 0 }}
-                          whileInView={{ width: `${pct}%` }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1.2 }}
+          <div className="space-y-8">
+            {giveaways.map((g, idx) => {
+              const pct = Math.min((g.entryCount / g.maxEntries) * 100, 100);
+              const remaining = g.maxEntries - g.entryCount;
+              const bottles = getGiveawayBottles(g.id);
+              return (
+                <motion.div
+                  key={g.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: idx * 0.1 }}
+                  className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 hover:border-primary/40 transition-colors"
+                >
+                  {/* Left: bottle grid */}
+                  <div className="grid grid-cols-4 gap-px bg-border/30">
+                    {bottles.map((bottle, i) => (
+                      <div
+                        key={i}
+                        className="aspect-[3/4] relative overflow-hidden group/bottle"
+                        style={{ background: bottle.background }}
+                      >
+                        <img
+                          src={bottle.image}
+                          alt={bottle.name}
+                          className="w-full h-full object-contain p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-105 transition-all duration-500"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-2 text-center">
+                          <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name}</p>
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <CountdownTimer daysToAdd={daysUntil(featured.drawDate)} />
-                      <div className="flex items-center gap-2 text-xs font-serif text-muted-foreground">
-                        <Ticket className="w-3.5 h-3.5 text-primary" />
-                        {pct.toFixed(0)}% sold
-                      </div>
-                    </div>
-
-                    <Button
-                      size="lg"
-                      className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-sm font-serif"
-                      onClick={() => setLocation(`/giveaway/${featured.id}`)}
-                    >
-                      Enter the Draw — from £2.99
-                    </Button>
+                    ))}
                   </div>
-                </div>
-              </motion.div>
-            );
-          })()
+
+                  {/* Right: info panel */}
+                  <div className="p-8 lg:p-10 flex flex-col justify-between gap-8">
+                    <div className="space-y-4">
+                      <div>
+                        <span className="text-xs font-serif text-primary uppercase tracking-widest">Prize Selection</span>
+                        <h3 className="text-3xl font-serif mt-2 mb-1">{g.name}</h3>
+                        <p className="text-4xl font-serif text-primary">{g.prizeValue}</p>
+                      </div>
+                      <p className="text-muted-foreground text-sm leading-relaxed">{g.description}</p>
+
+                      <div className="space-y-1.5 pt-2">
+                        {bottles.map((bottle, i) => (
+                          <div key={i} className="flex justify-between items-center text-xs font-serif py-1 border-b border-border/30 last:border-0">
+                            <span className="text-foreground/70">{bottle.name}</span>
+                            <span className="text-primary/80">{bottle.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex justify-between items-center text-xs font-serif mb-2">
+                          <span className="text-muted-foreground">{g.entryCount} / {g.maxEntries} tickets sold</span>
+                          <span className={remaining <= 20 ? 'text-red-400' : 'text-primary'}>{remaining} remaining</span>
+                        </div>
+                        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                          <motion.div
+                            className={`h-full rounded-full ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${pct}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1.2 }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <CountdownTimer daysToAdd={daysUntil(g.drawDate)} />
+                        <div className="flex items-center gap-2 text-xs font-serif text-muted-foreground">
+                          <Ticket className="w-3.5 h-3.5 text-primary" />
+                          {pct.toFixed(0)}% sold
+                        </div>
+                      </div>
+
+                      <Button
+                        size="lg"
+                        className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-sm font-serif"
+                        onClick={() => setLocation(`/giveaway/${g.id}`)}
+                      >
+                        Enter the Draw — from £2.99
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
         )}
       </section>
 
