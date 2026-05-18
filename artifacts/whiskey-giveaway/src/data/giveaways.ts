@@ -6,13 +6,13 @@ import portCaskImg from '@/assets/images/clonakilty-port-cask.png';
 import galleyHeadImg from '@/assets/images/clonakilty-galley-head.png';
 import galleyHeadBlueImg from '@/assets/images/clonakilty-galley-head-blue.png';
 
-import patronSilverImg from '@/assets/images/patron-silver.png';
-import patronReposadoImg from '@/assets/images/patron-reposado.png';
-import patronAnejoImg from '@/assets/images/patron-anejo.png';
+import patronSilverImg from '@/assets/images/patron-silver-jpha.png';
+import patronReposadoImg from '@/assets/images/patron-reposado-jpha.png';
+import patronAnejoImg from '@/assets/images/patron-anejo-jpha.png';
 import patronExtraAnejoImg from '@/assets/images/patron-extra-anejo.png';
-import patronGranPlatinumImg from '@/assets/images/patron-gran-platinum.png';
-import patronGranPiedraImg from '@/assets/images/patron-gran-piedra.png';
-import patronGranBurdeosImg from '@/assets/images/patron-gran-burdeos.png';
+import patronGranPlatinumImg from '@/assets/images/patron-gran-platinum-jpha.png';
+import patronGranPiedraImg from '@/assets/images/patron-gran-piedra-jpha.png';
+import patronGranBurdeosImg from '@/assets/images/patron-gran-burdeos-jpha.png';
 
 export type { Giveaway } from '@workspace/api-client-react';
 
@@ -79,49 +79,49 @@ export const COLLECTION_BOTTLES: Bottle[] = [
 export const PATRON_BOTTLES: Bottle[] = [
   {
     name: "Patrón Silver",
-    value: "£35",
+    value: "£47.95",
     image: patronSilverImg,
     description: "Unaged blanco tequila, crisp and clean with fresh agave, citrus, and a light pepper finish.",
     background: 'radial-gradient(ellipse at 50% 25%, #0d1f35 0%, #071020 50%, #030a14 100%)',
   },
   {
     name: "Patrón Reposado",
-    value: "£45",
+    value: "£56.95",
     image: patronReposadoImg,
     description: "Aged 2 months in oak barrels. Light vanilla and caramel balanced with fresh agave sweetness.",
     background: 'radial-gradient(ellipse at 50% 25%, #3d2805 0%, #1e1403 50%, #0c0901 100%)',
   },
   {
     name: "Patrón Añejo",
-    value: "£50",
+    value: "£64.95",
     image: patronAnejoImg,
     description: "Aged over 12 months in small oak barrels. Smooth honey, vanilla, and a rich earthy finish.",
     background: 'radial-gradient(ellipse at 50% 25%, #3d1a05 0%, #1e0d03 50%, #0c0501 100%)',
   },
   {
     name: "Patrón Extra Añejo",
-    value: "£75",
+    value: "£83.49",
     image: patronExtraAnejoImg,
     description: "Aged over 3 years. Complex dried fruit, toasted oak, and long smoky finish.",
     background: 'radial-gradient(ellipse at 50% 25%, #2d0f0a 0%, #180708 50%, #0a0305 100%)',
   },
   {
     name: "Gran Patrón Platinum",
-    value: "£150",
+    value: "£257.95",
     image: patronGranPlatinumImg,
     description: "Triple-distilled ultra-premium silver tequila. Silky smooth with sweet agave and white pepper.",
     background: 'radial-gradient(ellipse at 50% 25%, #1a2030 0%, #0d1018 50%, #05080e 100%)',
   },
   {
     name: "Gran Patrón Piedra",
-    value: "£200",
+    value: "£270.00",
     image: patronGranPiedraImg,
     description: "Extra añejo aged in new American oak. Intense butterscotch, toasted nuts, and rich spice.",
     background: 'radial-gradient(ellipse at 50% 25%, #2a1505 0%, #150b03 50%, #090501 100%)',
   },
   {
     name: "Gran Patrón Burdeos",
-    value: "£350",
+    value: "£499.99",
     image: patronGranBurdeosImg,
     description: "Aged in American oak then finished in Bordeaux wine barrels. Exceptionally rare and complex.",
     background: 'radial-gradient(ellipse at 50% 25%, #2d0a14 0%, #18050e 50%, #0a0308 100%)',
