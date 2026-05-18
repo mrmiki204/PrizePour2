@@ -170,7 +170,7 @@ export function Home() {
           <h2 className="text-4xl font-serif mb-4">Active Draws</h2>
           <p className="text-muted-foreground max-w-xl">
             {giveaways && giveaways.length > 0
-              ? `${giveaways.length} exclusive draw${giveaways.length === 1 ? '' : 's'} running now — enter for your chance to win the full collection, professionally packed and delivered insured to your door.`
+              ? `Enter for your chance to win.`
               : 'Check back soon for upcoming draws.'}
           </p>
         </div>
