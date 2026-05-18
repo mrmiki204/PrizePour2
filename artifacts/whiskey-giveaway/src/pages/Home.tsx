@@ -99,7 +99,6 @@ export function Home() {
               transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.2 }}
               className="text-5xl md:text-7xl font-serif leading-tight text-center"
             >
-              The Home of <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways.</span>
             </motion.h1>
 
