@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRoute, useLocation } from 'wouter';
 import { useGetGiveaway, useGetGiveawayWinner } from '@workspace/api-client-react';
-import { getGiveawayImage, COLLECTION_BOTTLES } from '@/data/giveaways';
+import { getGiveawayImage, getGiveawayBottles } from '@/data/giveaways';
 import { Button } from '@/components/ui/button';
 import { Trophy, ArrowLeft, Loader2 } from 'lucide-react';
 
@@ -84,11 +84,11 @@ export function DrawPage() {
 
               <div className="w-56 h-40 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
                 <div className="w-full h-full grid grid-cols-4 gap-px bg-border/20">
-                  {COLLECTION_BOTTLES.map((bottle, i) => (
+                  {getGiveawayBottles(giveawayId).map((bottle, i) => (
                     <div
                       key={i}
                       className="relative overflow-hidden"
-                      style={{ background: 'radial-gradient(ellipse at 50% 25%, #3d1a05 0%, #1c0c03 50%, #080401 100%)' }}
+                      style={{ background: bottle.background }}
                     >
                       <img src={bottle.image} alt={bottle.name} className="w-full h-full object-contain p-1 opacity-90" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />

@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw, CreditCard, Lock, ShieldCheck, Building2 } from 'lucide-react';
 import { useGetGiveaway, useCreateEntry } from '@workspace/api-client-react';
-import { getGiveawayImage, daysUntil, COLLECTION_BOTTLES } from '@/data/giveaways';
+import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
 
 const TICKET_PACKAGES = [
   { id: 1, qty: 1,  price: 2.99,  badge: null },
@@ -289,11 +289,11 @@ export function GiveawayDetail() {
               <div className="grid md:grid-cols-2 gap-8 bg-card border border-border p-6 rounded-sm shadow-xl">
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
                   <div className="w-full h-full grid grid-cols-4 gap-px bg-border/20">
-                    {COLLECTION_BOTTLES.map((bottle, i) => (
+                    {getGiveawayBottles(giveaway.id).map((bottle, i) => (
                       <div
                         key={i}
                         className="relative overflow-hidden"
-                        style={{ background: 'radial-gradient(ellipse at 50% 25%, #3d1a05 0%, #1c0c03 50%, #080401 100%)' }}
+                        style={{ background: bottle.background }}
                       >
                         <img src={bottle.image} alt={bottle.name} className="w-full h-full object-contain p-1 opacity-90" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

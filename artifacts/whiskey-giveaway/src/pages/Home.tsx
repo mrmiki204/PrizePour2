@@ -7,7 +7,7 @@ import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
-import { getGiveawayImage, daysUntil, COLLECTION_BOTTLES } from '@/data/giveaways';
+import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
 
 
@@ -136,7 +136,7 @@ export function Home() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                 <div className="absolute top-4 left-4">
-                  <span className="bg-primary/90 text-primary-foreground text-[10px] font-serif uppercase tracking-widest px-2 py-1 rounded-sm">Selected Bottles · 7 Expressions</span>
+                  {featured && <span className="bg-primary/90 text-primary-foreground text-[10px] font-serif uppercase tracking-widest px-2 py-1 rounded-sm">Prize Selection · {getGiveawayBottles(featured.id).length} Expressions</span>}
                 </div>
                 {featured && (
                   <div className="absolute bottom-4 left-4 right-4">
@@ -164,7 +164,7 @@ export function Home() {
         <div className="mb-16">
           <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Live Raffle</p>
           <h2 className="text-4xl font-serif mb-4">One Winner. A Rare Selection.</h2>
-          <p className="text-muted-foreground max-w-xl">Enter for a chance to win an exclusive Clonakilty whiskey selection — worth over £500, shipped insured to your door.</p>
+          <p className="text-muted-foreground max-w-xl">{featured ? `Enter for a chance to win ${featured.name} — ${featured.prizeValue}, shipped insured to your door.` : 'Check back soon for upcoming draws.'}</p>
         </div>
 
         {!featured ? (
@@ -185,11 +185,11 @@ export function Home() {
               >
                 {/* Left: bottle grid */}
                 <div className="grid grid-cols-4 gap-px bg-border/30">
-                  {COLLECTION_BOTTLES.map((bottle, i) => (
+                  {(featured ? getGiveawayBottles(featured.id) : []).map((bottle, i) => (
                     <div
                       key={i}
                       className="aspect-[3/4] relative overflow-hidden group/bottle"
-                      style={{ background: 'radial-gradient(ellipse at 50% 25%, #3d1a05 0%, #1c0c03 50%, #080401 100%)' }}
+                      style={{ background: bottle.background }}
                     >
                       <img
                         src={bottle.image}
@@ -215,7 +215,7 @@ export function Home() {
                     <p className="text-muted-foreground text-sm leading-relaxed">{featured.description}</p>
 
                     <div className="space-y-1.5 pt-2">
-                      {COLLECTION_BOTTLES.map((bottle, i) => (
+                      {getGiveawayBottles(featured.id).map((bottle, i) => (
                         <div key={i} className="flex justify-center items-center text-xs font-serif py-1 border-b border-border/30 last:border-0">
                           <span className="text-foreground/70 text-center">{bottle.name}</span>
                         </div>
