@@ -55,26 +55,23 @@ export function Terms() {
             </section>
 
             <section className="space-y-3">
-              <h2 className="text-xl font-serif text-foreground">4. Free Postal Entry Route</h2>
-              <p>4.1 Free postal entries are available for all competitions.</p>
-              <p>4.2 To enter for free, participants must send:</p>
+              <h2 className="text-xl font-serif text-foreground">4. Free Entry Route</h2>
+              <p>4.1 Free entries are available for all competitions. All online entries via the website are free of charge.</p>
+              <p>4.2 Alternatively, to enter without internet access, participants may email <a href="mailto:competitions@prizepour.com" className="text-primary hover:underline">competitions@prizepour.com</a> with the subject line "Free Entry — [Competition Name]", including:</p>
               <ul className="list-disc pl-6 space-y-1">
                 <li>full name</li>
                 <li>date of birth</li>
                 <li>email address</li>
-                <li>phone number</li>
                 <li>competition name</li>
                 <li>correct answer to the skill question</li>
               </ul>
-              <p>to the postal address specified on the relevant competition page.</p>
-              <p>4.3 Postal entries must:</p>
+              <p>4.3 Email entries must:</p>
               <ul className="list-disc pl-6 space-y-1">
-                <li>be sent individually;</li>
-                <li>be legible;</li>
-                <li>arrive before the competition closing date.</li>
+                <li>be submitted individually (one entry per email);</li>
+                <li>be received before the competition closing date.</li>
               </ul>
-              <p>4.4 Incomplete, illegible, bulk, automated, or late entries will not be accepted.</p>
-              <p>4.5 Postal entrants have equal chance of winning as paid entrants.</p>
+              <p>4.4 Incomplete, bulk, automated, or late entries will not be accepted.</p>
+              <p>4.5 Email entrants have an equal chance of winning as online entrants.</p>
             </section>
 
             <section className="space-y-3">

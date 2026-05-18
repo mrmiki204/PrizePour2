@@ -340,7 +340,7 @@ export function AdminDashboard() {
         {/* Stat Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard icon={Users} label="Total Entries" value={entries.length.toString()} sub="across all giveaways" />
-          <StatCard icon={DollarSign} label="Total Revenue" value={`$${totalRevenue.toFixed(2)}`} sub="from ticket sales" />
+          <StatCard icon={DollarSign} label="Total Revenue" value={`£${totalRevenue.toFixed(2)}`} sub="from ticket sales" />
           <StatCard icon={Ticket} label="Tickets Sold" value={totalTickets.toString()} sub={`avg ${avgTickets} per entry`} />
           <StatCard icon={BarChart2} label="Active Draws" value={activeDraws.toString()} sub={`${giveaways.length} total draws`} />
         </div>

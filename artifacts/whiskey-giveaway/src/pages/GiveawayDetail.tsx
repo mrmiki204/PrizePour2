@@ -344,7 +344,7 @@ export function GiveawayDetail() {
                 </div>
                 <div className="grid sm:grid-cols-3 gap-4">
                   {[
-                    { icon: '🎟️', title: 'Enter the draw', desc: 'Select a ticket package to enter.' },
+                    { icon: '🎟️', title: 'Enter the draw', desc: 'Complete your details and confirm your free entry.' },
                     { icon: '🔗', title: 'Get your link', desc: 'Receive a personal referral link on confirmation.' },
                     { icon: '📣', title: 'Share & grow', desc: 'Share with friends — every referral helps grow the community.' },
                   ].map((s) => (

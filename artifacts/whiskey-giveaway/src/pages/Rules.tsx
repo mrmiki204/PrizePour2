@@ -22,7 +22,7 @@ export function Rules() {
 
             <section className="space-y-3">
               <h2 className="text-xl font-serif text-foreground">2. Eligibility</h2>
-              <p>Open to legal residents of eligible jurisdictions who are at least 19 years of age (or the legal drinking age in their jurisdiction, whichever is higher) at time of entry. Employees, officers, directors, agents, and representatives of PrizePour, and their immediate family members, are not eligible. Void in jurisdictions where such promotions are prohibited.</p>
+              <p>Open to legal residents of eligible jurisdictions who are at least 18 years of age (or the legal drinking age in their jurisdiction, whichever is higher) at time of entry. Employees, officers, directors, agents, and representatives of PrizePour, and their immediate family members, are not eligible. Void in jurisdictions where such promotions are prohibited.</p>
             </section>
 
             <section className="space-y-3">
@@ -32,8 +32,8 @@ export function Rules() {
 
             <section className="space-y-3">
               <h2 className="text-xl font-serif text-foreground">4. How to Enter</h2>
-              <p><strong className="text-foreground">Method A — Purchase:</strong> Visit prizepour.com, select a draw, choose a ticket package, complete the entry form, answer the skill-testing question correctly, and complete payment via Stripe. Each ticket purchased earns one entry.</p>
-              <p><strong className="text-foreground">Method B — No Purchase:</strong> Mail a 3" × 5" card with your full name, address, email, and the draw name to: PrizePour, Attn: Free Entry, at the postal address listed on the relevant competition page. Limit one (1) free mail-in entry per person per draw. Mail-in entries must be postmarked before the draw close date.</p>
+              <p><strong className="text-foreground">Method A — Online (Free):</strong> Visit prizepour.com, select a draw, choose a ticket quantity, complete the entry form with your details, and answer the skill-testing question correctly. Entry is free of charge. Each submission earns one entry per ticket selected.</p>
+              <p><strong className="text-foreground">Method B — Email (No Internet Required):</strong> Send an email to <a href="mailto:competitions@prizepour.com" className="text-primary hover:underline">competitions@prizepour.com</a> with the subject line "Free Entry — [Draw Name]". Include your full name, date of birth, email address, the draw name, and your correct answer to the skill-testing question (available on the draw page). Limit one (1) free email entry per person per draw. Email entries must be received before the draw close date.</p>
             </section>
 
             <section className="space-y-3">
@@ -43,7 +43,7 @@ export function Rules() {
 
             <section className="space-y-3">
               <h2 className="text-xl font-serif text-foreground">6. Maximum Entries</h2>
-              <p>Each draw has a maximum ticket capacity, displayed on the draw page. Once the maximum is reached, ticket sales cease. The draw proceeds at the published close date regardless of whether capacity is reached. Maximum purchase: 25 tickets per person per draw unless otherwise stated.</p>
+              <p>Each draw has a maximum ticket capacity, displayed on the draw page. Once the maximum is reached, entries cease. The draw proceeds at the published close date regardless of whether capacity is reached. Maximum entries: 25 tickets per person per draw unless otherwise stated.</p>
             </section>
 
             <section className="space-y-3">
