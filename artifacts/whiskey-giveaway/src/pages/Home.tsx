@@ -99,7 +99,7 @@ export function Home() {
             </motion.h1>
 
             <motion.p variants={fadeIn} className="text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed">
-              Exclusive giveaways for rare spirits, premium bar equipment, glassware, and more. Enter for your chance to elevate your collection.
+              Exciting giveaways of premium spirits, exclusive distillery tours, professional bar equipment and more...
             </motion.p>
 
             <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4">
