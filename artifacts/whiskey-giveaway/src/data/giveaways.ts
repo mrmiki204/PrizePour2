@@ -10,9 +10,17 @@ import patronSilverImg from '@/assets/images/patron-silver.png';
 import patronReposadoImg from '@/assets/images/patron-reposado.png';
 import patronAnejoImg from '@/assets/images/patron-anejo.png';
 import patronExtraAnejoImg from '@/assets/images/patron-extra-anejo.png';
+import patronCristalinoImg from '@/assets/images/patron-cristalino.png';
+import patronElCieloImg from '@/assets/images/patron-el-cielo.png';
+import patronElAltoImg from '@/assets/images/patron-el-alto.png';
 import patronGranPlatinumImg from '@/assets/images/patron-gran-platinum.png';
 import patronGranPiedraImg from '@/assets/images/patron-gran-piedra.png';
 import patronGranBurdeosImg from '@/assets/images/patron-gran-burdeos.png';
+import patronAhumadoImg from '@/assets/images/patron-ahumado.png';
+import rocaPatronImg from '@/assets/images/roca-patron.png';
+import patronEstateImg from '@/assets/images/patron-estate.png';
+import patronCitrongeImg from '@/assets/images/patron-citronge.png';
+import patronXoCafeImg from '@/assets/images/patron-xo-cafe.png';
 
 export type { Giveaway } from '@workspace/api-client-react';
 
@@ -106,6 +114,27 @@ export const PATRON_BOTTLES: Bottle[] = [
     background: 'radial-gradient(ellipse at 50% 20%, #502608 0%, #281304 40%, #100802 75%, #060301 100%)',
   },
   {
+    name: "Patrón Cristalino",
+    value: "£64.95",
+    image: patronCristalinoImg,
+    description: "Añejo filtered through activated charcoal for crystalline clarity. Silky with vanilla, dried fruit, and caramel.",
+    background: 'radial-gradient(ellipse at 50% 20%, #3c1e08 0%, #1e0f04 40%, #0d0702 75%, #060301 100%)',
+  },
+  {
+    name: "Patrón El Cielo",
+    value: "£84.99",
+    image: patronElCieloImg,
+    description: "Quadruple distilled silver tequila of extraordinary purity. Fresh, ultra-smooth, and exceptionally refined.",
+    background: 'radial-gradient(ellipse at 50% 20%, #3a1c08 0%, #1d0e04 40%, #0c0702 75%, #060301 100%)',
+  },
+  {
+    name: "Patrón El Alto",
+    value: "£94.99",
+    image: patronElAltoImg,
+    description: "Extra aged reposado with deep wood spice, sweet agave, and a luxuriously long finish.",
+    background: 'radial-gradient(ellipse at 50% 20%, #5c2a08 0%, #2e1504 40%, #120802 75%, #060301 100%)',
+  },
+  {
     name: "Gran Patrón Platinum",
     value: "£257.95",
     image: patronGranPlatinumImg,
@@ -125,6 +154,41 @@ export const PATRON_BOTTLES: Bottle[] = [
     image: patronGranBurdeosImg,
     description: "Aged in American oak then finished in Bordeaux wine barrels. Exceptionally rare and complex.",
     background: 'radial-gradient(ellipse at 50% 20%, #5e2e08 0%, #301704 40%, #130902 75%, #060301 100%)',
+  },
+  {
+    name: "Patrón Ahumado",
+    value: "£69.99",
+    image: patronAhumadoImg,
+    description: "Smoked with mesquite wood before distillation. A bold, earthy tequila with a warm, lingering smokiness.",
+    background: 'radial-gradient(ellipse at 50% 20%, #3a1a06 0%, #1d0d03 40%, #0c0602 75%, #060301 100%)',
+  },
+  {
+    name: "Roca Patrón Collection",
+    value: "£174.99",
+    image: rocaPatronImg,
+    description: "Handcrafted using the ancient tahona method — crushed by a 2-tonne volcanic stone wheel. Silver, Reposado & Añejo trio.",
+    background: 'radial-gradient(ellipse at 50% 20%, #4e2408 0%, #271204 40%, #100802 75%, #060301 100%)',
+  },
+  {
+    name: "Patrón Estate Release",
+    value: "£149.99",
+    image: patronEstateImg,
+    description: "Limited annual release from a single estate. Rare, terroir-driven tequila with a uniquely expressive agave character.",
+    background: 'radial-gradient(ellipse at 50% 20%, #44200a 0%, #221005 40%, #0e0702 75%, #060301 100%)',
+  },
+  {
+    name: "Patrón Citrónge",
+    value: "£27.99",
+    image: patronCitrongeImg,
+    description: "Premium orange liqueur crafted by Patrón. Bright citrus zest with a clean, sweet finish — perfect for cocktails.",
+    background: 'radial-gradient(ellipse at 50% 20%, #5a2c06 0%, #2d1603 40%, #120902 75%, #060301 100%)',
+  },
+  {
+    name: "Patrón XO Café",
+    value: "£34.99",
+    image: patronXoCafeImg,
+    description: "A blend of Patrón Silver and natural coffee. Rich, bold espresso with sweet vanilla and a smooth tequila finish.",
+    background: 'radial-gradient(ellipse at 50% 20%, #1e1206 0%, #0f0903 40%, #080602 75%, #060301 100%)',
   },
 ];
 
