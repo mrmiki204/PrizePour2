@@ -39,17 +39,34 @@ const fadeIn = {
   visible: { opacity: 1, y: 0 }
 };
 
+const slideVariants = {
+  enter: (dir: number) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir < 0 ? '100%' : '-100%', opacity: 0 }),
+};
+
 export function Home() {
   const [, setLocation] = useLocation();
   const { data: giveaways, isLoading: giveawaysLoading } = useListGiveaways();
   const [showBanner, setShowBanner] = useState(true);
+  const [featuredIndex, setFeaturedIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
 
   useEffect(() => {
     const t = setTimeout(() => setShowBanner(false), 3000);
     return () => clearTimeout(t);
   }, []);
 
-  const featured = giveaways?.[0];
+  useEffect(() => {
+    if (!giveaways || giveaways.length <= 1) return;
+    const id = setInterval(() => {
+      setDirection(1);
+      setFeaturedIndex(i => (i + 1) % giveaways.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [giveaways]);
+
+  const featured = giveaways?.[featuredIndex];
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
@@ -123,40 +140,69 @@ export function Home() {
             className="relative"
           >
             <div className="absolute -inset-4 bg-primary/20 blur-3xl rounded-full" />
-            <div className="relative bg-card border border-border p-6 rounded-sm shadow-2xl">
-              <div className="aspect-[3/4] relative mb-6 overflow-hidden rounded-sm group">
-                {featured ? (
-                  getGiveawayImage(featured.id, featured.imageUrl) ? (
-                    <img src={getGiveawayImage(featured.id, featured.imageUrl)} alt={featured.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
-                      <Package className="w-24 h-24 text-primary/40" />
+            <div className="relative bg-card border border-border p-6 rounded-sm shadow-2xl overflow-hidden">
+              <AnimatePresence initial={false} custom={direction} mode="wait">
+                <motion.div
+                  key={featuredIndex}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+                >
+                  <div className="aspect-[3/4] relative mb-6 overflow-hidden rounded-sm group">
+                    {featured ? (
+                      getGiveawayImage(featured.id, featured.imageUrl) ? (
+                        <img src={getGiveawayImage(featured.id, featured.imageUrl)} alt={featured.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
+                          <Package className="w-24 h-24 text-primary/40" />
+                        </div>
+                      )
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
+                        <Package className="w-24 h-24 text-primary/40" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                    <div className="absolute top-4 left-4">
+                      {featured && <span className="bg-primary/90 text-primary-foreground text-[10px] font-serif uppercase tracking-widest px-2 py-1 rounded-sm">Prize Selection · {getGiveawayBottles(featured.id).length} Expressions</span>}
                     </div>
-                  )
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
-                    <Package className="w-24 h-24 text-primary/40" />
+                    {featured && (
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <h3 className="text-2xl font-serif text-white mb-2">{featured.name}</h3>
+                        <div className="flex justify-between items-end">
+                          <p className="text-primary font-serif">{featured.prizeValue}</p>
+                          <p className="text-sm text-gray-400 font-serif">{featured.entryCount.toLocaleString()} Entries</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                <div className="absolute top-4 left-4">
-                  {featured && <span className="bg-primary/90 text-primary-foreground text-[10px] font-serif uppercase tracking-widest px-2 py-1 rounded-sm">Prize Selection · {getGiveawayBottles(featured.id).length} Expressions</span>}
-                </div>
-                {featured && (
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-2xl font-serif text-white mb-2">{featured.name}</h3>
-                    <div className="flex justify-between items-end">
-                      <p className="text-primary font-serif">{featured.prizeValue}</p>
-                      <p className="text-sm text-gray-400 font-serif">{featured.entryCount.toLocaleString()} Entries</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+                </motion.div>
+              </AnimatePresence>
+
               <div className="flex items-center justify-between">
                 {featured && <CountdownTimer daysToAdd={daysUntil(featured.drawDate)} />}
-                <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => featured && setLocation(`/giveaway/${featured.id}`)}>
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
+                <div className="flex items-center gap-3">
+                  {giveaways && giveaways.length > 1 && (
+                    <div className="flex gap-1.5 items-center">
+                      {giveaways.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setDirection(i > featuredIndex ? 1 : -1);
+                            setFeaturedIndex(i);
+                          }}
+                          className={`rounded-full transition-all duration-300 h-2 ${i === featuredIndex ? 'bg-primary w-5' : 'bg-primary/30 w-2'}`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => featured && setLocation(`/giveaway/${featured.id}`)}>
+                    <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </div>
               </div>
             </div>
           </motion.div>
