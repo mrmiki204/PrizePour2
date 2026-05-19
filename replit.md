@@ -65,6 +65,11 @@ Exclusive whiskey giveaway platform where users enter draws to win rare, collect
 - Always run `pnpm --filter @workspace/api-spec run codegen` after changing `openapi.yaml`
 - Always run `pnpm --filter @workspace/db run push` after changing DB schema
 
+## Open decisions (in progress)
+
+- **Age verification**: currently a self-declared age gate. Options discussed: Stripe Identity, Onfido, Veriff, Persona, Sumsub, Yoti, GBG/Experian database lookup, Open Banking (TrueLayer/Plaid), manual ID upload + admin review, hybrid (DB lookup + doc fallback). No choice made yet.
+- **User accounts / login**: site has no accounts; entries are anonymous per-giveaway. Options discussed: Clerk (Replit-managed), custom email+password, or stub login UI now and wire backend later. No choice made yet. When picked, also: navbar Sign in/Register button, welcome+logout state, pre-fill entry form for logged-in users, "My entries" view linking past entries by `userId`.
+
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
