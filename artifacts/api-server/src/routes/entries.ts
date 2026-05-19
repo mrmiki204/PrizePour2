@@ -7,10 +7,11 @@ import {
   ListEntriesByGiveawayParams,
   ListEntriesResponseItem,
 } from "@workspace/api-zod";
+import { requireAdmin } from "../middleware/adminAuth.js";
 
 const router: IRouter = Router();
 
-router.get("/entries", async (req, res): Promise<void> => {
+router.get("/entries", requireAdmin, async (req, res): Promise<void> => {
   const { email } = req.query as { email?: string };
 
   const entries = await db

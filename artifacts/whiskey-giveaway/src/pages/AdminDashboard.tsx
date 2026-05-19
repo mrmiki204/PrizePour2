@@ -4,7 +4,8 @@ import type { Giveaway } from '@workspace/api-client-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { daysUntil } from '@/data/giveaways';
-import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2 } from 'lucide-react';
+import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2, LogOut } from 'lucide-react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -193,12 +194,18 @@ function GiveawayForm({ initial, onSubmit, onCancel, submitLabel, isSubmitting }
 }
 
 export function AdminDashboard() {
+  const [, setLocation] = useLocation();
   const { data: entries = [], isLoading: entriesLoading, refetch: refetchEntries, isFetching: fetchingEntries } = useListEntries();
   const { data: giveaways = [], isLoading: giveawaysLoading, refetch: refetchGiveaways, isFetching: fetchingGiveaways } = useListGiveaways({ all: true });
 
   const createGiveaway = useCreateGiveaway();
   const updateGiveaway = useUpdateGiveaway();
   const deleteGiveaway = useDeleteGiveaway();
+
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    setLocation('/');
+  };
 
   const [search, setSearch] = useState('');
   const [filterGiveaway, setFilterGiveaway] = useState<number | null>(null);
@@ -325,16 +332,27 @@ export function AdminDashboard() {
             <h1 className="text-3xl font-serif tracking-tight">Admin Dashboard</h1>
             <p className="text-muted-foreground text-sm font-serif mt-1 uppercase tracking-widest">Draw & Entry Management</p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => { refetchEntries(); refetchGiveaways(); }}
-            disabled={isFetching}
-            className="gap-2 font-serif text-xs uppercase tracking-widest"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => { refetchEntries(); refetchGiveaways(); }}
+              disabled={isFetching}
+              className="gap-2 font-serif text-xs uppercase tracking-widest"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="gap-2 font-serif text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         {/* Stat Cards */}

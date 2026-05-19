@@ -12,10 +12,11 @@ const app: Express = express();
 app.post(
   "/api/stripe/webhook",
   express.raw({ type: "application/json" }),
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     const signature = req.headers["stripe-signature"];
     if (!signature) {
-      return res.status(400).json({ error: "Missing stripe-signature" });
+      res.status(400).json({ error: "Missing stripe-signature" });
+      return;
     }
     try {
       const sig = Array.isArray(signature) ? signature[0] : signature;
@@ -48,7 +49,23 @@ app.use(
     },
   }),
 );
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
+
+app.use(
+  session({
+    name: "pp.sid",
+    secret: process.env["SESSION_SECRET"] ?? "prizepour-dev-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env["NODE_ENV"] === "production",
+      sameSite: process.env["NODE_ENV"] === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    },
+  }),
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

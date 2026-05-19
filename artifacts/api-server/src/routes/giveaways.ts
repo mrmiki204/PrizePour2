@@ -15,6 +15,7 @@ import {
 } from "@workspace/api-zod";
 import { sendWinnerEmail } from "../emailService.js";
 import { logger } from "../lib/logger.js";
+import { requireAdmin } from "../middleware/adminAuth.js";
 
 const router: IRouter = Router();
 
@@ -45,7 +46,7 @@ router.get("/giveaways", async (req, res): Promise<void> => {
   res.json(ListGiveawaysResponse.parse(giveaways));
 });
 
-router.post("/giveaways", async (req, res): Promise<void> => {
+router.post("/giveaways", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreateGiveawayBody.safeParse(req.body);
   if (!parsed.success) {
     req.log.warn({ errors: parsed.error.message }, "Invalid giveaway input");
@@ -69,7 +70,7 @@ router.post("/giveaways", async (req, res): Promise<void> => {
   res.status(201).json(GetGiveawayResponse.parse(withCount));
 });
 
-router.get("/giveaways/:id/winner", async (req, res): Promise<void> => {
+router.get("/giveaways/:id/winner", requireAdmin, async (req, res): Promise<void> => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid giveaway id" });
@@ -141,7 +142,7 @@ router.get("/giveaways/:id", async (req, res): Promise<void> => {
   res.json(GetGiveawayResponse.parse(withCount));
 });
 
-router.patch("/giveaways/:id", async (req, res): Promise<void> => {
+router.patch("/giveaways/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = UpdateGiveawayParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -176,7 +177,7 @@ router.patch("/giveaways/:id", async (req, res): Promise<void> => {
   res.json(UpdateGiveawayResponse.parse(withCount));
 });
 
-router.delete("/giveaways/:id", async (req, res): Promise<void> => {
+router.delete("/giveaways/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteGiveawayParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
