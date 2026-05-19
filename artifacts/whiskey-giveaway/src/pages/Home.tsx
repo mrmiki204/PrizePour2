@@ -279,9 +279,8 @@ export function Home() {
 
                       <div className="space-y-1.5 pt-2">
                         {bottles.map((bottle, i) => (
-                          <div key={i} className="flex justify-between items-center text-xs font-serif py-1 border-b border-border/30 last:border-0">
+                          <div key={i} className="flex items-center text-xs font-serif py-1 border-b border-border/30 last:border-0">
                             <span className="text-foreground/70">{bottle.name}</span>
-                            <span className="text-primary/80">{bottle.value}</span>
                           </div>
                         ))}
                       </div>
