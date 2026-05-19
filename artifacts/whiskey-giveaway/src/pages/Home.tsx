@@ -247,24 +247,30 @@ export function Home() {
                   className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 hover:border-primary/40 transition-colors"
                 >
                   {/* Left: bottle grid */}
-                  <div className="grid grid-cols-4 gap-px bg-border/30">
-                    {bottles.map((bottle, i) => (
-                      <div
-                        key={i}
-                        className="aspect-[3/4] relative overflow-hidden group/bottle"
-                        style={{ background: bottle.background }}
-                      >
-                        <img
-                          src={bottle.image}
-                          alt={bottle.name}
-                          className="w-full h-full object-contain p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-105 transition-all duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-2 text-center">
-                          <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name}</p>
+                  <div className="grid grid-cols-12 gap-px bg-border/30">
+                    {bottles.map((bottle, i) => {
+                      const firstRowCount = Math.ceil(bottles.length / 2);
+                      const colSpan = i < firstRowCount
+                        ? Math.floor(12 / firstRowCount)
+                        : Math.ceil(12 / (bottles.length - firstRowCount));
+                      return (
+                        <div
+                          key={i}
+                          className="aspect-[3/4] relative overflow-hidden group/bottle"
+                          style={{ background: bottle.background, gridColumn: `span ${colSpan}` }}
+                        >
+                          <img
+                            src={bottle.image}
+                            alt={bottle.name}
+                            className="w-full h-full object-contain p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-105 transition-all duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-2 text-center">
+                            <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   {/* Right: info panel */}

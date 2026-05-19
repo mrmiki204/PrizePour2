@@ -273,17 +273,24 @@ export function GiveawayDetail() {
 
               <div className="grid md:grid-cols-2 gap-8 bg-card border border-border p-6 rounded-sm shadow-xl">
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
-                  <div className="w-full h-full grid grid-cols-4 gap-px bg-border/20">
-                    {getGiveawayBottles(giveaway.id).map((bottle, i) => (
-                      <div
-                        key={i}
-                        className="relative overflow-hidden"
-                        style={{ background: bottle.background }}
-                      >
-                        <img src={bottle.image} alt={bottle.name} className="w-full h-full object-contain p-1 opacity-90" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      </div>
-                    ))}
+                  <div className="w-full h-full grid grid-cols-12 grid-rows-2 gap-px bg-border/20">
+                    {getGiveawayBottles(giveaway.id).map((bottle, i) => {
+                      const bottles = getGiveawayBottles(giveaway.id);
+                      const firstRowCount = Math.ceil(bottles.length / 2);
+                      const colSpan = i < firstRowCount
+                        ? Math.floor(12 / firstRowCount)
+                        : Math.ceil(12 / (bottles.length - firstRowCount));
+                      return (
+                        <div
+                          key={i}
+                          className="relative overflow-hidden"
+                          style={{ background: bottle.background, gridColumn: `span ${colSpan}` }}
+                        >
+                          <img src={bottle.image} alt={bottle.name} className="w-full h-full object-contain p-1 opacity-90" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        </div>
+                      );
+                    })}
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent pointer-events-none" />
                   <div className="absolute bottom-6 left-6 right-6 space-y-4">
