@@ -30,6 +30,18 @@ uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero-patron.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "B9Jlsq6gv4qjZS0YLjcWh"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero-bg-whiskey.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "efmKwuaVSmBmKEVvwtWTO"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero-bg-tequila.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "yOGJkLWPn4cLMR4PGFt0K"
 uri = "file://attached_assets/image_search/clonakilty32_2.jpg"
@@ -41,3 +53,15 @@ id = "iMI28Vg2GWQxNAaMSH7ol"
 uri = "file://attached_assets/image_search/clonakilty32_1.jpg"
 type = "image"
 title = "Clonakilty 32 Year Old — Thumbnail view"
+
+[[outputs]]
+id = "GTleG2zETg1I8uCosX98M"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero-clonakilty.png"
+type = "image"
+title = "Clonakilty hero - real bottles on AI backdrop"
+
+[[outputs]]
+id = "fx7L8WdLIhZUxtEyMbTVl"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero-patron.png"
+type = "image"
+title = "Patrón hero - real bottles on AI backdrop"
