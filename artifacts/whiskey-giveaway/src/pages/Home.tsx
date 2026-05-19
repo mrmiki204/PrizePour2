@@ -90,57 +90,38 @@ export function Home() {
 
       <Navbar onScrollTo={scrollTo} />
 
-      {/* ── Hero ── */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      {/* ── Hero / Featured Draw ── */}
+      <section className="relative pt-28 pb-16 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img src={heroImg} alt="Whiskey Bar" className="w-full h-full object-cover opacity-30 mix-blend-overlay" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background/50" />
+          <img src={heroImg} alt="" className="w-full h-full object-cover opacity-20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <motion.div
-            initial="hidden"
-            animate="visible"
-            transition={{ duration: 0.8, staggerChildren: 0.2 }}
-            className="space-y-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8"
           >
-            <motion.div variants={fadeIn} className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 mb-4">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-serif text-primary uppercase tracking-widest">Featured Draw Ends Soon</span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, x: -80 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.2 }}
-              className="text-5xl md:text-7xl font-serif leading-tight text-center"
-            >
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways.</span>
-            </motion.h1>
-
-            <motion.p variants={fadeIn} className="text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed">
-              Exciting giveaways of premium spirits, exclusive distillery tours, professional bar equipment and more...
-            </motion.p>
-
-            <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider" onClick={() => featured && setLocation(`/giveaway/${featured.id}`)}>
-                Enter Featured Draw
-              </Button>
-              <Button size="lg" variant="outline" className="border-border hover:bg-white/5 uppercase tracking-wider" onClick={() => scrollTo('giveaways')}>
-                View All Draws
-              </Button>
-            </motion.div>
+              <span className="text-[10px] font-serif text-primary uppercase tracking-[0.2em]">Featured Draw</span>
+            </div>
+            <h1 className="text-3xl md:text-5xl font-serif leading-tight">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways</span>
+            </h1>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, delay: 0.4 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
             className="relative"
           >
-            <div className="absolute -inset-4 bg-primary/20 blur-3xl rounded-full" />
-            <div className="relative bg-card border border-border p-6 rounded-sm shadow-2xl overflow-hidden">
+            <div className="absolute -inset-6 bg-primary/15 blur-3xl rounded-full pointer-events-none" />
+
+            <div className="relative bg-card/70 backdrop-blur border border-border rounded-sm shadow-2xl overflow-hidden">
               <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
                   key={featuredIndex}
@@ -149,61 +130,131 @@ export function Home() {
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="grid lg:grid-cols-5"
                 >
-                  <div className="aspect-[4/3] relative mb-4 overflow-hidden rounded-sm group">
-                    {featured ? (
-                      getGiveawayImage(featured.id, featured.imageUrl) ? (
-                        <img src={getGiveawayImage(featured.id, featured.imageUrl)} alt={featured.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
-                          <Package className="w-24 h-24 text-primary/40" />
-                        </div>
-                      )
+                  {/* ── Image (3/5) ── */}
+                  <div className="lg:col-span-3 relative aspect-[4/3] lg:aspect-auto lg:min-h-[520px] overflow-hidden bg-black">
+                    {featured && getGiveawayImage(featured.id, featured.imageUrl) ? (
+                      <img
+                        src={getGiveawayImage(featured.id, featured.imageUrl)}
+                        alt={featured?.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
                         <Package className="w-24 h-24 text-primary/40" />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-                    <div className="absolute top-4 left-4">
-                      {featured && <span className="bg-primary/90 text-primary-foreground text-[10px] font-serif uppercase tracking-widest px-2 py-1 rounded-sm">Prize Selection · {getGiveawayBottles(featured.id).length} Expressions</span>}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
+                    <div className="absolute inset-0 lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-card/95" />
+
+                    {/* Top badges */}
+                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start gap-2">
+                      <span className="bg-primary text-primary-foreground text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg">
+                        Live Draw
+                      </span>
+                      {featured && (
+                        <span className="bg-black/70 backdrop-blur text-white text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border border-white/10">
+                          {getGiveawayBottles(featured.id).length} Bottles
+                        </span>
+                      )}
                     </div>
+
+                    {/* Bottom name on mobile */}
                     {featured && (
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <h3 className="text-2xl font-serif text-white mb-2">{featured.name}</h3>
-                        <div className="flex justify-between items-end">
-                          <p className="text-primary font-serif">{featured.prizeValue}</p>
-                          <p className="text-sm text-gray-400 font-serif">{featured.entryCount.toLocaleString()} Entries</p>
-                        </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-6 lg:hidden">
+                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Complete Collection</p>
+                        <h2 className="text-2xl font-serif text-white leading-tight">{featured.name}</h2>
                       </div>
                     )}
                   </div>
+
+                  {/* ── Info (2/5) ── */}
+                  <div className="lg:col-span-2 p-6 lg:p-8 flex flex-col justify-between gap-6 bg-card/95">
+                    <div className="space-y-4">
+                      <div className="hidden lg:block">
+                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Complete Collection</p>
+                        <h2 className="text-3xl xl:text-4xl font-serif text-white leading-tight">{featured?.name}</h2>
+                      </div>
+
+                      <div className="flex items-baseline gap-3 pt-2 border-t border-border/40">
+                        <span className="text-[10px] font-serif text-muted-foreground uppercase tracking-[0.2em]">Prize Value</span>
+                        <span className="text-3xl lg:text-4xl font-serif text-primary">{featured?.prizeValue}</span>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{featured?.description}</p>
+                    </div>
+
+                    {/* Progress + countdown */}
+                    {featured && (() => {
+                      const pct = Math.min((featured.entryCount / featured.maxEntries) * 100, 100);
+                      const remaining = featured.maxEntries - featured.entryCount;
+                      return (
+                        <div className="space-y-4">
+                          <div>
+                            <div className="flex justify-between items-center text-[11px] font-serif mb-1.5">
+                              <span className="text-muted-foreground uppercase tracking-widest">{featured.entryCount} / {featured.maxEntries} sold</span>
+                              <span className={remaining <= 20 ? 'text-red-400' : 'text-primary'}>{remaining} left</span>
+                            </div>
+                            <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                              <motion.div
+                                key={featuredIndex}
+                                className={`h-full rounded-full ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${pct}%` }}
+                                transition={{ duration: 0.9, ease: 'easeOut' }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 pt-2 border-t border-border/40">
+                            <div>
+                              <p className="text-[9px] font-serif text-muted-foreground uppercase tracking-[0.2em] mb-1">Draw Ends In</p>
+                              <CountdownTimer daysToAdd={daysUntil(featured.drawDate)} />
+                            </div>
+                            <div className="text-right">
+                              <p className="text-[9px] font-serif text-muted-foreground uppercase tracking-[0.2em] mb-1">Entry</p>
+                              <p className="text-xl font-serif text-white">£4.99</p>
+                            </div>
+                          </div>
+
+                          <Button
+                            size="lg"
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-[0.15em] h-12"
+                            onClick={() => setLocation(`/giveaway/${featured.id}`)}
+                          >
+                            Enter Now <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </div>
+                      );
+                    })()}
+                  </div>
                 </motion.div>
               </AnimatePresence>
+            </div>
 
-              <div className="flex items-center justify-between">
-                {featured && <CountdownTimer daysToAdd={daysUntil(featured.drawDate)} />}
-                <div className="flex items-center gap-3">
-                  {giveaways && giveaways.length > 1 && (
-                    <div className="flex gap-1.5 items-center">
-                      {giveaways.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => {
-                            setDirection(i > featuredIndex ? 1 : -1);
-                            setFeaturedIndex(i);
-                          }}
-                          className={`rounded-full transition-all duration-300 h-2 ${i === featuredIndex ? 'bg-primary w-5' : 'bg-primary/30 w-2'}`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => featured && setLocation(`/giveaway/${featured.id}`)}>
-                    <ArrowRight className="w-5 h-5" />
-                  </Button>
-                </div>
+            {/* Carousel controls */}
+            {giveaways && giveaways.length > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-6">
+                {giveaways.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setDirection(i > featuredIndex ? 1 : -1);
+                      setFeaturedIndex(i);
+                    }}
+                    aria-label={`Show featured draw ${i + 1}`}
+                    className={`rounded-full transition-all duration-300 h-1.5 ${i === featuredIndex ? 'bg-primary w-8' : 'bg-primary/30 hover:bg-primary/50 w-2'}`}
+                  />
+                ))}
               </div>
+            )}
+
+            <div className="flex justify-center mt-4">
+              <Button variant="ghost" className="text-muted-foreground hover:text-primary text-xs font-serif uppercase tracking-[0.2em]" onClick={() => scrollTo('giveaways')}>
+                View All Draws <ArrowRight className="w-3 h-3 ml-2" />
+              </Button>
             </div>
           </motion.div>
         </div>
