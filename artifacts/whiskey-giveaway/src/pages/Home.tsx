@@ -151,7 +151,7 @@ export function Home() {
                   exit="exit"
                   transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
                 >
-                  <div className="aspect-[3/4] relative mb-6 overflow-hidden rounded-sm group">
+                  <div className="aspect-[4/3] relative mb-4 overflow-hidden rounded-sm group">
                     {featured ? (
                       getGiveawayImage(featured.id, featured.imageUrl) ? (
                         <img src={getGiveawayImage(featured.id, featured.imageUrl)} alt={featured.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />

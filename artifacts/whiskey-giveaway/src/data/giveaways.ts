@@ -6,13 +6,13 @@ import portCaskImg from '@/assets/images/clonakilty-port-cask.png';
 import galleyHeadImg from '@/assets/images/clonakilty-galley-head.png';
 import galleyHeadBlueImg from '@/assets/images/clonakilty-galley-head-blue.png';
 
-import patronSilverImg from '@/assets/images/patron-silver-jpha.png';
-import patronReposadoImg from '@/assets/images/patron-reposado-jpha.png';
-import patronAnejoImg from '@/assets/images/patron-anejo-jpha.png';
+import patronSilverImg from '@/assets/images/patron-silver.png';
+import patronReposadoImg from '@/assets/images/patron-reposado.png';
+import patronAnejoImg from '@/assets/images/patron-anejo.png';
 import patronExtraAnejoImg from '@/assets/images/patron-extra-anejo.png';
-import patronGranPlatinumImg from '@/assets/images/patron-gran-platinum-jpha.png';
-import patronGranPiedraImg from '@/assets/images/patron-gran-piedra-jpha.png';
-import patronGranBurdeosImg from '@/assets/images/patron-gran-burdeos-jpha.png';
+import patronGranPlatinumImg from '@/assets/images/patron-gran-platinum.png';
+import patronGranPiedraImg from '@/assets/images/patron-gran-piedra.png';
+import patronGranBurdeosImg from '@/assets/images/patron-gran-burdeos.png';
 
 export type { Giveaway } from '@workspace/api-client-react';
 
