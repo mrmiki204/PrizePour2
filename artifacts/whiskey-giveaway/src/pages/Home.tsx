@@ -151,21 +151,45 @@ export function Home() {
                   exit="exit"
                   transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
                 >
-                  <div className="aspect-[4/3] relative mb-4 overflow-hidden rounded-sm group">
+                  <div
+                    className="aspect-[4/3] relative mb-4 overflow-hidden rounded-sm group"
+                    style={{ background: 'radial-gradient(ellipse at 50% 30%, #4a2208 0%, #25110480%, #0a0501 100%)' }}
+                  >
                     {featured ? (
-                      getGiveawayImage(featured.id, featured.imageUrl) ? (
-                        <img src={getGiveawayImage(featured.id, featured.imageUrl)} alt={featured.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
-                          <Package className="w-24 h-24 text-primary/40" />
-                        </div>
-                      )
+                      (() => {
+                        const bottles = getGiveawayBottles(featured.id);
+                        if (bottles.length === 0) {
+                          return (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="w-24 h-24 text-primary/40" />
+                            </div>
+                          );
+                        }
+                        const rowSize = Math.ceil(bottles.length / 2);
+                        const rows = [bottles.slice(0, rowSize), bottles.slice(rowSize)];
+                        return (
+                          <div className="absolute inset-0 flex flex-col justify-center gap-1 px-4 pt-8 pb-20">
+                            {rows.map((row, rowIdx) => (
+                              <div key={rowIdx} className="flex-1 flex items-end justify-center gap-1">
+                                {row.map((bottle, i) => (
+                                  <img
+                                    key={i}
+                                    src={bottle.image}
+                                    alt={bottle.name}
+                                    className="h-full w-auto max-w-full object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.6)] transition-transform duration-700 group-hover:scale-105"
+                                  />
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
+                      <div className="w-full h-full flex items-center justify-center">
                         <Package className="w-24 h-24 text-primary/40" />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/95 via-black/10 to-black/40" />
                     <div className="absolute top-4 left-4">
                       {featured && <span className="bg-primary/90 text-primary-foreground text-[10px] font-serif uppercase tracking-widest px-2 py-1 rounded-sm">Prize Selection · {getGiveawayBottles(featured.id).length} Expressions</span>}
                     </div>
