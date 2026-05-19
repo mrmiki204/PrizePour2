@@ -477,15 +477,16 @@ export function Home() {
 
       {/* ── Why PrizePour ── */}
       <section className="py-24 bg-card border-y border-border">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
+        <div className="max-w-5xl mx-auto px-6">
+          <div>
+            <div className="mb-12 text-center">
               <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Why Us</p>
               <h2 className="text-4xl font-serif mb-6 leading-tight">The collector's edge you've been looking for.</h2>
-              <p className="text-muted-foreground leading-relaxed mb-10">
+              <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                 PrizePour was built by enthusiasts for enthusiasts. We source direct from authorised retailers — no grey-market prizes, ever. Every draw is independently verified and every winner notified within 24 hours.
               </p>
-              <div className="grid sm:grid-cols-2 gap-6">
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
                   { icon: Lock, title: 'Cryptographic Draws', body: 'Winners selected by auditable RNG — no human involvement possible.' },
                   { icon: ShieldCheck, title: 'Verified Prizes', body: 'Every prize sourced from authorised retailers and checked before entering the draw.' },
@@ -502,25 +503,6 @@ export function Home() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-            <div className="relative">
-              <div className="absolute -inset-8 bg-primary/10 blur-3xl rounded-full" />
-              <div className="relative aspect-[4/5] rounded-sm overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-br from-amber-950 via-amber-900/50 to-stone-950 flex items-center justify-center">
-                  <svg viewBox="0 0 80 160" className="w-24 h-48 opacity-15 fill-amber-400" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="28" y="0" width="24" height="20" rx="4" />
-                    <rect x="20" y="18" width="40" height="8" rx="2" />
-                    <rect x="16" y="24" width="48" height="110" rx="6" />
-                    <rect x="20" y="134" width="40" height="26" rx="4" />
-                  </svg>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-sm border border-border rounded-sm p-4">
-                  <p className="text-xs font-serif text-primary uppercase tracking-widest mb-1">Currently Live</p>
-                  <p className="font-serif text-lg">{giveaways?.length ?? 0} Active {(giveaways?.length ?? 0) === 1 ? 'Draw' : 'Draws'}</p>
-                  <p className="text-xs text-muted-foreground mt-1">From £2.99 per ticket · Draw closes soon</p>
-                </div>
               </div>
             </div>
           </div>
