@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package } from 'lucide-react';
+import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package, ChevronDown, ChevronUp } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
@@ -32,6 +32,45 @@ const FAQS = [
 
 function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function BottleList({ bottles }: { bottles: { name: string }[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const COLLAPSED = 6;
+  const needsToggle = bottles.length > COLLAPSED;
+  const shown = expanded || !needsToggle ? bottles : bottles.slice(0, COLLAPSED);
+  const hiddenCount = bottles.length - COLLAPSED;
+  return (
+    <div className="space-y-1.5 pt-2">
+      <AnimatePresence initial={false}>
+        {shown.map((bottle, i) => (
+          <motion.div
+            key={`${bottle.name}-${i}`}
+            initial={i >= COLLAPSED ? { opacity: 0, height: 0 } : false}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center text-xs font-serif py-1 border-b border-border/30 last:border-0 overflow-hidden"
+          >
+            <span className="text-foreground/70">{bottle.name}</span>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+      {needsToggle && (
+        <button
+          type="button"
+          onClick={() => setExpanded(v => !v)}
+          className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-serif uppercase tracking-[0.15em] text-primary hover:text-amber-300 transition-colors"
+        >
+          {expanded ? (
+            <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
+          ) : (
+            <>Show all {bottles.length} bottles (+{hiddenCount}) <ChevronDown className="w-3.5 h-3.5" /></>
+          )}
+        </button>
+      )}
+    </div>
+  );
 }
 
 const fadeIn = {
@@ -341,13 +380,7 @@ export function Home() {
                       </div>
                       <p className="text-muted-foreground text-sm leading-relaxed">{g.description}</p>
 
-                      <div className="space-y-1.5 pt-2">
-                        {bottles.map((bottle, i) => (
-                          <div key={i} className="flex items-center text-xs font-serif py-1 border-b border-border/30 last:border-0">
-                            <span className="text-foreground/70">{bottle.name}</span>
-                          </div>
-                        ))}
-                      </div>
+                      <BottleList bottles={bottles} />
                     </div>
 
                     <div className="space-y-6">
