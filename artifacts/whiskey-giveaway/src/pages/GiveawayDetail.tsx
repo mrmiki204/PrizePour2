@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useRoute } from 'wouter';
 import { Navbar } from '@/components/layout/Navbar';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw, ShieldCheck } from 'lucide-react';
-import { useGetGiveaway, useCreateEntry } from '@workspace/api-client-react';
+import { useGetGiveaway } from '@workspace/api-client-react';
 import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
 
 const TICKET_PACKAGES = [
@@ -86,7 +86,7 @@ export function GiveawayDetail() {
   const [, setLocation] = useLocation();
   const giveawayId = params?.id ? parseInt(params.id) : 1;
   const { data: giveaway, isLoading } = useGetGiveaway(giveawayId);
-  const { mutateAsync: createEntry, isPending: isSubmitting } = useCreateEntry();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [step, setStep] = useState(1);
   const [selectedPackage, setSelectedPackage] = useState(TICKET_PACKAGES[0]);
@@ -134,27 +134,50 @@ export function GiveawayDetail() {
   const handlePayment = async () => {
     if (!giveaway) return;
     setEntryError('');
+    setIsSubmitting(true);
     try {
-      const result = await createEntry({
-        data: {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           giveawayId: giveaway.id,
+          ticketQty: selectedPackage.qty,
           firstName: details.firstName,
           lastName: details.lastName,
           email: details.email,
-          ticketQty: selectedPackage.qty,
+          amountCents: Math.round(selectedPackage.price * 100),
           referralCode: referredBy ?? undefined,
-        },
+        }),
       });
-      const tickets = (result as { ticketNumbers?: string[] }).ticketNumbers ?? [];
-      setAssignedTickets(tickets);
-      const code = `${details.firstName.toLowerCase().replace(/[^a-z]/g, '')}-${giveawayId}-${(tickets[0] ?? '').replace('#', '')}`;
-      setReferralLink(`${window.location.origin}/giveaway/${giveawayId}?ref=${code}`);
-      nextStep();
+      const json = await response.json() as { url?: string; error?: string };
+      if (json.error || !json.url) throw new Error(json.error ?? 'No checkout URL returned');
+      window.location.href = json.url;
     } catch (err: unknown) {
-      const body = (err as { response?: { data?: { error?: string } } })?.response?.data;
-      setEntryError(body?.error ?? 'Could not process your entry — please try again.');
+      setEntryError((err as Error)?.message ?? 'Could not start checkout — please try again.');
+      setIsSubmitting(false);
     }
   };
+
+  // Handle returning from Stripe checkout with ?session_id=xxx
+  useEffect(() => {
+    const sessionId = new URLSearchParams(window.location.search).get('session_id');
+    if (!sessionId || !giveaway) return;
+    window.history.replaceState({}, '', window.location.pathname);
+    fetch(`/api/stripe/session/${sessionId}`)
+      .then(r => r.json())
+      .then((data: { ticketNumbers?: string[]; entry?: { firstName?: string }; error?: string }) => {
+        if (data.error) { setEntryError(data.error); return; }
+        const tickets = data.ticketNumbers ?? [];
+        setAssignedTickets(tickets);
+        const firstName = data.entry?.firstName ?? '';
+        if (firstName && tickets[0]) {
+          const code = `${firstName.toLowerCase().replace(/[^a-z]/g, '')}-${giveawayId}-${tickets[0].replace('#', '')}`;
+          setReferralLink(`${window.location.origin}/giveaway/${giveawayId}?ref=${code}`);
+        }
+        setStep(5);
+      })
+      .catch(() => setEntryError('Could not verify your payment — please contact support.'));
+  }, [giveaway, giveawayId]);
 
   const isDetailsValid =
     details.firstName.length > 0 &&
@@ -314,7 +337,7 @@ export function GiveawayDetail() {
                             {pkg.qty} {pkg.qty === 1 ? 'Ticket' : 'Tickets'}
                           </span>
                         </div>
-                        <span className="font-serif text-primary">Free</span>
+                        <span className="font-serif text-primary">£{pkg.price.toFixed(2)}</span>
                       </button>
                     ))}
                   </div>
@@ -344,7 +367,7 @@ export function GiveawayDetail() {
                 </div>
                 <div className="grid sm:grid-cols-3 gap-4">
                   {[
-                    { icon: '🎟️', title: 'Enter the draw', desc: 'Complete your details and confirm your free entry.' },
+                    { icon: '🎟️', title: 'Enter the draw', desc: 'Complete your details and pay securely via Stripe.' },
                     { icon: '🔗', title: 'Get your link', desc: 'Receive a personal referral link on confirmation.' },
                     { icon: '📣', title: 'Share & grow', desc: 'Share with friends — every referral helps grow the community.' },
                   ].map((s) => (
@@ -503,7 +526,7 @@ export function GiveawayDetail() {
               <div className="flex justify-between">
                 <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
                 <div className="bg-card border border-border rounded-sm px-4 py-2 text-xs font-serif text-muted-foreground">
-                  {selectedPackage.qty} ticket{selectedPackage.qty !== 1 ? 's' : ''} · Free
+                  {selectedPackage.qty} ticket{selectedPackage.qty !== 1 ? 's' : ''} · £{selectedPackage.price.toFixed(2)}
                 </div>
               </div>
             </motion.div>
@@ -520,7 +543,7 @@ export function GiveawayDetail() {
             >
               <div className="space-y-1">
                 <h2 className="text-3xl font-serif text-primary">Confirm Your Entry</h2>
-                <p className="text-muted-foreground text-sm">Review your details and confirm your free entry below.</p>
+                <p className="text-muted-foreground text-sm">Review your details and proceed to secure checkout.</p>
               </div>
 
               <div className="bg-card border border-border rounded-sm p-8 space-y-6">
@@ -547,8 +570,8 @@ export function GiveawayDetail() {
                   </div>
                   <div className="h-px bg-border/50 my-1" />
                   <div className="flex justify-between font-serif text-lg text-primary">
-                    <span>Cost</span>
-                    <span>Free</span>
+                    <span>Total</span>
+                    <span>£{selectedPackage.price.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -565,13 +588,13 @@ export function GiveawayDetail() {
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /> Confirming…</>
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Redirecting to Stripe…</>
                   ) : (
-                    <><ShieldCheck className="w-5 h-5" /> Confirm Entry</>
+                    <><ShieldCheck className="w-5 h-5" /> Pay £{selectedPackage.price.toFixed(2)} — Secure Checkout</>
                   )}
                 </Button>
 
-                <p className="text-center text-xs text-muted-foreground font-serif">Free entry · No payment required</p>
+                <p className="text-center text-xs text-muted-foreground font-serif">Powered by Stripe · 256-bit SSL encryption</p>
               </div>
 
               <Button variant="ghost" className="w-full" onClick={() => setStep(3)}>← Back</Button>

@@ -271,7 +271,7 @@ export function Home() {
                         className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-sm font-serif"
                         onClick={() => setLocation(`/giveaway/${g.id}`)}
                       >
-                        Enter the Draw — Free
+                        Enter the Draw — From £2.99
                       </Button>
                     </div>
                   </div>
@@ -410,7 +410,7 @@ export function Home() {
                 <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-sm border border-border rounded-sm p-4">
                   <p className="text-xs font-serif text-primary uppercase tracking-widest mb-1">Currently Live</p>
                   <p className="font-serif text-lg">{giveaways?.length ?? 0} Active {(giveaways?.length ?? 0) === 1 ? 'Draw' : 'Draws'}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Free entry · Draw closes soon</p>
+                  <p className="text-xs text-muted-foreground mt-1">From £2.99 per ticket · Draw closes soon</p>
                 </div>
               </div>
             </div>
