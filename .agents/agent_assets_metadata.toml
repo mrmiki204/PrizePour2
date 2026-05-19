@@ -18,6 +18,18 @@ uri = "file://attached_assets/generated_images/prizepour_icon.png"
 type = "image"
 title = "prizepour mobile icon"
 
+[[generated]]
+id = "zUdYX5C2x1wq4qK-TC-9e"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero-clonakilty.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Fr75ktCA45NDgMpgIzqZD"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero-patron.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "yOGJkLWPn4cLMR4PGFt0K"
 uri = "file://attached_assets/image_search/clonakilty32_2.jpg"

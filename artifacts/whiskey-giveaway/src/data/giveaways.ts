@@ -22,6 +22,9 @@ import patronEstateImg from '@/assets/images/patron-estate.png';
 import patronCitrongeImg from '@/assets/images/patron-citronge.png';
 import patronXoCafeImg from '@/assets/images/patron-xo-cafe.png';
 
+import heroClonakiltyImg from '@/assets/images/hero-clonakilty.png';
+import heroPatronImg from '@/assets/images/hero-patron.png';
+
 export type { Giveaway } from '@workspace/api-client-react';
 
 export interface Bottle {
@@ -198,8 +201,8 @@ export const GIVEAWAY_BOTTLES: Record<number, Bottle[]> = {
 };
 
 export const BUNDLED_IMAGE_MAP: Record<number, string> = {
-  1: twentyOneYoImg,
-  2: patronGranBurdeosImg,
+  1: heroClonakiltyImg,
+  2: heroPatronImg,
 };
 
 export function getGiveawayBottles(giveawayId: number): Bottle[] {
