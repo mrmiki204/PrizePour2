@@ -111,6 +111,9 @@ export function Home() {
             <h1 className="text-3xl md:text-5xl font-serif leading-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways</span>
             </h1>
+            <p className="mt-5 mx-auto max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
+              Exciting giveaways of premium spirits, exclusive distillery tours, professional bar equipment and more...
+            </p>
           </motion.div>
 
           <motion.div
