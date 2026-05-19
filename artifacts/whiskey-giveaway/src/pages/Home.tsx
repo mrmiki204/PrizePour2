@@ -167,7 +167,7 @@ export function Home() {
                     {/* Bottom name on mobile */}
                     {featured && (
                       <div className="absolute bottom-0 left-0 right-0 p-6 lg:hidden">
-                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Complete Collection</p>
+                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>
                         <h2 className="text-2xl font-serif text-white leading-tight">{featured.name}</h2>
                       </div>
                     )}
@@ -177,7 +177,7 @@ export function Home() {
                   <div className="lg:col-span-2 p-6 lg:p-8 flex flex-col justify-between gap-6 bg-card/95">
                     <div className="space-y-4">
                       <div className="hidden lg:block">
-                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Complete Collection</p>
+                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>
                         <h2 className="text-3xl xl:text-4xl font-serif text-white leading-tight">{featured?.name}</h2>
                       </div>
 
