@@ -65,3 +65,9 @@ id = "fx7L8WdLIhZUxtEyMbTVl"
 uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero-patron.png"
 type = "image"
 title = "Patrón hero - real bottles on AI backdrop"
+
+[[outputs]]
+id = "zBjFJY43DJrILrcmLtWK3"
+uri = "file://exports/prizepour-review.tar.gz"
+type = "unspecified"
+title = "PrizePour code review bundle (.tar.gz)"
