@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ArrowLeft, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package, ChevronDown, ChevronUp, Quote, Gift } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ShieldCheck, Users, Ticket, Lock, Package, ChevronDown, ChevronUp } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
 import bushmillsHeroImg from '@/assets/images/bushmills-hero.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES, COLLECTION_BOTTLES } from '@/data/giveaways';
@@ -101,25 +101,6 @@ function useIsCompactMotion() {
   return compact;
 }
 
-// Animated number counter for social-proof stats.
-function useCountUp(target: number, durationMs = 1800, start = true) {
-  const [value, setValue] = useState(0);
-  useEffect(() => {
-    if (!start) return;
-    let raf = 0;
-    const t0 = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - t0) / durationMs);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setValue(Math.round(target * eased));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target, durationMs, start]);
-  return value;
-}
-
 // ── Cinematic backdrop: floating dust particles + light sweep + vignette ──
 function CinematicBackdrop({ accent = 'amber' }: { accent?: 'amber' | 'emerald' }) {
   const compact = useIsCompactMotion();
@@ -177,166 +158,6 @@ const ACTIVITY_MESSAGES = [
   { icon: '🎟️', text: 'James from Dublin just bought 5 tickets' },
   { icon: '✨', text: 'Bushmills Distillery Tour — only 215 tickets left' },
 ];
-
-// ── Recent winners + social proof counters ──
-const RECENT_WINNERS = [
-  { initials: 'JM', name: 'James M.', city: 'Belfast', prize: 'Clonakilty 21yo Collection', value: '£1,200', when: '2 days ago', tone: 'amber' as const },
-  { initials: 'SO', name: 'Sarah O.', city: 'Manchester', prize: 'Patrón El Alto Bundle', value: '£950', when: '5 days ago', tone: 'emerald' as const },
-  { initials: 'DH', name: 'David H.', city: 'Edinburgh', prize: 'Gran Patrón Burdeos', value: '£499', when: '1 week ago', tone: 'emerald' as const },
-  { initials: 'EW', name: 'Emma W.', city: 'Cardiff', prize: 'Bushmills Distillery Tour for Two', value: '£2,500', when: '2 weeks ago', tone: 'amber' as const },
-];
-
-const SOCIAL_STATS = [
-  { label: 'Prizes Awarded', target: 42850, prefix: '£', icon: Trophy },
-  { label: 'Happy Winners', target: 387, suffix: '+', icon: Gift },
-  { label: 'Tickets Sold', target: 24500, suffix: '+', icon: Ticket },
-  { label: 'Avg. Rating', target: 49, divisor: 10, suffix: '/5', icon: Star },
-];
-
-function StatCounter({ stat, start }: { stat: typeof SOCIAL_STATS[number]; start: boolean }) {
-  const raw = useCountUp(stat.target, 1800, start);
-  const display = stat.divisor ? (raw / stat.divisor).toFixed(1) : raw.toLocaleString('en-GB');
-  const Icon = stat.icon;
-  return (
-    <div className="text-center group">
-      <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
-        <Icon className="w-5 h-5 text-primary" />
-      </div>
-      <p className="font-serif text-2xl sm:text-3xl text-white tabular-nums">
-        {stat.prefix ?? ''}{display}{stat.suffix ?? ''}
-      </p>
-      <p className="text-[10px] sm:text-xs font-serif text-muted-foreground uppercase tracking-[0.2em] mt-1">{stat.label}</p>
-    </div>
-  );
-}
-
-function SocialProofAndWinners() {
-  const [started, setStarted] = useState(false);
-  return (
-    <section id="winners" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
-      <div className="flex items-center gap-4 mb-4">
-        <div className="h-px bg-border flex-1" />
-        <p className="text-xs font-serif text-primary uppercase tracking-widest px-2 sm:px-4 text-center">Hall of Winners</p>
-        <div className="h-px bg-border flex-1" />
-      </div>
-      <h2 className="text-3xl sm:text-4xl font-serif text-center mb-3 px-2">Real Members, Real Prizes</h2>
-      <p className="text-sm sm:text-base text-muted-foreground text-center max-w-xl mx-auto mb-12">
-        Every prize delivered to the door — fully insured, professionally packed, duties covered.
-      </p>
-
-      {/* Social proof counters */}
-      <motion.div
-        onViewportEnter={() => setStarted(true)}
-        viewport={{ once: true }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-12 sm:mb-16 p-6 sm:p-8 rounded-sm border border-border bg-card/50 backdrop-blur"
-      >
-        {SOCIAL_STATS.map(stat => (
-          <StatCounter key={stat.label} stat={stat} start={started} />
-        ))}
-      </motion.div>
-
-      {/* Recent winners grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {RECENT_WINNERS.map((w, idx) => {
-          const isEmerald = w.tone === 'emerald';
-          return (
-            <motion.div
-              key={w.initials + idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.08 }}
-              className={`relative p-5 sm:p-6 bg-card border ${isEmerald ? 'border-emerald-400/30 hover:border-emerald-400/60' : 'border-primary/30 hover:border-primary/60'} rounded-sm space-y-4 overflow-hidden transition-colors group`}
-            >
-              <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-40 ${isEmerald ? 'bg-emerald-500/30' : 'bg-primary/30'}`} />
-
-              <div className="flex items-center gap-3 relative">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-sm ${isEmerald ? 'bg-gradient-to-br from-emerald-400 to-emerald-700 text-emerald-50' : 'bg-gradient-to-br from-amber-300 to-amber-700 text-amber-50'} shadow-lg`}>
-                  {w.initials}
-                </div>
-                <div className="min-w-0">
-                  <p className="font-serif text-sm text-white truncate">{w.name}</p>
-                  <p className="text-[10px] font-serif text-muted-foreground uppercase tracking-widest">{w.city}</p>
-                </div>
-              </div>
-
-              <div className="relative">
-                <p className="text-[10px] font-serif text-muted-foreground uppercase tracking-widest mb-1">Won</p>
-                <p className="font-serif text-sm text-foreground leading-snug line-clamp-2 min-h-[2.5rem]">{w.prize}</p>
-              </div>
-
-              <div className="flex items-end justify-between pt-3 border-t border-border/40 relative">
-                <span className={`font-serif text-xl ${isEmerald ? 'text-emerald-300' : 'text-primary'}`}>{w.value}</span>
-                <span className="text-[10px] font-serif text-muted-foreground uppercase tracking-widest">{w.when}</span>
-              </div>
-
-              <div className="absolute top-3 right-3 flex gap-0.5 relative">
-                {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${isEmerald ? 'fill-emerald-400 text-emerald-400' : 'fill-primary text-primary'}`} />)}
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-// ── Testimonials carousel ──
-const TESTIMONIALS = [
-  { quote: 'Won the Clonakilty 21yo and it arrived in 3 days, beautifully packed. The bottle is genuine and stunning. Already entered the next draw.', name: 'James M.', city: 'Belfast', rating: 5 },
-  { quote: 'I was sceptical at first but the whole process was transparent. Got my Patrón Reposado bundle and they covered all the import duties. Class act.', name: 'Sarah O.', city: 'Manchester', rating: 5 },
-  { quote: 'The Bushmills tour for two was a dream. They organised everything — transport, hotel, the lot. Genuinely a once-in-a-lifetime experience.', name: 'Emma W.', city: 'Cardiff', rating: 5 },
-  { quote: 'Bought 5 tickets, won the Gran Patrón Burdeos. Couldn\'t believe it. Service was unreal — felt like a private member\'s club.', name: 'David H.', city: 'Edinburgh', rating: 5 },
-];
-
-function TestimonialsSection() {
-  return (
-    <section className="py-16 sm:py-24 bg-gradient-to-b from-background via-card/40 to-background border-y border-border/50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10 sm:mb-14">
-          <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Member Reviews</p>
-          <h2 className="text-3xl sm:text-4xl font-serif mb-4">What Our Winners Are Saying</h2>
-          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground font-serif">
-            <div className="flex gap-0.5">
-              {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />)}
-            </div>
-            <span className="uppercase tracking-widest">4.9 / 5 average from 387+ winners</span>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-5 sm:gap-6">
-          {TESTIMONIALS.map((t, idx) => (
-            <motion.figure
-              key={idx}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ delay: idx * 0.1 }}
-              className="relative p-6 sm:p-8 bg-card/80 backdrop-blur border border-border rounded-sm overflow-hidden hover:border-primary/40 transition-colors"
-            >
-              <Quote className="absolute top-4 right-4 w-10 h-10 text-primary/15" />
-              <div className="flex gap-0.5 mb-4">
-                {[...Array(t.rating)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />)}
-              </div>
-              <blockquote className="text-sm sm:text-base text-foreground/90 leading-relaxed font-serif italic mb-5">
-                "{t.quote}"
-              </blockquote>
-              <figcaption className="flex items-center gap-3 pt-4 border-t border-border/40">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 flex items-center justify-center text-[11px] font-serif text-amber-50 shadow">
-                  {t.name.split(' ').map(s => s[0]).join('')}
-                </div>
-                <div>
-                  <p className="font-serif text-sm text-white">{t.name}</p>
-                  <p className="text-[10px] font-serif text-muted-foreground uppercase tracking-widest">Verified winner · {t.city}</p>
-                </div>
-              </figcaption>
-            </motion.figure>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ── Bottle spotlight: rotating premium bottle showcase with floating motion ──
 const PATRON_SPOTLIGHT_NAMES = ['Patrón Silver', 'Patrón Reposado', 'Patrón Añejo', 'Patrón El Alto', 'Patrón Cristalino'];
@@ -1116,9 +937,6 @@ export function Home() {
           </div>
         </div>
       </section>
-
-      <SocialProofAndWinners />
-      <TestimonialsSection />
 
       {/* ── Why PrizePour ── */}
       <section className="py-16 sm:py-24 bg-card border-y border-border">
