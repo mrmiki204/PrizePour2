@@ -7,6 +7,7 @@ import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package, ChevronDown, ChevronUp } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
+import bushmillsHeroImg from '@/assets/images/bushmills-hero.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
 
@@ -300,6 +301,78 @@ export function Home() {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* ── Featured Experience: Bushmills ── */}
+      <section className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6">
+        <motion.button
+          type="button"
+          onClick={() => setLocation('/experiences/bushmills')}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7 }}
+          aria-label="View the Bushmills Distillery Tour Experience"
+          className="group relative w-full overflow-hidden rounded-sm border border-primary/30 hover:border-primary/70 transition-all text-left block focus:outline-none focus:ring-2 focus:ring-primary/60"
+        >
+          <div className="grid md:grid-cols-2 min-h-[440px] md:min-h-[400px]">
+            {/* Image side */}
+            <div className="relative aspect-[16/10] md:aspect-auto md:min-h-[400px] overflow-hidden">
+              <img
+                src={bushmillsHeroImg}
+                alt="Bushmills Distillery at golden hour"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.4s] group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-card/30 to-card md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-card" />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent md:bg-none" />
+              <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/60 bg-background/80 backdrop-blur-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-[10px] font-serif text-primary uppercase tracking-[0.25em]">Featured Experience</span>
+              </div>
+            </div>
+
+            {/* Copy side */}
+            <div className="relative bg-card p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center -mt-20 md:mt-0 z-10">
+              <p className="text-[10px] sm:text-xs font-serif text-primary uppercase tracking-[0.25em] mb-3">
+                Luxury Irish Whiskey Getaway · Limited Tickets
+              </p>
+              <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-[1.05] mb-4">
+                Win the Ultimate{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-br from-amber-300 via-primary to-amber-700">
+                  Bushmills
+                </span>
+                <br className="hidden sm:block" /> Whiskey Experience
+              </h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-6 max-w-md">
+                Private distillery tour, rare expression tasting, two nights at Bushmills Inn, and a four-bottle
+                take-home collection. Worth over £2,500.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-6 text-xs sm:text-sm">
+                <div>
+                  <p className="text-[9px] sm:text-[10px] font-serif text-muted-foreground uppercase tracking-widest leading-tight">Prize Value</p>
+                  <p className="font-serif text-base sm:text-lg text-primary">£2,500</p>
+                </div>
+                <div className="w-px h-8 bg-border" />
+                <div>
+                  <p className="text-[9px] sm:text-[10px] font-serif text-muted-foreground uppercase tracking-widest leading-tight">From</p>
+                  <p className="font-serif text-base sm:text-lg text-foreground">£4.99 / ticket</p>
+                </div>
+                <div className="w-px h-8 bg-border" />
+                <div>
+                  <p className="text-[9px] sm:text-[10px] font-serif text-muted-foreground uppercase tracking-widest leading-tight">Remaining</p>
+                  <p className="font-serif text-base sm:text-lg text-foreground">215 tickets</p>
+                </div>
+              </div>
+
+              <span className="inline-flex items-center gap-2 self-start bg-primary text-primary-foreground font-serif uppercase tracking-[0.2em] text-xs px-5 py-3 rounded-sm group-hover:gap-3 transition-all min-h-[44px]">
+                Explore the Experience
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </span>
+            </div>
+          </div>
+        </motion.button>
       </section>
 
       {/* ── All Draws ── */}

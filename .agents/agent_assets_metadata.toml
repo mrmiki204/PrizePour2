@@ -42,6 +42,36 @@ uri = "file://artifacts/whiskey-giveaway/src/assets/images/hero-bg-tequila.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "BP4-xogT6i7pTys_iQO8k"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/bushmills-hero.png"
+type = "image"
+title = "bushmills distillery exterior hero"
+
+[[generated]]
+id = "mjK7-sQwyAnG3wRKv01f4"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/bushmills-stills.png"
+type = "image"
+title = "bushmills copper pot stills"
+
+[[generated]]
+id = "tGtKrNw3yDjYRLim7C5JH"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/bushmills-tasting.png"
+type = "image"
+title = "bushmills tasting flight glasses"
+
+[[generated]]
+id = "br96Suq9Is2RqFEImTO6K"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/bushmills-suite.png"
+type = "image"
+title = "bushmills luxury suite stay"
+
+[[generated]]
+id = "qkbvPSq7D8fzpwGoJ3W2s"
+uri = "file://artifacts/whiskey-giveaway/src/assets/images/bushmills-bottles.png"
+type = "image"
+title = "bushmills bottle collection lineup"
+
 [[outputs]]
 id = "yOGJkLWPn4cLMR4PGFt0K"
 uri = "file://attached_assets/image_search/clonakilty32_2.jpg"
