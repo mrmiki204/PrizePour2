@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package, ChevronDown, ChevronUp, Quote, Gift } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
 import bushmillsHeroImg from '@/assets/images/bushmills-hero.png';
-import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
+import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
 
 
@@ -338,6 +338,154 @@ function TestimonialsSection() {
   );
 }
 
+// ── Patrón spotlight: rotating premium bottle showcase with floating motion ──
+const PATRON_SPOTLIGHT_NAMES = ['Patrón Silver', 'Patrón Reposado', 'Patrón Añejo', 'Patrón El Alto', 'Patrón Cristalino'];
+const PATRON_TAGLINES = [
+  'Win the ultimate Patrón collection',
+  'Luxury tequila experiences await',
+  'Premium bottles for true collectors',
+  'Exclusive tequila prize draws',
+];
+
+function PatronSpotlight() {
+  const spotlightBottles = useMemo(
+    () => PATRON_SPOTLIGHT_NAMES
+      .map(name => PATRON_BOTTLES.find(b => b.name === name))
+      .filter((b): b is typeof PATRON_BOTTLES[number] => Boolean(b)),
+    [],
+  );
+  const [idx, setIdx] = useState(0);
+  const compact = useIsCompactMotion();
+
+  useEffect(() => {
+    if (spotlightBottles.length <= 1 || compact) return;
+    const id = setInterval(() => setIdx(i => (i + 1) % spotlightBottles.length), 2800);
+    return () => clearInterval(id);
+  }, [spotlightBottles.length, compact]);
+
+  const bottle = spotlightBottles[idx];
+  if (!bottle) return null;
+
+  return (
+    <div className="absolute inset-0">
+      {/* Agave-inspired warm radial backdrop */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 35%, rgba(52,211,153,0.18) 0%, rgba(120,75,15,0.25) 35%, rgba(10,6,2,0.95) 75%)',
+        }}
+      />
+      {/* Gold foil sweep (static on compact/reduced-motion) */}
+      {compact ? (
+        <div
+          aria-hidden
+          className="absolute inset-0 mix-blend-screen pointer-events-none"
+          style={{ background: 'linear-gradient(120deg, transparent 30%, rgba(252,211,77,0.10) 50%, transparent 70%)' }}
+        />
+      ) : (
+        <motion.div
+          aria-hidden
+          className="absolute inset-0 mix-blend-screen pointer-events-none"
+          style={{ background: 'linear-gradient(120deg, transparent 30%, rgba(252,211,77,0.10) 50%, transparent 70%)' }}
+          animate={{ x: ['-30%', '30%'] }}
+          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', repeatType: 'reverse' }}
+        />
+      )}
+
+      {/* Rotating bottle stage */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={bottle.name}
+          initial={{ opacity: 0, scale: 0.92, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: -10 }}
+          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          {/* Halo behind the bottle */}
+          <div className="absolute inset-x-12 top-1/4 bottom-1/4 bg-emerald-400/15 blur-3xl rounded-full" />
+          <div className="absolute inset-x-20 top-1/3 bottom-1/3 bg-amber-300/20 blur-3xl rounded-full" />
+
+          {/* Floating bottle */}
+          <motion.img
+            src={bottle.image}
+            alt={bottle.name}
+            className="relative w-auto h-[78%] max-h-[440px] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.7)] drop-shadow-[0_0_30px_rgba(52,211,153,0.25)]"
+            animate={compact ? undefined : { y: [0, -10, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+
+          {/* Floor reflection ellipse */}
+          <div
+            aria-hidden
+            className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-[50%] h-6 rounded-[50%]"
+            style={{ background: 'radial-gradient(ellipse, rgba(52,211,153,0.35) 0%, transparent 70%)' }}
+          />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Bottle name + value chip (bottom-center) */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 pointer-events-none">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={bottle.name + '-label'}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col items-center"
+          >
+            <p className="font-serif text-base sm:text-lg text-white tracking-wide drop-shadow-lg">{bottle.name}</p>
+            <p className="font-serif text-[11px] text-emerald-300/90 uppercase tracking-[0.25em]">Worth {bottle.value}</p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Bottle indicator dots */}
+      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 flex gap-1.5 pt-2">
+        {spotlightBottles.map((_, i) => (
+          <span
+            key={i}
+            className={`block h-1 rounded-full transition-all duration-300 ${i === idx ? 'w-5 bg-emerald-300' : 'w-1 bg-emerald-300/30'}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PatronRotatingTagline() {
+  const compact = useIsCompactMotion();
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (compact) return;
+    const id = setInterval(() => setIdx(i => (i + 1) % PATRON_TAGLINES.length), 3500);
+    return () => clearInterval(id);
+  }, [compact]);
+  if (compact) {
+    return (
+      <p className="text-[10px] font-serif text-emerald-300 uppercase tracking-[0.2em] mb-2">
+        {PATRON_TAGLINES[0]}
+      </p>
+    );
+  }
+  return (
+    <AnimatePresence mode="wait">
+      <motion.p
+        key={idx}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -6 }}
+        transition={{ duration: 0.4 }}
+        className="text-[10px] font-serif text-emerald-300 uppercase tracking-[0.2em] mb-2"
+      >
+        {PATRON_TAGLINES[idx]}
+      </motion.p>
+    </AnimatePresence>
+  );
+}
+
 function LiveActivityTicker() {
   const [index, setIndex] = useState(0);
   useEffect(() => {
@@ -470,17 +618,11 @@ export function Home() {
                 {isPatronFeatured ? 'Featured Tequila Draw' : 'Featured Draw'}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif leading-[1.02] tracking-tight px-2">
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-primary to-amber-300 drop-shadow-[0_2px_18px_rgba(234,146,55,0.35)]">
-                Win the World's Rarest
-              </span>
-              <span className="block mt-1 sm:mt-2 text-white/95 font-light italic text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
-                Whiskey &amp; Tequila
-              </span>
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif leading-tight px-2">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways</span>
             </h1>
-            <p className="mt-5 sm:mt-7 mx-auto max-w-2xl text-sm sm:text-base md:text-lg text-muted-foreground/90 leading-relaxed px-2">
-              An exclusive members' club for collectors — curated whiskey collections, ultra-premium Patrón tequila bundles,
-              and once-in-a-lifetime distillery experiences. Tickets from <span className="text-primary font-medium">£2.99</span>.
+            <p className="mt-4 sm:mt-5 mx-auto max-w-2xl text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed px-2">
+              Exciting giveaways of premium spirits, exclusive distillery tours, professional bar equipment and more...
             </p>
           </motion.div>
 
@@ -506,7 +648,9 @@ export function Home() {
                 >
                   {/* ── Image (3/5) ── */}
                   <div className="lg:col-span-3 relative aspect-[4/3] lg:aspect-auto lg:min-h-[520px] overflow-hidden bg-black">
-                    {featured && getGiveawayImage(featured.id, featured.imageUrl) ? (
+                    {isPatronFeatured ? (
+                      <PatronSpotlight />
+                    ) : featured && getGiveawayImage(featured.id, featured.imageUrl) ? (
                       <img
                         src={getGiveawayImage(featured.id, featured.imageUrl)}
                         alt={featured?.name}
@@ -517,7 +661,7 @@ export function Home() {
                         <Package className="w-24 h-24 text-primary/40" />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
+                    {!isPatronFeatured && <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />}
                     <div className="absolute inset-0 lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-card/95" />
 
                     {/* Top badges */}
@@ -565,7 +709,9 @@ export function Home() {
                   <div className="lg:col-span-2 p-5 sm:p-6 lg:p-8 flex flex-col justify-between gap-5 sm:gap-6 bg-card/95">
                     <div className="space-y-4">
                       <div className="hidden lg:block">
-                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>
+                        {isPatronFeatured
+                          ? <PatronRotatingTagline />
+                          : <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>}
                         <h2 className="text-2xl sm:text-3xl xl:text-4xl font-serif text-white leading-tight">{featured?.name}</h2>
                       </div>
 
@@ -803,17 +949,25 @@ export function Home() {
                             {row.map((bottle, i) => (
                               <div
                                 key={i}
-                                className="aspect-[3/4] relative overflow-hidden group/bottle flex-none"
+                                className="aspect-[3/4] relative overflow-hidden group/bottle flex-none cursor-pointer"
                                 style={{ background: bottle.background, width: `${100 / rowSize}%` }}
                               >
+                                {/* Glow halo on hover */}
+                                <div className={`absolute inset-0 opacity-0 group-hover/bottle:opacity-100 transition-opacity duration-500 pointer-events-none ${g.id === 2 ? 'bg-gradient-radial' : ''}`}
+                                  style={{ background: g.id === 2
+                                    ? 'radial-gradient(ellipse at 50% 45%, rgba(52,211,153,0.30) 0%, transparent 65%)'
+                                    : 'radial-gradient(ellipse at 50% 45%, rgba(234,146,55,0.28) 0%, transparent 65%)'
+                                  }}
+                                />
                                 <img
                                   src={bottle.image}
                                   alt={bottle.name}
-                                  className="w-full h-full object-contain p-1 sm:p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-105 transition-all duration-500"
+                                  className="relative w-full h-full object-contain p-1 sm:p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-110 group-hover/bottle:-translate-y-1 transition-all duration-500"
+                                  style={{ filter: 'drop-shadow(0 10px 14px rgba(0,0,0,0.6))' }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                                 <div className="absolute bottom-0 left-0 right-0 p-1 sm:p-2 text-center">
-                                  <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name}</p>
+                                  <p className="text-[9px] text-white/60 leading-tight line-clamp-1 group-hover/bottle:text-white transition-colors">{bottle.name}</p>
                                 </div>
                               </div>
                             ))}
