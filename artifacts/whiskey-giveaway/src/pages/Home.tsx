@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, ArrowLeft, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package, ChevronDown, ChevronUp, Quote, Gift } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
 import bushmillsHeroImg from '@/assets/images/bushmills-hero.png';
-import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES } from '@/data/giveaways';
+import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
 
 
@@ -338,7 +338,7 @@ function TestimonialsSection() {
   );
 }
 
-// ── Patrón spotlight: rotating premium bottle showcase with floating motion ──
+// ── Bottle spotlight: rotating premium bottle showcase with floating motion ──
 const PATRON_SPOTLIGHT_NAMES = ['Patrón Silver', 'Patrón Reposado', 'Patrón Añejo', 'Patrón El Alto', 'Patrón Cristalino'];
 const PATRON_TAGLINES = [
   'Win the ultimate Patrón collection',
@@ -346,35 +346,51 @@ const PATRON_TAGLINES = [
   'Premium bottles for true collectors',
   'Exclusive tequila prize draws',
 ];
+const CLONAKILTY_SPOTLIGHT_NAMES = ['21 Year Old Single Malt', 'Single Pot Still', 'Cognac Cask Finish', 'Double Oak', 'Port Cask'];
+const CLONAKILTY_TAGLINES = [
+  'Win the rare Clonakilty 21yo collection',
+  'Atlantic-aged Irish whiskey at its finest',
+  'Hand-picked single malts for true collectors',
+  'A West Cork distillery masterclass',
+];
 
-function PatronSpotlight() {
-  const spotlightBottles = useMemo(
-    () => PATRON_SPOTLIGHT_NAMES
-      .map(name => PATRON_BOTTLES.find(b => b.name === name))
-      .filter((b): b is typeof PATRON_BOTTLES[number] => Boolean(b)),
-    [],
-  );
+type SpotlightAccent = 'emerald' | 'amber';
+
+interface BottleSpotlightProps {
+  bottles: typeof PATRON_BOTTLES;
+  accent: SpotlightAccent;
+}
+
+function BottleSpotlight({ bottles, accent }: BottleSpotlightProps) {
   const [idx, setIdx] = useState(0);
   const compact = useIsCompactMotion();
 
   useEffect(() => {
-    if (spotlightBottles.length <= 1 || compact) return;
-    const id = setInterval(() => setIdx(i => (i + 1) % spotlightBottles.length), 2800);
+    if (bottles.length <= 1 || compact) return;
+    const id = setInterval(() => setIdx(i => (i + 1) % bottles.length), 2800);
     return () => clearInterval(id);
-  }, [spotlightBottles.length, compact]);
+  }, [bottles.length, compact]);
 
-  const bottle = spotlightBottles[idx];
+  const bottle = bottles[idx];
   if (!bottle) return null;
+
+  const backdrop = accent === 'emerald'
+    ? 'radial-gradient(ellipse at 50% 35%, rgba(52,211,153,0.18) 0%, rgba(120,75,15,0.25) 35%, rgba(10,6,2,0.95) 75%)'
+    : 'radial-gradient(ellipse at 50% 35%, rgba(234,146,55,0.22) 0%, rgba(120,75,15,0.28) 35%, rgba(10,6,2,0.95) 75%)';
+  const haloPrimary = accent === 'emerald' ? 'bg-emerald-400/15' : 'bg-amber-400/20';
+  const haloSecondary = accent === 'emerald' ? 'bg-amber-300/20' : 'bg-amber-500/15';
+  const floorRgba = accent === 'emerald' ? 'rgba(52,211,153,0.35)' : 'rgba(234,146,55,0.4)';
+  const bottleGlow = accent === 'emerald' ? 'rgba(52,211,153,0.25)' : 'rgba(234,146,55,0.3)';
+  const labelAccent = accent === 'emerald' ? 'text-emerald-300/90' : 'text-amber-300/90';
+  const dotActive = accent === 'emerald' ? 'bg-emerald-300' : 'bg-amber-300';
 
   return (
     <div className="absolute inset-0">
-      {/* Agave-inspired warm radial backdrop */}
+      {/* Warm radial backdrop */}
       <div
         aria-hidden
         className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 35%, rgba(52,211,153,0.18) 0%, rgba(120,75,15,0.25) 35%, rgba(10,6,2,0.95) 75%)',
-        }}
+        style={{ background: backdrop }}
       />
       {/* Gold foil sweep (static on compact/reduced-motion) */}
       {compact ? (
@@ -404,14 +420,15 @@ function PatronSpotlight() {
           className="absolute inset-0 flex items-center justify-center"
         >
           {/* Halo behind the bottle */}
-          <div className="absolute inset-x-12 top-1/4 bottom-1/4 bg-emerald-400/15 blur-3xl rounded-full" />
-          <div className="absolute inset-x-20 top-1/3 bottom-1/3 bg-amber-300/20 blur-3xl rounded-full" />
+          <div className={`absolute inset-x-12 top-1/4 bottom-1/4 ${haloPrimary} blur-3xl rounded-full`} />
+          <div className={`absolute inset-x-20 top-1/3 bottom-1/3 ${haloSecondary} blur-3xl rounded-full`} />
 
-          {/* Floating bottle */}
+          {/* Floating bottle (centered) */}
           <motion.img
             src={bottle.image}
             alt={bottle.name}
-            className="relative w-auto h-[78%] max-h-[440px] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.7)] drop-shadow-[0_0_30px_rgba(52,211,153,0.25)]"
+            className="relative w-auto h-[70%] max-h-[400px] object-contain mx-auto"
+            style={{ filter: `drop-shadow(0 30px 40px rgba(0,0,0,0.7)) drop-shadow(0 0 30px ${bottleGlow})` }}
             animate={compact ? undefined : { y: [0, -10, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
           />
@@ -419,14 +436,14 @@ function PatronSpotlight() {
           {/* Floor reflection ellipse */}
           <div
             aria-hidden
-            className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-[50%] h-6 rounded-[50%]"
-            style={{ background: 'radial-gradient(ellipse, rgba(52,211,153,0.35) 0%, transparent 70%)' }}
+            className="absolute bottom-[14%] left-1/2 -translate-x-1/2 w-[50%] h-6 rounded-[50%]"
+            style={{ background: `radial-gradient(ellipse, ${floorRgba} 0%, transparent 70%)` }}
           />
         </motion.div>
       </AnimatePresence>
 
-      {/* Bottle name + value chip (bottom-center) */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 pointer-events-none">
+      {/* Bottle name (bottom-center) */}
+      <div className="absolute bottom-6 left-0 right-0 z-10 flex justify-center pointer-events-none px-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={bottle.name + '-label'}
@@ -434,19 +451,19 @@ function PatronSpotlight() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.4 }}
-            className="flex flex-col items-center"
+            className="flex justify-center w-full"
           >
-            <p className="font-serif text-base sm:text-lg text-white tracking-wide drop-shadow-lg">{bottle.name}</p>
+            <p className={`font-serif text-base sm:text-lg text-white tracking-wide drop-shadow-lg text-center ${labelAccent ? '' : ''}`}>{bottle.name}</p>
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* Bottle indicator dots */}
-      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 flex gap-1.5 pt-2">
-        {spotlightBottles.map((_, i) => (
+      <div className="absolute bottom-1.5 left-0 right-0 z-10 flex justify-center gap-1.5">
+        {bottles.map((_, i) => (
           <span
             key={i}
-            className={`block h-1 rounded-full transition-all duration-300 ${i === idx ? 'w-5 bg-emerald-300' : 'w-1 bg-emerald-300/30'}`}
+            className={`block h-1 rounded-full transition-all duration-300 ${i === idx ? `w-5 ${dotActive}` : `w-1 ${dotActive} opacity-30`}`}
           />
         ))}
       </div>
@@ -454,18 +471,24 @@ function PatronSpotlight() {
   );
 }
 
-function PatronRotatingTagline() {
+interface RotatingTaglineProps {
+  lines: readonly string[];
+  accent: SpotlightAccent;
+}
+
+function RotatingTagline({ lines, accent }: RotatingTaglineProps) {
   const compact = useIsCompactMotion();
   const [idx, setIdx] = useState(0);
   useEffect(() => {
     if (compact) return;
-    const id = setInterval(() => setIdx(i => (i + 1) % PATRON_TAGLINES.length), 3500);
+    const id = setInterval(() => setIdx(i => (i + 1) % lines.length), 3500);
     return () => clearInterval(id);
-  }, [compact]);
+  }, [compact, lines.length]);
+  const colorClass = accent === 'emerald' ? 'text-emerald-300' : 'text-primary';
   if (compact) {
     return (
-      <p className="text-[10px] font-serif text-emerald-300 uppercase tracking-[0.2em] mb-2">
-        {PATRON_TAGLINES[0]}
+      <p className={`text-[10px] font-serif uppercase tracking-[0.2em] mb-2 ${colorClass}`}>
+        {lines[0]}
       </p>
     );
   }
@@ -477,9 +500,9 @@ function PatronRotatingTagline() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -6 }}
         transition={{ duration: 0.4 }}
-        className="text-[10px] font-serif text-emerald-300 uppercase tracking-[0.2em] mb-2"
+        className={`text-[10px] font-serif uppercase tracking-[0.2em] mb-2 ${colorClass}`}
       >
-        {PATRON_TAGLINES[idx]}
+        {lines[idx]}
       </motion.p>
     </AnimatePresence>
   );
@@ -557,6 +580,15 @@ export function Home() {
   const featured = featuredGiveaways[featuredIndex];
   const isBushmillsFeatured = featured?.id === BUSHMILLS_ID;
   const isPatronFeatured = featured?.id === 2;
+  const isClonakiltyFeatured = featured?.id === 1;
+  const hasSpotlight = isPatronFeatured || isClonakiltyFeatured;
+  const spotlightBottles = isPatronFeatured
+    ? PATRON_BOTTLES.filter(b => PATRON_SPOTLIGHT_NAMES.includes(b.name))
+    : isClonakiltyFeatured
+      ? COLLECTION_BOTTLES.filter(b => CLONAKILTY_SPOTLIGHT_NAMES.includes(b.name))
+      : [];
+  const spotlightTaglines = isPatronFeatured ? PATRON_TAGLINES : isClonakiltyFeatured ? CLONAKILTY_TAGLINES : [];
+  const spotlightAccent: SpotlightAccent = isPatronFeatured ? 'emerald' : 'amber';
   const accent: 'amber' | 'emerald' = isPatronFeatured ? 'emerald' : 'amber';
   const accentText = isPatronFeatured ? 'text-emerald-300' : 'text-primary';
   const accentBorder = isPatronFeatured ? 'border-emerald-400/40' : 'border-primary/30';
@@ -645,8 +677,8 @@ export function Home() {
                 >
                   {/* ── Image (3/5) ── */}
                   <div className="lg:col-span-3 relative aspect-[4/3] lg:aspect-auto lg:min-h-[520px] overflow-hidden bg-black">
-                    {isPatronFeatured ? (
-                      <PatronSpotlight />
+                    {hasSpotlight ? (
+                      <BottleSpotlight bottles={spotlightBottles} accent={spotlightAccent} />
                     ) : featured && getGiveawayImage(featured.id, featured.imageUrl) ? (
                       <img
                         src={getGiveawayImage(featured.id, featured.imageUrl)}
@@ -658,7 +690,7 @@ export function Home() {
                         <Package className="w-24 h-24 text-primary/40" />
                       </div>
                     )}
-                    {!isPatronFeatured && <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />}
+                    {!hasSpotlight && <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />}
                     <div className="absolute inset-0 lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-card/95" />
 
                     {/* Top badges */}
@@ -706,8 +738,8 @@ export function Home() {
                   <div className="lg:col-span-2 p-5 sm:p-6 lg:p-8 flex flex-col justify-between gap-5 sm:gap-6 bg-card/95">
                     <div className="space-y-4">
                       <div className="hidden lg:block">
-                        {isPatronFeatured
-                          ? <PatronRotatingTagline />
+                        {hasSpotlight
+                          ? <RotatingTagline lines={spotlightTaglines} accent={spotlightAccent} />
                           : <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>}
                         <h2 className="text-2xl sm:text-3xl xl:text-4xl font-serif text-white leading-tight">{featured?.name}</h2>
                       </div>
