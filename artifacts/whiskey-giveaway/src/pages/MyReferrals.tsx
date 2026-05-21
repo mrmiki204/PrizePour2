@@ -108,15 +108,15 @@ export function MyReferrals() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm px-6 py-4 flex items-center justify-between">
+      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
         <button onClick={() => setLocation('/')} className="font-serif text-xl text-primary tracking-widest">PRIZEPOUR</button>
         <Button variant="ghost" size="sm" onClick={() => setLocation('/')} className="font-serif text-xs uppercase tracking-widest">← Back to Draws</Button>
       </header>
 
-      <div className="max-w-2xl mx-auto px-6 py-14 space-y-10">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-8 sm:space-y-10">
         <div className="space-y-2">
           <p className="font-serif text-xs uppercase tracking-widest text-primary">Referral Rewards</p>
-          <h1 className="font-serif text-4xl">My Rewards</h1>
+          <h1 className="font-serif text-3xl sm:text-4xl">My Rewards</h1>
           <p className="text-muted-foreground text-sm">When someone enters a draw using your referral link, you earn 1–5 free tickets to use on any draw.</p>
         </div>
 
@@ -162,7 +162,7 @@ export function MyReferrals() {
                 </h2>
                 {unclaimed.map(reward => (
                   <motion.div key={reward.id} layout className="bg-gradient-to-br from-primary/10 to-card border border-primary/30 rounded-sm overflow-hidden">
-                    <div className="px-6 py-4 flex items-center justify-between">
+                    <div className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
                           <Ticket className="w-5 h-5 text-primary" />
@@ -189,7 +189,7 @@ export function MyReferrals() {
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.2 }}
                           onSubmit={handleClaim}
-                          className="overflow-hidden border-t border-primary/20 px-6 py-5 space-y-4 bg-background/50"
+                          className="overflow-hidden border-t border-primary/20 px-4 sm:px-6 py-5 space-y-4 bg-background/50"
                         >
                           <p className="text-sm text-muted-foreground">Choose a draw and enter your details to claim your <span className="text-primary font-serif">{reward.freeTickets} free {reward.freeTickets === 1 ? 'ticket' : 'tickets'}</span>.</p>
 

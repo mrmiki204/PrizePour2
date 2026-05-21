@@ -116,12 +116,12 @@ export function Home() {
             animate={{ y: 0 }}
             exit={{ y: '-100%' }}
             transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-            className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center py-5 px-6"
+            className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center py-3 sm:py-5 px-4 sm:px-6"
             style={{ background: 'linear-gradient(135deg, #3d1a05 0%, #1c0c03 100%)', borderBottom: '2px solid #ea9237' }}
           >
             <div className="text-center">
-              <p className="font-serif text-xs tracking-widest text-amber-500/70 uppercase mb-1">Draw Status</p>
-              <p className="font-serif text-3xl md:text-5xl text-amber-400 tracking-wide">No Active Draws</p>
+              <p className="font-serif text-[10px] sm:text-xs tracking-widest text-amber-500/70 uppercase mb-1">Draw Status</p>
+              <p className="font-serif text-xl sm:text-3xl md:text-5xl text-amber-400 tracking-wide">No Active Draws</p>
             </div>
           </motion.div>
         )}
@@ -130,13 +130,13 @@ export function Home() {
       <Navbar onScrollTo={scrollTo} />
 
       {/* ── Hero / Featured Draw ── */}
-      <section className="relative pt-28 pb-16 overflow-hidden">
+      <section className="relative pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img src={heroImg} alt="" className="w-full h-full object-cover opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background" />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -147,10 +147,10 @@ export function Home() {
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="text-[10px] font-serif text-primary uppercase tracking-[0.2em]">Featured Draw</span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-serif leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif leading-tight px-2">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways</span>
             </h1>
-            <p className="mt-5 mx-auto max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
+            <p className="mt-4 sm:mt-5 mx-auto max-w-2xl text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed px-2">
               Exciting giveaways of premium spirits, exclusive distillery tours, professional bar equipment and more...
             </p>
           </motion.div>
@@ -205,24 +205,24 @@ export function Home() {
 
                     {/* Bottom name on mobile */}
                     {featured && (
-                      <div className="absolute bottom-0 left-0 right-0 p-6 lg:hidden">
+                      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 lg:hidden">
                         <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>
-                        <h2 className="text-2xl font-serif text-white leading-tight">{featured.name}</h2>
+                        <h2 className="text-xl sm:text-2xl font-serif text-white leading-tight">{featured.name}</h2>
                       </div>
                     )}
                   </div>
 
                   {/* ── Info (2/5) ── */}
-                  <div className="lg:col-span-2 p-6 lg:p-8 flex flex-col justify-between gap-6 bg-card/95">
+                  <div className="lg:col-span-2 p-5 sm:p-6 lg:p-8 flex flex-col justify-between gap-5 sm:gap-6 bg-card/95">
                     <div className="space-y-4">
                       <div className="hidden lg:block">
                         <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>
-                        <h2 className="text-3xl xl:text-4xl font-serif text-white leading-tight">{featured?.name}</h2>
+                        <h2 className="text-2xl sm:text-3xl xl:text-4xl font-serif text-white leading-tight">{featured?.name}</h2>
                       </div>
 
                       <div className="flex items-baseline gap-3 pt-2 border-t border-border/40">
                         <span className="text-[10px] font-serif text-muted-foreground uppercase tracking-[0.2em]">Prize Value</span>
-                        <span className="text-3xl lg:text-4xl font-serif text-primary">{featured?.prizeValue}</span>
+                        <span className="text-2xl sm:text-3xl lg:text-4xl font-serif text-primary">{featured?.prizeValue}</span>
                       </div>
 
                       <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{featured?.description}</p>
@@ -250,20 +250,20 @@ export function Home() {
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between gap-3 pt-2 border-t border-border/40">
-                            <div>
+                          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/40">
+                            <div className="min-w-0">
                               <p className="text-[9px] font-serif text-muted-foreground uppercase tracking-[0.2em] mb-1">Draw Ends In</p>
                               <CountdownTimer daysToAdd={daysUntil(featured.drawDate)} />
                             </div>
                             <div className="text-right">
                               <p className="text-[9px] font-serif text-muted-foreground uppercase tracking-[0.2em] mb-1">Entry</p>
-                              <p className="text-xl font-serif text-white">£4.99</p>
+                              <p className="text-lg sm:text-xl font-serif text-white">£4.99</p>
                             </div>
                           </div>
 
                           <Button
                             size="lg"
-                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-[0.15em] h-12"
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-[0.15em] h-12 min-h-[48px]"
                             onClick={() => setLocation(`/giveaway/${featured.id}`)}
                           >
                             Enter Now <ArrowRight className="w-4 h-4 ml-2" />
@@ -303,10 +303,10 @@ export function Home() {
       </section>
 
       {/* ── All Draws ── */}
-      <section id="giveaways" className="py-24 max-w-7xl mx-auto px-6">
-        <div className="mb-16">
+      <section id="giveaways" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="mb-10 sm:mb-16">
           <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Live Raffles</p>
-          <h2 className="text-4xl font-serif mb-4">Active Draws</h2>
+          <h2 className="text-3xl sm:text-4xl font-serif mb-4">Active Draws</h2>
           <p className="text-muted-foreground max-w-xl">
             {giveaways && giveaways.length > 0
               ? `Enter for your chance to win.`
@@ -339,12 +339,19 @@ export function Home() {
                   transition={{ duration: 0.6, delay: idx * 0.1 }}
                   className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 hover:border-primary/40 transition-colors"
                 >
-                  {/* Left: bottle grid */}
+                  {/* Left: bottle grid — cap columns on mobile so bottles don't shrink to nothing */}
                   {(() => {
-                    const rowSize = Math.ceil(bottles.length / 2);
-                    const rows = [bottles.slice(0, rowSize), bottles.slice(rowSize)];
-                    return (
-                      <div className="flex flex-col gap-px bg-border/30">
+                    if (bottles.length === 0) return null;
+                    const desktopRowSize = Math.max(1, Math.ceil(bottles.length / 2));
+                    const mobileMaxCols = 4;
+                    const mobileRowSize = Math.max(1, Math.min(desktopRowSize, mobileMaxCols));
+                    const mobileRows: typeof bottles[] = [];
+                    for (let i = 0; i < bottles.length; i += mobileRowSize) {
+                      mobileRows.push(bottles.slice(i, i + mobileRowSize));
+                    }
+                    const desktopRows = [bottles.slice(0, desktopRowSize), bottles.slice(desktopRowSize)];
+                    const renderRows = (rows: typeof bottles[], rowSize: number) => (
+                      <>
                         {rows.map((row, rowIdx) => (
                           <div key={rowIdx} className="flex gap-px justify-center">
                             {row.map((bottle, i) => (
@@ -356,38 +363,48 @@ export function Home() {
                                 <img
                                   src={bottle.image}
                                   alt={bottle.name}
-                                  className="w-full h-full object-contain p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-105 transition-all duration-500"
+                                  className="w-full h-full object-contain p-1 sm:p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-105 transition-all duration-500"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                                <div className="absolute bottom-0 left-0 right-0 p-2 text-center">
+                                <div className="absolute bottom-0 left-0 right-0 p-1 sm:p-2 text-center">
                                   <p className="text-[9px] text-white/60 leading-tight line-clamp-1">{bottle.name}</p>
                                 </div>
                               </div>
                             ))}
                           </div>
                         ))}
-                      </div>
+                      </>
+                    );
+                    return (
+                      <>
+                        <div className="flex flex-col gap-px bg-border/30 sm:hidden">
+                          {renderRows(mobileRows, mobileRowSize)}
+                        </div>
+                        <div className="hidden sm:flex flex-col gap-px bg-border/30">
+                          {renderRows(desktopRows, desktopRowSize)}
+                        </div>
+                      </>
                     );
                   })()}
 
                   {/* Right: info panel */}
-                  <div className="p-8 lg:p-10 flex flex-col justify-between gap-8">
+                  <div className="p-5 sm:p-8 lg:p-10 flex flex-col justify-between gap-6 sm:gap-8">
                     <div className="space-y-4">
                       <div>
                         <span className="text-xs font-serif text-primary uppercase tracking-widest">Prize Selection</span>
-                        <h3 className="text-3xl font-serif mt-2 mb-1">{g.name}</h3>
-                        <p className="text-4xl font-serif text-primary">{g.prizeValue}</p>
+                        <h3 className="text-2xl sm:text-3xl font-serif mt-2 mb-1 break-words">{g.name}</h3>
+                        <p className="text-3xl sm:text-4xl font-serif text-primary">{g.prizeValue}</p>
                       </div>
                       <p className="text-muted-foreground text-sm leading-relaxed">{g.description}</p>
 
                       <BottleList bottles={bottles} />
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-5 sm:space-y-6">
                       <div>
-                        <div className="flex justify-between items-center text-xs font-serif mb-2">
-                          <span className="text-muted-foreground">{g.entryCount} / {g.maxEntries} tickets sold</span>
-                          <span className={remaining <= 20 ? 'text-red-400' : 'text-primary'}>{remaining} remaining</span>
+                        <div className="flex justify-between items-center text-xs font-serif mb-2 gap-2">
+                          <span className="text-muted-foreground truncate">{g.entryCount} / {g.maxEntries} sold</span>
+                          <span className={`shrink-0 ${remaining <= 20 ? 'text-red-400' : 'text-primary'}`}>{remaining} left</span>
                         </div>
                         <div className="h-2 bg-secondary rounded-full overflow-hidden">
                           <motion.div
@@ -400,7 +417,7 @@ export function Home() {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
                         <CountdownTimer daysToAdd={daysUntil(g.drawDate)} />
                         <div className="flex items-center gap-2 text-xs font-serif text-muted-foreground">
                           <Ticket className="w-3.5 h-3.5 text-primary" />
@@ -410,10 +427,10 @@ export function Home() {
 
                       <Button
                         size="lg"
-                        className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-sm font-serif"
+                        className="w-full h-14 min-h-[48px] bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-xs sm:text-sm font-serif px-3"
                         onClick={() => setLocation(`/giveaway/${g.id}`)}
                       >
-                        Enter the Draw — From £2.99
+                        <span className="truncate">Enter the Draw — From £2.99</span>
                       </Button>
                     </div>
                   </div>
@@ -425,15 +442,15 @@ export function Home() {
       </section>
 
       {/* ── How it Works ── */}
-      <section id="how-it-works" className="py-24 bg-card border-y border-border">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
+      <section id="how-it-works" className="py-16 sm:py-24 bg-card border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10 sm:mb-16">
             <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">The Process</p>
-            <h2 className="text-4xl font-serif mb-4">Simple. Transparent. Fair.</h2>
-            <p className="text-muted-foreground max-w-md mx-auto">Every draw follows the same iron-clad process, independently verified at each step.</p>
+            <h2 className="text-3xl sm:text-4xl font-serif mb-4">Simple. Transparent. Fair.</h2>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">Every draw follows the same iron-clad process, independently verified at each step.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-12">
             {[
               { icon: Ticket, step: '1', title: 'Secure Entry', body: 'Choose your prize and secure your entries. Each draw has a strict capacity limit to protect your odds.' },
               { icon: ShieldCheck, step: '2', title: 'Verified Draw', body: 'Winners are selected via a cryptographically secure RNG upon timer expiry, independently witnessed and recorded.' },
@@ -453,25 +470,25 @@ export function Home() {
       </section>
 
       {/* ── Recent Additions ── */}
-      <section id="winners" className="py-24 max-w-7xl mx-auto px-6">
+      <section id="winners" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-4 mb-4">
           <div className="h-px bg-border flex-1" />
-          <p className="text-xs font-serif text-primary uppercase tracking-widest px-4">Latest Draws</p>
+          <p className="text-xs font-serif text-primary uppercase tracking-widest px-2 sm:px-4 text-center">Latest Draws</p>
           <div className="h-px bg-border flex-1" />
         </div>
-        <h2 className="text-3xl font-serif text-center mb-16">Recent Additions to Collections</h2>
+        <h2 className="text-2xl sm:text-3xl font-serif text-center mb-10 sm:mb-16 px-2">Recent Additions to Collections</h2>
 
         {(() => {
           const recentGiveaways = [...(giveaways ?? [])].reverse().slice(0, 4);
           if (giveawaysLoading) return (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="h-48 bg-card border border-border/30 rounded-sm animate-pulse" />
               ))}
             </div>
           );
           return (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {recentGiveaways.map((g, idx) => {
                 const days = daysUntil(g.drawDate);
                 const img = getGiveawayImage(g.id);
@@ -482,7 +499,7 @@ export function Home() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    className="p-6 bg-card border border-border/50 rounded-sm text-center space-y-4 relative overflow-hidden cursor-pointer hover:border-primary/40 transition-colors"
+                    className="p-4 sm:p-6 bg-card border border-border/50 rounded-sm text-center space-y-3 sm:space-y-4 relative overflow-hidden cursor-pointer hover:border-primary/40 transition-colors"
                     onClick={() => setLocation(`/giveaway/${g.id}`)}
                   >
                     <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-primary/20 to-transparent opacity-50" />
@@ -509,17 +526,17 @@ export function Home() {
       </section>
 
       {/* ── Why PrizePour ── */}
-      <section className="py-24 bg-card border-y border-border">
-        <div className="max-w-5xl mx-auto px-6">
+      <section className="py-16 sm:py-24 bg-card border-y border-border">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div>
-            <div className="mb-12 text-center">
+            <div className="mb-10 sm:mb-12 text-center">
               <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Why Us</p>
-              <h2 className="text-4xl font-serif mb-6 leading-tight">The collector's edge you've been looking for.</h2>
-              <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-serif mb-4 sm:mb-6 leading-tight">The collector's edge you've been looking for.</h2>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                 PrizePour was built by enthusiasts for enthusiasts. We source direct from authorised retailers — no grey-market prizes, ever. Every draw is independently verified and every winner notified within 24 hours.
               </p>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
                 {[
                   { icon: Lock, title: 'Cryptographic Draws', body: 'Winners selected by auditable RNG — no human involvement possible.' },
                   { icon: ShieldCheck, title: 'Verified Prizes', body: 'Every prize sourced from authorised retailers and checked before entering the draw.' },
@@ -542,14 +559,14 @@ export function Home() {
       </section>
 
       {/* ── About / FAQ ── */}
-      <section id="about" className="py-24 max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
+      <section id="about" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-10 sm:mb-16">
           <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">About PrizePour</p>
-          <h2 className="text-4xl font-serif mb-4">Frequently Asked Questions</h2>
-          <p className="text-muted-foreground max-w-md mx-auto">Everything you need to know before entering your first draw.</p>
+          <h2 className="text-3xl sm:text-4xl font-serif mb-4">Frequently Asked Questions</h2>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">Everything you need to know before entering your first draw.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
           {FAQS.map((faq, i) => (
             <motion.div
               key={i}
@@ -557,16 +574,16 @@ export function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-card border border-border rounded-sm p-6"
+              className="bg-card border border-border rounded-sm p-5 sm:p-6"
             >
-              <h4 className="font-serif text-lg mb-3 text-foreground">{faq.q}</h4>
+              <h4 className="font-serif text-base sm:text-lg mb-3 text-foreground">{faq.q}</h4>
               <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
             </motion.div>
           ))}
         </div>
 
-        <div className="text-center mt-16">
-          <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider" onClick={() => scrollTo('giveaways')}>
+        <div className="text-center mt-10 sm:mt-16">
+          <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider min-h-[48px]" onClick={() => scrollTo('giveaways')}>
             Browse Active Draws
           </Button>
         </div>

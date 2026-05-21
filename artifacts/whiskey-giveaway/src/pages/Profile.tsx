@@ -165,7 +165,7 @@ export function Profile() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <div className="pt-36 pb-24 max-w-2xl mx-auto px-6">
+      <div className="pt-24 sm:pt-28 md:pt-36 pb-16 sm:pb-24 max-w-2xl mx-auto px-4 sm:px-6">
         <AnimatePresence mode="wait">
 
           {/* ── Signed-in view ── */}
@@ -284,7 +284,7 @@ export function Profile() {
                   <User className="w-7 h-7 text-primary" />
                 </div>
                 <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Create Account</p>
-                <h1 className="text-4xl font-serif mb-3">Join PrizePour</h1>
+                <h1 className="text-3xl sm:text-4xl font-serif mb-3">Join PrizePour</h1>
                 <p className="text-muted-foreground max-w-sm">
                   Save your details, track rewards, and enter draws faster. Must be 18 or older to register.
                 </p>

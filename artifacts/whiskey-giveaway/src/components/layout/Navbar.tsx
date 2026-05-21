@@ -47,9 +47,9 @@ export function Navbar({ onScrollTo }: NavbarProps) {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="max-w-7xl mx-auto px-6 h-28 flex items-center justify-between">
-        <button onClick={() => setLocation('/')} className="flex items-center">
-          <img src={logoSrc} alt="PrizePour" className="h-28 w-auto object-contain" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 md:h-28 flex items-center justify-between">
+        <button onClick={() => setLocation('/')} className="flex items-center" aria-label="PrizePour home">
+          <img src={logoSrc} alt="PrizePour" className="h-12 sm:h-16 md:h-28 w-auto object-contain" />
         </button>
 
         <div className="hidden md:flex items-center gap-8">
@@ -64,10 +64,10 @@ export function Navbar({ onScrollTo }: NavbarProps) {
           ))}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <button
             onClick={() => { setMobileOpen(false); setLocation('/profile'); }}
-            className="w-9 h-9 rounded-full border border-border hover:border-primary transition-colors flex items-center justify-center text-foreground/80 hover:text-primary"
+            className="w-10 h-10 sm:w-9 sm:h-9 rounded-full border border-border hover:border-primary transition-colors flex items-center justify-center text-foreground/80 hover:text-primary"
             aria-label="Profile"
           >
             {initials ? (
@@ -82,8 +82,10 @@ export function Navbar({ onScrollTo }: NavbarProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-foreground"
+            className="md:hidden text-foreground h-10 w-10"
             onClick={() => setMobileOpen(o => !o)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </Button>
@@ -92,19 +94,19 @@ export function Navbar({ onScrollTo }: NavbarProps) {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-background/95 backdrop-blur-md border-b border-border px-6 pb-6 space-y-4">
+        <div className="md:hidden bg-background/95 backdrop-blur-md border-b border-border px-4 sm:px-6 pb-4 pt-2 space-y-1">
           {links.map(l => (
             <button
               key={l.id}
               onClick={() => handleNav(l.id)}
-              className="block w-full text-left text-sm font-medium tracking-widest text-foreground/80 hover:text-primary transition-colors uppercase py-2"
+              className="block w-full text-left text-sm font-medium tracking-widest text-foreground/80 hover:text-primary transition-colors uppercase py-3 min-h-[44px]"
             >
               {l.label}
             </button>
           ))}
           <button
             onClick={() => { setMobileOpen(false); setLocation('/profile'); }}
-            className="block w-full text-left text-sm font-medium tracking-widest text-foreground/80 hover:text-primary transition-colors uppercase py-2"
+            className="block w-full text-left text-sm font-medium tracking-widest text-foreground/80 hover:text-primary transition-colors uppercase py-3 min-h-[44px]"
           >
             {initials ? `My Profile (${initials})` : 'Create Profile'}
           </button>

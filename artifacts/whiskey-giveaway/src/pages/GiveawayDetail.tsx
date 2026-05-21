@@ -206,7 +206,7 @@ export function GiveawayDetail() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
 
-      <div className="flex-1 pt-36 pb-12 max-w-4xl mx-auto w-full px-6">
+      <div className="flex-1 pt-24 sm:pt-28 md:pt-36 pb-12 max-w-4xl mx-auto w-full px-4 sm:px-6">
         <Button variant="ghost" className="mb-6 -ml-4 text-muted-foreground hover:text-foreground" onClick={() => setLocation('/')}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Giveaways
         </Button>
@@ -249,7 +249,7 @@ export function GiveawayDetail() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="relative overflow-hidden bg-gradient-to-r from-primary/15 via-primary/10 to-amber-600/10 border border-primary/40 rounded-sm px-6 py-4"
+                  className="relative overflow-hidden bg-gradient-to-r from-primary/15 via-primary/10 to-amber-600/10 border border-primary/40 rounded-sm px-4 sm:px-6 py-4"
                 >
                   <div className="absolute top-0 left-0 w-1 h-full bg-primary rounded-l-sm" />
                   <div className="flex items-center gap-4">
@@ -271,7 +271,7 @@ export function GiveawayDetail() {
                 </motion.div>
               )}
 
-              <div className="grid md:grid-cols-2 gap-8 bg-card border border-border p-6 rounded-sm shadow-xl">
+              <div className="grid md:grid-cols-2 gap-6 sm:gap-8 bg-card border border-border p-4 sm:p-6 rounded-sm shadow-xl">
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
                   {(() => {
                     const bottles = getGiveawayBottles(giveaway.id);
@@ -409,8 +409,8 @@ export function GiveawayDetail() {
                 <p className="text-muted-foreground">Please provide your legal name for the official draw.</p>
               </div>
 
-              <div className="bg-card border border-border p-8 rounded-sm space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="bg-card border border-border p-5 sm:p-8 rounded-sm space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>First Name</Label>
                     <Input value={details.firstName} onChange={e => setDetails({...details, firstName: e.target.value})} placeholder="James" />
@@ -482,7 +482,7 @@ export function GiveawayDetail() {
                 </p>
               </div>
 
-              <div className="bg-card border border-border p-8 rounded-sm space-y-6">
+              <div className="bg-card border border-border p-5 sm:p-8 rounded-sm space-y-6">
                 {quizAttempts > 0 && (
                   <motion.div
                     key={`attempt-${quizAttempts}`}
@@ -557,7 +557,7 @@ export function GiveawayDetail() {
                 <p className="text-muted-foreground text-sm">Review your details and proceed to secure checkout.</p>
               </div>
 
-              <div className="bg-card border border-border rounded-sm p-8 space-y-6">
+              <div className="bg-card border border-border rounded-sm p-5 sm:p-8 space-y-6">
                 {/* Entrant summary */}
                 <div className="flex items-center gap-3 pb-5 border-b border-border/50">
                   <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
@@ -630,7 +630,7 @@ export function GiveawayDetail() {
               </motion.div>
 
               <div>
-                <h2 className="text-4xl font-serif text-primary mb-3">You're In!</h2>
+                <h2 className="text-3xl sm:text-4xl font-serif text-primary mb-3">You're In!</h2>
                 <p className="text-muted-foreground">Your entry for <span className="text-foreground font-serif">{giveaway.name}</span> has been confirmed.</p>
               </div>
 

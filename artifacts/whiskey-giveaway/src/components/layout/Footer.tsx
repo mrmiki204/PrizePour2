@@ -7,13 +7,13 @@ export function Footer() {
   const nav = (path: string) => setLocation(path);
 
   return (
-    <footer className="bg-card border-t border-border py-16">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
-        <div className="col-span-1 md:col-span-2 space-y-6">
+    <footer className="bg-card border-t border-border py-12 sm:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12">
+        <div className="col-span-1 sm:col-span-2 space-y-4 sm:space-y-6">
           <div className="flex items-center">
-            <img src={logoSrc} alt="PrizePour" className="h-16 w-auto object-contain" />
+            <img src={logoSrc} alt="PrizePour" className="h-12 sm:h-16 w-auto object-contain" />
           </div>
-          <p className="text-muted-foreground max-w-sm">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-sm">
             Exclusive prize draws for rare spirits, premium bar equipment, glassware, and more. A transparent, honest platform for collectors and enthusiasts.
           </p>
         </div>
@@ -38,7 +38,7 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-border/50 text-center md:text-left text-sm text-muted-foreground flex flex-col md:flex-row justify-between items-center gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-border/50 text-center md:text-left text-xs sm:text-sm text-muted-foreground flex flex-col md:flex-row justify-between items-center gap-4">
         <p>&copy; {new Date().getFullYear()} PrizePour. All rights reserved.</p>
         <div className="flex gap-6">
           <button onClick={() => nav('/terms')} className="hover:text-primary transition-colors">Terms</button>

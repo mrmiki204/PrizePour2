@@ -5,11 +5,11 @@ export function Terms() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
-      <main className="flex-1 pt-32 pb-24">
-        <div className="max-w-3xl mx-auto px-6 space-y-10">
+      <main className="flex-1 pt-20 sm:pt-24 md:pt-32 pb-16 sm:pb-24">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-8 sm:space-y-10">
           <div className="space-y-3">
             <p className="text-xs font-serif text-primary uppercase tracking-widest">Legal</p>
-            <h1 className="text-4xl font-serif">Competition Terms &amp; Conditions</h1>
+            <h1 className="text-3xl sm:text-4xl font-serif">Competition Terms &amp; Conditions</h1>
             <p className="text-muted-foreground text-sm font-serif">Effective Date: 16 May 2026</p>
             <p className="text-muted-foreground text-sm leading-relaxed">
               These Terms &amp; Conditions govern participation in competitions operated by Prize Pour ("Prize Pour", "we", "our", "us").

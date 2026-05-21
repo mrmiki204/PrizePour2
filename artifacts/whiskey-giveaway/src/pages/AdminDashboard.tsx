@@ -324,15 +324,15 @@ export function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
-      <div className="flex-1 pt-28 pb-16 max-w-7xl mx-auto w-full px-6 space-y-10">
+      <div className="flex-1 pt-20 sm:pt-24 md:pt-28 pb-16 max-w-7xl mx-auto w-full px-4 sm:px-6 space-y-8 sm:space-y-10">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-serif tracking-tight">Admin Dashboard</h1>
-            <p className="text-muted-foreground text-sm font-serif mt-1 uppercase tracking-widest">Draw & Entry Management</p>
+            <h1 className="text-2xl sm:text-3xl font-serif tracking-tight">Admin Dashboard</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm font-serif mt-1 uppercase tracking-widest">Draw & Entry Management</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               variant="outline"
               size="sm"
@@ -385,7 +385,7 @@ export function AdminDashboard() {
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden mb-4"
               >
-                <div className="bg-card border border-primary/30 rounded-sm p-6 mb-4">
+                <div className="bg-card border border-primary/30 rounded-sm p-4 sm:p-6 mb-4">
                   <h3 className="font-serif text-base mb-4 text-primary">New Giveaway Draw</h3>
                   <GiveawayForm
                     initial={emptyForm()}
@@ -410,7 +410,8 @@ export function AdminDashboard() {
                 <Button size="sm" variant="outline" onClick={() => setShowCreateForm(true)}>Create first draw</Button>
               </div>
             ) : (
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-[720px]">
                 <thead>
                   <tr className="border-b border-border bg-secondary/20">
                     <th className="text-left px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Draw</th>
@@ -505,6 +506,7 @@ export function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </div>
@@ -513,7 +515,8 @@ export function AdminDashboard() {
         <div>
           <h2 className="text-lg font-serif mb-4">Revenue Breakdown</h2>
           <div className="bg-card border border-border rounded-sm overflow-hidden">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[560px]">
               <thead>
                 <tr className="border-b border-border bg-secondary/20">
                   <th className="text-left px-5 py-3 font-serif text-xs uppercase tracking-widest text-muted-foreground">Giveaway</th>
@@ -533,12 +536,13 @@ export function AdminDashboard() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
         {/* ── Entries Table ── */}
         <div>
-          <div className="flex items-center justify-between mb-4 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3 sm:gap-4">
             <h2 className="text-lg font-serif shrink-0">
               All Entries
               {filterGiveaway && (
