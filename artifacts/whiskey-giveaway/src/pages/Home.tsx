@@ -437,7 +437,6 @@ function PatronSpotlight() {
             className="flex flex-col items-center"
           >
             <p className="font-serif text-base sm:text-lg text-white tracking-wide drop-shadow-lg">{bottle.name}</p>
-            <p className="font-serif text-[11px] text-emerald-300/90 uppercase tracking-[0.25em]">Worth {bottle.value}</p>
           </motion.div>
         </AnimatePresence>
       </div>
