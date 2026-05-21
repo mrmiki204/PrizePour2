@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package, ChevronDown, ChevronUp, Quote, Gift } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Trophy, ShieldCheck, Users, Ticket, Star, Lock, Package, ChevronDown, ChevronUp, Quote, Gift } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
 import bushmillsHeroImg from '@/assets/images/bushmills-hero.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES } from '@/data/giveaways';
@@ -548,14 +548,12 @@ export function Home() {
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    if (featuredGiveaways.length <= 1) return;
-    const id = setInterval(() => {
-      setDirection(1);
-      setFeaturedIndex(i => (i + 1) % featuredGiveaways.length);
-    }, 5000);
-    return () => clearInterval(id);
-  }, [featuredGiveaways]);
+  const goToSlide = (i: number) => {
+    setDirection(i > featuredIndex ? 1 : -1);
+    setFeaturedIndex(((i % featuredGiveaways.length) + featuredGiveaways.length) % featuredGiveaways.length);
+  };
+  const nextSlide = () => goToSlide(featuredIndex + 1);
+  const prevSlide = () => goToSlide(featuredIndex - 1);
 
   const featured = featuredGiveaways[featuredIndex];
   const isBushmillsFeatured = featured?.id === BUSHMILLS_ID;
@@ -779,16 +777,35 @@ export function Home() {
               </AnimatePresence>
             </div>
 
-            {/* Carousel controls */}
+            {/* Carousel arrows (overlay on slide) */}
+            {featuredGiveaways.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={prevSlide}
+                  aria-label="Previous featured draw"
+                  className="absolute top-1/2 left-2 sm:left-3 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-primary text-white hover:text-primary-foreground backdrop-blur border border-white/15 hover:border-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
+                >
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={nextSlide}
+                  aria-label="Next featured draw"
+                  className="absolute top-1/2 right-2 sm:right-3 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-primary text-white hover:text-primary-foreground backdrop-blur border border-white/15 hover:border-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
+                >
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+              </>
+            )}
+
+            {/* Carousel dots */}
             {featuredGiveaways.length > 1 && (
               <div className="flex items-center justify-center gap-2 mt-6">
                 {featuredGiveaways.map((_, i) => (
                   <button
                     key={i}
-                    onClick={() => {
-                      setDirection(i > featuredIndex ? 1 : -1);
-                      setFeaturedIndex(i);
-                    }}
+                    onClick={() => goToSlide(i)}
                     aria-label={`Show featured draw ${i + 1}`}
                     className={`rounded-full transition-all duration-300 h-1.5 ${i === featuredIndex ? 'bg-primary w-8' : 'bg-primary/30 hover:bg-primary/50 w-2'}`}
                   />
