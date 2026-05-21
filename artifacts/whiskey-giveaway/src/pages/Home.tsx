@@ -85,6 +85,94 @@ const slideVariants = {
   exit: (dir: number) => ({ x: dir < 0 ? '100%' : '-100%', opacity: 0 }),
 };
 
+// ── Cinematic backdrop: floating dust particles + light sweep + vignette ──
+function CinematicBackdrop({ accent = 'amber' }: { accent?: 'amber' | 'emerald' }) {
+  const particles = useMemo(
+    () => Array.from({ length: 18 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      delay: Math.random() * 8,
+      duration: 12 + Math.random() * 10,
+      size: 1 + Math.random() * 2.5,
+      drift: -20 + Math.random() * 40,
+    })),
+    [],
+  );
+  const sweepColor = accent === 'emerald'
+    ? 'linear-gradient(115deg, transparent 35%, rgba(52,211,153,0.10) 50%, transparent 65%)'
+    : 'linear-gradient(115deg, transparent 35%, rgba(234,146,55,0.12) 50%, transparent 65%)';
+  const particleColor = accent === 'emerald' ? 'bg-emerald-200/40' : 'bg-amber-200/40';
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {/* Animated light sweep */}
+      <motion.div
+        className="absolute -inset-x-1/4 top-0 h-full"
+        style={{ background: sweepColor, mixBlendMode: 'screen' }}
+        animate={{ x: ['-30%', '30%', '-30%'] }}
+        transition={{ duration: 14, ease: 'easeInOut', repeat: Infinity }}
+      />
+      {/* Floating dust particles */}
+      {particles.map(p => (
+        <motion.span
+          key={p.id}
+          className={`absolute bottom-0 rounded-full ${particleColor} blur-[1px]`}
+          style={{ left: `${p.left}%`, width: p.size, height: p.size }}
+          initial={{ y: 0, opacity: 0 }}
+          animate={{ y: -600, x: p.drift, opacity: [0, 0.7, 0] }}
+          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: 'linear' }}
+        />
+      ))}
+      {/* Soft smoke/fog gradient */}
+      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+      {/* Cinematic vignette */}
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%)' }} />
+    </div>
+  );
+}
+
+// ── Live activity ticker: rotating social-proof messages ──
+const ACTIVITY_MESSAGES = [
+  { icon: '🥃', text: 'John from Belfast just entered the Clonakilty draw' },
+  { icon: '⚡', text: '15 tickets sold in the last hour' },
+  { icon: '🌵', text: 'Sarah from Manchester won the Patrón Reposado bundle' },
+  { icon: '🏆', text: 'Over £42,000 in prizes awarded this year' },
+  { icon: '🎟️', text: 'James from Dublin just bought 5 tickets' },
+  { icon: '✨', text: 'Bushmills Distillery Tour — only 215 tickets left' },
+];
+
+function LiveActivityTicker() {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setIndex(i => (i + 1) % ACTIVITY_MESSAGES.length), 3800);
+    return () => clearInterval(id);
+  }, []);
+  const msg = ACTIVITY_MESSAGES[index];
+  return (
+    <div className="mt-6 flex justify-center px-2">
+      <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-primary/20 bg-card/60 backdrop-blur-md shadow-[0_0_30px_-10px_rgba(234,146,55,0.4)] max-w-full">
+        <span className="relative flex h-2 w-2 shrink-0">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60 animate-ping" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+        </span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={index}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.35 }}
+            className="text-[11px] sm:text-xs font-serif text-muted-foreground tracking-wide truncate"
+          >
+            <span className="mr-1.5">{msg.icon}</span>
+            {msg.text}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
 export function Home() {
   const [, setLocation] = useLocation();
   const { data: giveaways, isLoading: giveawaysLoading } = useListGiveaways();
@@ -126,6 +214,14 @@ export function Home() {
 
   const featured = featuredGiveaways[featuredIndex];
   const isBushmillsFeatured = featured?.id === BUSHMILLS_ID;
+  const isPatronFeatured = featured?.id === 2;
+  const accent: 'amber' | 'emerald' = isPatronFeatured ? 'emerald' : 'amber';
+  const accentText = isPatronFeatured ? 'text-emerald-300' : 'text-primary';
+  const accentBorder = isPatronFeatured ? 'border-emerald-400/40' : 'border-primary/30';
+  const accentDot = isPatronFeatured ? 'bg-emerald-400' : 'bg-primary';
+  const accentBgSoft = isPatronFeatured ? 'bg-emerald-500/10' : 'bg-primary/10';
+  const remainingTickets = featured ? featured.maxEntries - featured.entryCount : 0;
+  const isUrgent = remainingTickets > 0 && remainingTickets <= 50;
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
@@ -152,9 +248,17 @@ export function Home() {
       {/* ── Hero / Featured Draw ── */}
       <section className="relative pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img src={heroImg} alt="" className="w-full h-full object-cover opacity-20" />
+          <motion.img
+            src={heroImg}
+            alt=""
+            className="w-full h-full object-cover opacity-20"
+            initial={{ scale: 1 }}
+            animate={{ scale: 1.08 }}
+            transition={{ duration: 24, ease: 'easeInOut', repeat: Infinity, repeatType: 'reverse' }}
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background" />
         </div>
+        <CinematicBackdrop accent={accent} />
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div
@@ -163,9 +267,11 @@ export function Home() {
             transition={{ duration: 0.6 }}
             className="text-center mb-8"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 mb-4">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-serif text-primary uppercase tracking-[0.2em]">Featured Draw</span>
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${accentBorder} ${accentBgSoft} mb-4 transition-colors duration-700`}>
+              <span className={`w-2 h-2 rounded-full ${accentDot} animate-pulse`} />
+              <span className={`text-[10px] font-serif ${accentText} uppercase tracking-[0.2em]`}>
+                {isPatronFeatured ? 'Featured Tequila Draw' : 'Featured Draw'}
+              </span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif leading-tight px-2">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways</span>
@@ -212,13 +318,33 @@ export function Home() {
                     <div className="absolute inset-0 lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-card/95" />
 
                     {/* Top badges */}
-                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start gap-2">
-                      <span className="bg-primary text-primary-foreground text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg">
-                        Live Draw
-                      </span>
+                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start gap-2 z-10">
+                      <div className="flex flex-col gap-2 items-start">
+                        <span className={`text-primary-foreground text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg ${isPatronFeatured ? 'bg-emerald-500' : 'bg-primary'}`}>
+                          Live Draw
+                        </span>
+                        {isUrgent ? (
+                          <motion.span
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: [1, 1.05, 1] }}
+                            transition={{ scale: { duration: 1.4, repeat: Infinity } }}
+                            className="bg-red-600/95 text-white text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg border border-red-300/40"
+                          >
+                            Only {remainingTickets} Tickets Left
+                          </motion.span>
+                        ) : (
+                          <span className="bg-black/70 backdrop-blur text-white/90 text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border border-white/10">
+                            {isBushmillsFeatured ? 'VIP Experience Draw' : 'Limited Entries'}
+                          </span>
+                        )}
+                      </div>
                       {featured && (
                         <span className="bg-black/70 backdrop-blur text-white text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border border-white/10">
-                          {isBushmillsFeatured ? 'Luxury Experience' : `${getGiveawayBottles(featured.id).length} Bottles`}
+                          {isBushmillsFeatured
+                            ? 'Luxury Experience'
+                            : isPatronFeatured
+                              ? `${getGiveawayBottles(featured.id).length} Patrón Bottles`
+                              : `${getGiveawayBottles(featured.id).length} Bottles`}
                         </span>
                       )}
                     </div>
@@ -281,13 +407,21 @@ export function Home() {
                             </div>
                           </div>
 
-                          <Button
-                            size="lg"
-                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-[0.15em] h-12 min-h-[48px]"
-                            onClick={() => setLocation(isBushmillsFeatured ? '/experiences/bushmills' : `/giveaway/${featured.id}`)}
-                          >
-                            Enter Now <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
+                          <div className="relative">
+                            <motion.div
+                              aria-hidden
+                              className={`absolute -inset-1 rounded-md blur-md ${isPatronFeatured ? 'bg-emerald-500/60' : 'bg-primary/60'}`}
+                              animate={{ opacity: [0.35, 0.75, 0.35] }}
+                              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                            />
+                            <Button
+                              size="lg"
+                              className={`relative w-full text-primary-foreground font-semibold uppercase tracking-[0.15em] h-14 min-h-[52px] shadow-[0_8px_30px_-6px_rgba(234,146,55,0.55)] hover:translate-y-[-1px] transition-transform ${isPatronFeatured ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-primary hover:bg-primary/90'}`}
+                              onClick={() => setLocation(isBushmillsFeatured ? '/experiences/bushmills' : `/giveaway/${featured.id}`)}
+                            >
+                              Buy Tickets — Enter Now <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </div>
                         </div>
                       );
                     })()}
@@ -312,6 +446,8 @@ export function Home() {
                 ))}
               </div>
             )}
+
+            <LiveActivityTicker />
 
             <div className="flex justify-center mt-4">
               <Button variant="ghost" className="text-muted-foreground hover:text-primary text-xs font-serif uppercase tracking-[0.2em]" onClick={() => scrollTo('giveaways')}>

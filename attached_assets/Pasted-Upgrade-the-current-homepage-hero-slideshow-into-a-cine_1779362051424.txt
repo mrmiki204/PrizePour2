@@ -1,0 +1,157 @@
+Upgrade the current homepage hero slideshow into a cinematic luxury alcohol experience focused on both premium whiskey and ultra-premium tequila collections while keeping the existing PrizePour branding and structure.
+
+The homepage should feel like a blend of:
+
+* a luxury whiskey lounge
+* a premium tequila club
+* a high-end lifestyle brand
+* a modern VIP members experience
+
+Main Goal:
+Increase ticket sales, emotional engagement, and trust by creating a visually immersive premium experience that immediately grabs attention and makes users want to enter draws.
+
+Visual Direction:
+
+* Dark luxury aesthetic with:
+
+  * black
+  * charcoal
+  * deep amber
+  * warm gold
+  * premium tequila green accents
+* Add cinematic contrast and layered lighting.
+* Create a rich atmosphere inspired by luxury alcohol advertisements and exclusive members clubs.
+
+Hero Slideshow Upgrades:
+
+Atmosphere & Effects:
+
+* Add cinematic whiskey lounge atmosphere.
+* Add luxury tequila bar inspiration.
+* Include:
+
+  * smoke/fog overlays
+  * floating dust particles
+  * moving reflections
+  * ambient glow lighting
+  * subtle animated light sweeps
+  * premium glass reflections
+* Add cinematic depth using:
+
+  * layered blur effects
+  * shadows
+  * glassmorphism cards
+  * glowing borders
+  * soft vignette overlays
+
+Animations:
+
+* Add slow zoom background animations.
+* Add floating bottle animations.
+* Add elegant fade/slide transitions.
+* Add glowing hover effects on buttons.
+* Add subtle movement to background lighting.
+* Add animated bottle highlights for premium products.
+* Keep animations smooth, immersive, and lightweight.
+
+Tequila Patrón Improvements:
+
+* Create dedicated premium slides featuring Patrón collections.
+* Highlight:
+
+  * Patrón Silver
+  * Patrón Reposado
+  * Patrón Añejo
+  * Patrón El Alto
+  * Patrón Reserva
+* Use luxury tequila styling:
+
+  * emerald/green accents
+  * gold foil-inspired highlights
+  * premium agave-inspired visuals
+  * warm sunset tones
+* Add premium tequila marketing copy such as:
+
+  * “Win the ultimate Patrón collection”
+  * “Luxury tequila experiences”
+  * “Exclusive tequila prize draws”
+  * “Premium bottles for true collectors”
+* Add featured bottle spotlight animations.
+* Make tequila slides visually distinct while still matching overall branding.
+
+Whiskey Improvements:
+
+* Keep strong whiskey lounge styling with:
+
+  * warm amber lighting
+  * dark oak aesthetics
+  * premium distillery atmosphere
+* Highlight luxury whiskey collections and VIP distillery experiences.
+* Include cinematic bottle showcase sections.
+
+Hero Content Improvements:
+
+* Improve text hierarchy and readability.
+* Use larger premium typography.
+* Add emotionally engaging headlines.
+* Add urgency messaging:
+
+  * “Ending Soon”
+  * “Limited Entries”
+  * “Only 42 Tickets Left”
+  * “VIP Experience Draw”
+* Add prize value displays.
+* Add countdown timers.
+* Add “tickets remaining” indicators.
+
+CTA Improvements:
+
+* Make “Buy Tickets” the main focal point.
+* Add glowing premium CTA buttons.
+* Add hover animations and pulse effects.
+* Increase mobile button size for better conversions.
+
+Trust & Conversion Features:
+
+* Add recent winner banners.
+* Add live activity notifications:
+
+  * “John from Belfast just entered”
+  * “15 tickets sold in the last hour”
+* Add customer reviews/testimonials.
+* Add total prizes awarded section.
+* Add social proof counters.
+
+Mobile Optimisation:
+
+* Fully optimise hero slideshow for mobile.
+* Ensure responsive layouts across:
+
+  * phones
+  * tablets
+  * desktop
+* Stack hero content properly on smaller screens.
+* Reduce clutter on mobile while preserving luxury feel.
+* Optimise animation performance for mobile devices.
+
+Technical Requirements:
+
+* Use React + Tailwind best practices.
+* Keep animations lightweight and performant.
+* Ensure accessibility and responsive design.
+* Preserve current branding and website structure.
+* Improve overall polish, smoothness, and visual quality significantly.
+
+The final result should feel like:
+
+* a luxury alcohol members club
+* a premium tequila and whiskey experience platform
+* cinematic, immersive, modern, and highly trustworthy
+* visually addictive and conversion-focused
+
+After completion:
+
+* summarise all slideshow and hero improvements made
+* explain all conversion-focused upgrades
+* explain all tequila Patrón improvements added
+* identify any sections that may still need manual polishing
