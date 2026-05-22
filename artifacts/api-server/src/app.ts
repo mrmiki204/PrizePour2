@@ -2,6 +2,9 @@ import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { existsSync } from "node:fs";
 import router from "./routes/index.js";
 import { logger } from "./lib/logger.js";
 import { WebhookHandlers } from "./webhookHandlers.js";
@@ -70,5 +73,41 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+// ── Production: serve built React frontend from whiskey-giveaway/dist/public ──
+// In local Replit dev the Vite dev server is served separately by the workspace
+// proxy, so we only enable this in production (e.g. Railway).
+if (process.env["NODE_ENV"] === "production") {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  // Bundled server lives at artifacts/api-server/dist/index.mjs
+  // Frontend build is at artifacts/whiskey-giveaway/dist/public
+  const clientDist = path.resolve(
+    here,
+    "..",
+    "..",
+    "whiskey-giveaway",
+    "dist",
+    "public",
+  );
+  const indexHtml = path.join(clientDist, "index.html");
+
+  if (existsSync(indexHtml)) {
+    app.use(express.static(clientDist, { index: false, maxAge: "1h" }));
+
+    // SPA fallback: any non-/api GET returns index.html so client-side
+    // routes (wouter) work on hard refresh.
+    app.get(/^(?!\/api\/).*/, (req, res, next) => {
+      if (req.method !== "GET") return next();
+      res.sendFile(indexHtml);
+    });
+
+    logger.info({ clientDist }, "Serving built frontend in production");
+  } else {
+    logger.warn(
+      { clientDist },
+      "Frontend build not found — run the whiskey-giveaway build before starting in production",
+    );
+  }
+}
 
 export default app;

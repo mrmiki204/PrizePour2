@@ -4,22 +4,29 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-const rawPort = process.env.PORT;
+// PORT and BASE_PATH are required by the Replit dev workflow (which sets them
+// per-artifact for the shared proxy). For production builds (e.g. Railway) the
+// frontend is served by the Express API server at the root path, so we default
+// BASE_PATH to "/" and skip the PORT requirement.
+const isProdBuild =
+  process.env.NODE_ENV === "production" ||
+  process.argv.some((a) => a === "build");
 
-if (!rawPort) {
+const rawPort = process.env.PORT;
+let port = 5173;
+if (rawPort) {
+  const parsed = Number(rawPort);
+  if (Number.isNaN(parsed) || parsed <= 0) {
+    throw new Error(`Invalid PORT value: "${rawPort}"`);
+  }
+  port = parsed;
+} else if (!isProdBuild) {
   throw new Error(
     "PORT environment variable is required but was not provided.",
   );
 }
 
-const port = Number(rawPort);
-
-if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${rawPort}"`);
-}
-
-const basePath = process.env.BASE_PATH;
-
+const basePath = process.env.BASE_PATH ?? (isProdBuild ? "/" : "");
 if (!basePath) {
   throw new Error(
     "BASE_PATH environment variable is required but was not provided.",
