@@ -5,7 +5,10 @@ nixPkgs = ["nodejs", "pnpm"]
 cmds = ["pnpm install --no-frozen-lockfile"]
 
 [phases.build]
-cmds = ["pnpm build"]
+cmds = [
+  "pnpm --filter ./client build",
+  "pnpm --filter ./server build"
+]
 
 [start]
-cmd = "pnpm --filter @workspace/api-server start"
+cmd = "pnpm --filter ./server start"
