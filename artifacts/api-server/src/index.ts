@@ -1,5 +1,6 @@
 import app from "./app.js";
 import { logger } from "./lib/logger.js";
+import { ensureSchema } from "./lib/ensureSchema.js";
 import { runMigrations } from "stripe-replit-sync";
 import { getStripeSync } from "./stripeClient.js";
 import { db, giveawaysTable } from "@workspace/db";
@@ -22,10 +23,16 @@ async function seedGiveaways() {
   try {
     const existing = await db.select().from(giveawaysTable);
     if (existing.length > 0) {
+      const activeCount = existing.filter((g) => g.isActive).length;
       logger.info(
-        { count: existing.length },
+        { count: existing.length, activeCount },
         "Giveaways already seeded — skipping",
       );
+      if (activeCount === 0) {
+        logger.warn(
+          "Seeded giveaways exist but none are active — homepage Active Draws section will be empty",
+        );
+      }
       return;
     }
 
@@ -92,6 +99,7 @@ async function initStripe() {
   }
 }
 
+await ensureSchema();
 await seedGiveaways();
 await initStripe();
 
