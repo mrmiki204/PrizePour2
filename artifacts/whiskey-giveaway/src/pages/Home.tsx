@@ -636,7 +636,7 @@ export function Home() {
                   type="button"
                   onClick={prevSlide}
                   aria-label="Previous featured draw"
-                  className="absolute top-1/2 left-2 sm:left-3 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-primary text-white hover:text-primary-foreground backdrop-blur border border-white/15 hover:border-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
+                  className="absolute top-1/2 left-2 sm:left-3 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-primary text-white hover:text-primary-foreground backdrop-blur border border-white/10 hover:border-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
                 >
                   <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -644,7 +644,7 @@ export function Home() {
                   type="button"
                   onClick={nextSlide}
                   aria-label="Next featured draw"
-                  className="absolute top-1/2 right-2 sm:right-3 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-primary text-white hover:text-primary-foreground backdrop-blur border border-white/15 hover:border-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
+                  className="absolute top-1/2 right-2 sm:right-3 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-primary text-white hover:text-primary-foreground backdrop-blur border border-white/10 hover:border-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
                 >
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
