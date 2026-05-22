@@ -373,7 +373,7 @@ export function Home() {
   const bushmillsFeatured = useMemo(() => ({
     id: BUSHMILLS_ID,
     name: 'Bushmills Distillery Tour Experience',
-    prizeValue: '£2,500',
+    prizeValue: 'Worth Over £2,000',
     description: 'A private distillery tour, rare expression tasting, two nights at the historic Bushmills Inn, and a curated four-bottle take-home collection — for two, on the Causeway Coast.',
     imageUrl: bushmillsHeroImg,
     entryCount: 487,
@@ -729,7 +729,7 @@ export function Home() {
                     <h3 className="text-2xl sm:text-3xl font-serif mt-2 mb-1 break-words">
                       Bushmills Distillery Tour Experience
                     </h3>
-                    <p className="text-3xl sm:text-4xl font-serif text-primary">£2,500</p>
+                    <p className="text-3xl sm:text-4xl font-serif text-primary">Worth Over £2,000</p>
                   </div>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     A private distillery tour, rare expression tasting, two nights at the historic Bushmills Inn,
