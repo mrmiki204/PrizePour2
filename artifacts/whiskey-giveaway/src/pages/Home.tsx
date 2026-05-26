@@ -514,9 +514,9 @@ export function Home() {
                     {!hasSpotlight && <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />}
                     <div className="absolute inset-0 lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-card/95" />
 
-                    {/* Top badges */}
-                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start gap-2 z-10">
-                      <div className="flex flex-col gap-2 items-start">
+                    {/* Top badges — stack on mobile so left + right groups never collide */}
+                    <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 z-10">
+                      <div className="flex flex-col gap-2 items-start min-w-0">
                         <span className={`text-primary-foreground text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg ${isPatronFeatured ? 'bg-emerald-500' : 'bg-primary'}`}>
                           Live Draw
                         </span>
@@ -525,18 +525,18 @@ export function Home() {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: [1, 1.05, 1] }}
                             transition={{ scale: { duration: 1.4, repeat: Infinity } }}
-                            className="bg-red-600/95 text-white text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg border border-red-300/40"
+                            className="bg-red-600/95 text-white text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg border border-red-300/40 max-w-full truncate"
                           >
                             Only {remainingTickets} Tickets Left
                           </motion.span>
                         ) : (
-                          <span className="bg-black/70 backdrop-blur text-white/90 text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border border-white/10">
+                          <span className="bg-black/70 backdrop-blur text-white/90 text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border border-white/10 max-w-full truncate">
                             {isBushmillsFeatured ? 'VIP Experience Draw' : 'Limited Entries'}
                           </span>
                         )}
                       </div>
                       {featured && (
-                        <span className="bg-black/70 backdrop-blur text-white text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border border-white/10">
+                        <span className="self-start sm:self-auto bg-black/70 backdrop-blur text-white text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border border-white/10 max-w-full truncate">
                           {isBushmillsFeatured
                             ? 'Luxury Experience'
                             : isPatronFeatured
@@ -546,11 +546,11 @@ export function Home() {
                       )}
                     </div>
 
-                    {/* Bottom name on mobile */}
+                    {/* Bottom name on mobile — gradient scrim for guaranteed contrast */}
                     {featured && (
-                      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 lg:hidden">
+                      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 lg:hidden bg-gradient-to-t from-black/90 via-black/60 to-transparent">
                         <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>
-                        <h2 className="text-xl sm:text-2xl font-serif text-white leading-tight">{featured.name}</h2>
+                        <h2 className="text-lg sm:text-2xl font-serif text-white leading-tight break-words">{featured.name}</h2>
                       </div>
                     )}
                   </div>
@@ -562,12 +562,12 @@ export function Home() {
                         {hasSpotlight
                           ? <RotatingTagline lines={spotlightTaglines} accent={spotlightAccent} />
                           : <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>}
-                        <h2 className="text-2xl sm:text-3xl xl:text-4xl font-serif text-white leading-tight">{featured?.name}</h2>
+                        <h2 className="text-2xl sm:text-3xl xl:text-4xl font-serif text-white leading-tight break-words">{featured?.name}</h2>
                       </div>
 
-                      <div className="flex items-baseline gap-3 pt-2 border-t border-border/40">
-                        <span className="text-[10px] font-serif text-muted-foreground uppercase tracking-[0.2em]">Prize Value</span>
-                        <span className="text-2xl sm:text-3xl lg:text-4xl font-serif text-primary">{featured?.prizeValue}</span>
+                      <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 pt-2 border-t border-border/40 min-w-0">
+                        <span className="text-[10px] font-serif text-muted-foreground uppercase tracking-[0.2em] shrink-0">Prize Value</span>
+                        <span className="text-xl sm:text-2xl lg:text-4xl font-serif text-primary break-words leading-tight">{featured?.prizeValue}</span>
                       </div>
 
                       <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{featured?.description}</p>
@@ -636,7 +636,7 @@ export function Home() {
                   type="button"
                   onClick={prevSlide}
                   aria-label="Previous featured draw"
-                  className="absolute top-1/2 left-2 sm:left-3 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-transparent hover:bg-primary/80 text-white hover:text-primary-foreground border border-transparent hover:border-primary flex items-center justify-center transition-all duration-200 hover:scale-105"
+                  className="absolute top-[22%] sm:top-1/2 left-2 sm:left-3 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-transparent hover:bg-primary/80 text-white hover:text-primary-foreground border border-transparent hover:border-primary flex items-center justify-center transition-all duration-200 hover:scale-105"
                 >
                   <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -644,7 +644,7 @@ export function Home() {
                   type="button"
                   onClick={nextSlide}
                   aria-label="Next featured draw"
-                  className="absolute top-1/2 right-2 sm:right-3 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-transparent hover:bg-primary/80 text-white hover:text-primary-foreground border border-transparent hover:border-primary flex items-center justify-center transition-all duration-200 hover:scale-105"
+                  className="absolute top-[22%] sm:top-1/2 right-2 sm:right-3 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-transparent hover:bg-primary/80 text-white hover:text-primary-foreground border border-transparent hover:border-primary flex items-center justify-center transition-all duration-200 hover:scale-105"
                 >
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -726,10 +726,10 @@ export function Home() {
                 <div className="space-y-4">
                   <div>
                     <span className="text-xs font-serif text-primary uppercase tracking-widest">Luxury Whiskey Getaway</span>
-                    <h3 className="text-2xl sm:text-3xl font-serif mt-2 mb-1 break-words">
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-serif mt-2 mb-1 break-words leading-tight">
                       Bushmills Distillery Tour Experience
                     </h3>
-                    <p className="text-3xl sm:text-4xl font-serif text-primary">Worth Over £2,000</p>
+                    <p className="text-2xl sm:text-3xl md:text-4xl font-serif text-primary break-words leading-tight">Worth Over £2,000</p>
                   </div>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     A private distillery tour, rare expression tasting, two nights at the historic Bushmills Inn,
