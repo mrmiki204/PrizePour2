@@ -263,22 +263,6 @@ function BottleSpotlight({ bottles, accent }: BottleSpotlightProps) {
         </motion.div>
       </AnimatePresence>
 
-      {/* Bottle name (bottom-center) */}
-      <div className="absolute bottom-6 left-0 right-0 z-10 flex justify-center pointer-events-none px-4">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={bottle.name + '-label'}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.4 }}
-            className="flex justify-center w-full"
-          >
-            <p className={`font-serif text-base sm:text-lg text-white tracking-wide drop-shadow-lg text-center ${labelAccent ? '' : ''}`}>{bottle.name}</p>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
       {/* Bottle indicator dots */}
       <div className="absolute bottom-1.5 left-0 right-0 z-10 flex justify-center gap-1.5">
         {bottles.map((_, i) => (
