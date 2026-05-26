@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ArrowLeft, ShieldCheck, Users, Ticket, Lock, Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ShieldCheck, Users, Ticket, Lock, Package, ChevronDown, ChevronUp, Search, CreditCard, Trophy } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
 import bushmillsHeroImg from '@/assets/images/bushmills-hero.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES, COLLECTION_BOTTLES } from '@/data/giveaways';
@@ -895,30 +895,120 @@ export function Home() {
       </section>
 
       {/* ── How it Works ── */}
-      <section id="how-it-works" className="py-16 sm:py-24 bg-card border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10 sm:mb-16">
-            <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">The Process</p>
-            <h2 className="text-3xl sm:text-4xl font-serif mb-4">Simple. Transparent. Fair.</h2>
-            <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">Every draw follows the same iron-clad process, independently verified at each step.</p>
+      <section id="how-it-works" className="relative py-20 sm:py-28 bg-card border-y border-border overflow-hidden">
+        {/* Decorative ambient glow */}
+        <div aria-hidden className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[60%] bg-primary/[0.04] blur-3xl rounded-full" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-14 sm:mb-20"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span className="text-[10px] font-serif text-primary uppercase tracking-[0.25em]">The Process</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif mb-4 leading-tight">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">How It Works</span>
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+              Three simple steps from browsing to winning — fair, transparent, and built for collectors.
+            </p>
+          </motion.div>
+
+          <div className="relative">
+            {/* Connecting line — desktop only */}
+            <div aria-hidden className="hidden md:block absolute top-10 left-[16.66%] right-[16.66%] h-px">
+              <div className="w-full h-full bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 sm:gap-8 md:gap-6 relative">
+              {[
+                {
+                  icon: Search,
+                  step: '01',
+                  title: 'Choose a Draw',
+                  body: 'Browse premium whisky, tequila and spirit giveaways from authorised retailers worldwide.',
+                },
+                {
+                  icon: CreditCard,
+                  step: '02',
+                  title: 'Buy Your Entries',
+                  body: 'Secure checkout with transparent entry limits. Every draw has a fixed cap to protect your odds.',
+                },
+                {
+                  icon: Trophy,
+                  step: '03',
+                  title: 'Winner Selected',
+                  body: 'Winners are chosen fairly via verifiable RNG and announced publicly — every prize, every time.',
+                },
+              ].map(({ icon: Icon, step, title, body }, idx) => (
+                <motion.div
+                  key={step}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.6, delay: idx * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="group relative"
+                >
+                  <div className="relative h-full text-center bg-background/40 backdrop-blur-sm border border-border rounded-sm p-6 sm:p-8 transition-all duration-500 hover:border-primary/60 hover:bg-background/70 hover:-translate-y-1 hover:shadow-[0_20px_50px_-20px_rgba(234,146,55,0.3)]">
+                    {/* Icon */}
+                    <div className="relative mx-auto mb-6 w-20 h-20 flex items-center justify-center">
+                      {/* Outer pulse ring */}
+                      <div className="absolute inset-0 rounded-full border border-primary/20 group-hover:border-primary/50 transition-colors duration-500" />
+                      {/* Inner gradient circle */}
+                      <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/40 flex items-center justify-center group-hover:from-primary/30 group-hover:to-primary/10 transition-all duration-500">
+                        <Icon className="w-7 h-7 text-primary group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
+                      </div>
+                      {/* Glow on hover */}
+                      <div aria-hidden className="absolute inset-0 rounded-full bg-primary/30 blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-700 -z-10" />
+                    </div>
+
+                    {/* Step number */}
+                    <p className="font-serif text-[11px] tracking-[0.3em] text-primary/70 uppercase mb-3">Step {step}</p>
+
+                    {/* Title */}
+                    <h3 className="font-serif text-xl sm:text-2xl text-white mb-3 leading-tight">{title}</h3>
+
+                    {/* Hairline divider */}
+                    <div className="mx-auto w-10 h-px bg-primary/40 mb-4 group-hover:w-16 group-hover:bg-primary/70 transition-all duration-500" />
+
+                    {/* Body */}
+                    <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-12">
-            {[
-              { icon: Ticket, step: '1', title: 'Secure Entry', body: 'Choose your prize and secure your entries. Each draw has a strict capacity limit to protect your odds.' },
-              { icon: ShieldCheck, step: '2', title: 'Verified Draw', body: 'Winners are selected via a cryptographically secure RNG upon timer expiry, independently witnessed and recorded.' },
-              { icon: Package, step: '3', title: 'Doorstep Delivery', body: 'Your prize is professionally packed with full insurance and shipped tracked to your door. Duties covered.' },
-            ].map(({ icon: Icon, step, title, body }) => (
-              <div key={step} className="text-center space-y-4 relative">
-                <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center relative">
-                  <Icon className="w-8 h-8 text-primary" />
-                  <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-serif flex items-center justify-center">{step}</span>
-                </div>
-                <h3 className="text-xl font-serif">{title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{body}</p>
-              </div>
-            ))}
-          </div>
+          {/* Trust strip */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-12 sm:mt-16 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[11px] font-serif text-muted-foreground uppercase tracking-[0.2em]"
+          >
+            <span className="inline-flex items-center gap-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+              Independently verified
+            </span>
+            <span className="hidden sm:inline text-border">•</span>
+            <span className="inline-flex items-center gap-2">
+              <Lock className="w-3.5 h-3.5 text-primary" />
+              Secure payment
+            </span>
+            <span className="hidden sm:inline text-border">•</span>
+            <span className="inline-flex items-center gap-2">
+              <Package className="w-3.5 h-3.5 text-primary" />
+              Insured delivery
+            </span>
+          </motion.div>
         </div>
       </section>
 
