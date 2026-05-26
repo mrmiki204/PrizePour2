@@ -496,8 +496,8 @@ export function Home() {
                   transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                   className="grid lg:grid-cols-5"
                 >
-                  {/* ── Image (3/5) ── */}
-                  <div className="lg:col-span-3 relative aspect-[4/3] lg:aspect-auto lg:min-h-[520px] overflow-hidden bg-black">
+                  {/* ── Image (3/5) — taller on mobile so badges + bottle + title don't collide ── */}
+                  <div className="lg:col-span-3 relative min-h-[460px] sm:min-h-[480px] lg:min-h-[520px] lg:aspect-auto overflow-hidden bg-black">
                     {hasSpotlight ? (
                       <BottleSpotlight bottles={spotlightBottles} accent={spotlightAccent} />
                     ) : featured && getGiveawayImage(featured.id, featured.imageUrl) ? (
@@ -515,7 +515,7 @@ export function Home() {
                     <div className="absolute inset-0 lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-card/95" />
 
                     {/* Top badges — stack on mobile so left + right groups never collide */}
-                    <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 z-10">
+                    <div className="absolute top-4 sm:top-4 left-4 sm:left-4 right-4 sm:right-4 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-2 z-10">
                       <div className="flex flex-col gap-2 items-start min-w-0">
                         <span className={`text-primary-foreground text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg ${isPatronFeatured ? 'bg-emerald-500' : 'bg-primary'}`}>
                           Live Draw
@@ -548,16 +548,16 @@ export function Home() {
 
                     {/* Bottom name on mobile — gradient scrim for guaranteed contrast */}
                     {featured && (
-                      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 lg:hidden bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>
-                        <h2 className="text-lg sm:text-2xl font-serif text-white leading-tight break-words">{featured.name}</h2>
+                      <div className="absolute bottom-0 left-0 right-0 px-5 pt-10 pb-6 sm:p-6 lg:hidden bg-gradient-to-t from-black via-black/75 to-transparent">
+                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-3">Win The Special Collection</p>
+                        <h2 className="text-lg sm:text-2xl font-serif text-white leading-snug break-words">{featured.name}</h2>
                       </div>
                     )}
                   </div>
 
-                  {/* ── Info (2/5) ── */}
-                  <div className="lg:col-span-2 p-5 sm:p-6 lg:p-8 flex flex-col justify-between gap-5 sm:gap-6 bg-card/95">
-                    <div className="space-y-4">
+                  {/* ── Info (2/5) — generous mobile padding + spacing ── */}
+                  <div className="lg:col-span-2 px-6 py-8 sm:p-6 lg:p-8 flex flex-col justify-between gap-8 sm:gap-6 bg-card/95">
+                    <div className="space-y-7 sm:space-y-4">
                       <div className="hidden lg:block">
                         {hasSpotlight
                           ? <RotatingTagline lines={spotlightTaglines} accent={spotlightAccent} />
@@ -565,9 +565,9 @@ export function Home() {
                         <h2 className="text-2xl sm:text-3xl xl:text-4xl font-serif text-white leading-tight break-words">{featured?.name}</h2>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 pt-2 border-t border-border/40 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3 pt-4 sm:pt-2 border-t border-border/40 min-w-0">
                         <span className="text-[10px] font-serif text-muted-foreground uppercase tracking-[0.2em] shrink-0">Prize Value</span>
-                        <span className="text-xl sm:text-2xl lg:text-4xl font-serif text-primary break-words leading-tight">{featured?.prizeValue}</span>
+                        <span className="text-2xl sm:text-2xl lg:text-4xl font-serif text-primary break-words leading-tight">{featured?.prizeValue}</span>
                       </div>
 
                       <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{featured?.description}</p>
@@ -578,11 +578,11 @@ export function Home() {
                       const pct = Math.min((featured.entryCount / featured.maxEntries) * 100, 100);
                       const remaining = featured.maxEntries - featured.entryCount;
                       return (
-                        <div className="space-y-4">
+                        <div className="space-y-6 sm:space-y-4">
                           <div>
-                            <div className="flex justify-between items-center text-[11px] font-serif mb-1.5">
-                              <span className="text-muted-foreground uppercase tracking-widest">{featured.entryCount} / {featured.maxEntries} sold</span>
-                              <span className={remaining <= 20 ? 'text-red-400' : 'text-primary'}>{remaining} left</span>
+                            <div className="flex justify-between items-center text-[11px] font-serif mb-2 sm:mb-1.5 gap-3">
+                              <span className="text-muted-foreground uppercase tracking-widest truncate">{featured.entryCount} / {featured.maxEntries} sold</span>
+                              <span className={`shrink-0 ${remaining <= 20 ? 'text-red-400' : 'text-primary'}`}>{remaining} left</span>
                             </div>
                             <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
                               <motion.div
@@ -595,7 +595,7 @@ export function Home() {
                             </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/40">
+                          <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-3 pt-4 sm:pt-2 border-t border-border/40">
                             <div className="min-w-0">
                               <p className="text-[9px] font-serif text-muted-foreground uppercase tracking-[0.2em] mb-1">Draw Ends In</p>
                               <CountdownTimer daysToAdd={daysUntil(featured.drawDate)} />
