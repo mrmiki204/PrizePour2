@@ -79,7 +79,7 @@ export function DrawPage() {
             >
               <div className="space-y-4">
                 <p className="text-primary font-serif tracking-[0.2em] uppercase text-sm animate-pulse">Official Draw</p>
-                <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif text-center break-words">{giveaway?.name ?? '...'}</h1>
+                <h1 className="text-2xl sm:text-5xl md:text-7xl font-serif text-center break-words leading-tight px-2">{giveaway?.name ?? '...'}</h1>
               </div>
 
               <div className="w-56 h-40 mx-auto relative rounded-sm overflow-hidden border border-border shadow-2xl">
@@ -200,7 +200,7 @@ export function DrawPage() {
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ type: "spring", bounce: 0.4, delay: 0.3 }}
-                          className="text-4xl sm:text-6xl md:text-8xl font-serif text-primary font-bold break-all"
+                          className="text-3xl sm:text-6xl md:text-8xl font-serif text-primary font-bold break-all px-2"
                         >
                           {winner.ticketNumber}
                         </motion.p>

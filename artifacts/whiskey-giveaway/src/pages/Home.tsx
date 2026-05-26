@@ -845,8 +845,8 @@ export function Home() {
                     <div className="space-y-4">
                       <div>
                         <span className="text-xs font-serif text-primary uppercase tracking-widest">Prize Selection</span>
-                        <h3 className="text-2xl sm:text-3xl font-serif mt-2 mb-1 break-words">{g.name}</h3>
-                        <p className="text-3xl sm:text-4xl font-serif text-primary">{g.prizeValue}</p>
+                        <h3 className="text-xl sm:text-3xl font-serif mt-2 mb-1 break-words leading-tight">{g.name}</h3>
+                        <p className="text-2xl sm:text-4xl font-serif text-primary break-words leading-tight">{g.prizeValue}</p>
                       </div>
                       <p className="text-muted-foreground text-sm leading-relaxed">{g.description}</p>
 
@@ -880,7 +880,7 @@ export function Home() {
 
                       <Button
                         size="lg"
-                        className="w-full h-14 min-h-[48px] bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-xs sm:text-sm font-serif px-3"
+                        className="w-full h-14 min-h-[48px] bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-xs sm:text-sm font-serif px-4 sm:px-6"
                         onClick={() => setLocation(`/giveaway/${g.id}`)}
                       >
                         <span className="truncate">Enter the Draw — From £2.99</span>

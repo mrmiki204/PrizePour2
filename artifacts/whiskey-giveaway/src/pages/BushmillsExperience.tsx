@@ -204,18 +204,18 @@ export function BushmillsExperience() {
               </div>
 
               {/* Quick stats */}
-              <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-6 max-w-xl">
+              <div className="grid grid-cols-3 gap-2 sm:gap-6 pt-6 max-w-xl">
                 <div>
                   <p className="text-[10px] font-serif text-muted-foreground uppercase tracking-widest mb-1">Prize Value</p>
-                  <p className="text-xl sm:text-2xl font-serif text-primary">£{PRIZE_VALUE_GBP.toLocaleString()}</p>
+                  <p className="text-lg sm:text-2xl font-serif text-primary break-words leading-tight">£{PRIZE_VALUE_GBP.toLocaleString()}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-serif text-muted-foreground uppercase tracking-widest mb-1">Per Ticket</p>
-                  <p className="text-xl sm:text-2xl font-serif text-foreground">£{TICKET_PRICE.toFixed(2)}</p>
+                  <p className="text-lg sm:text-2xl font-serif text-foreground break-words leading-tight">£{TICKET_PRICE.toFixed(2)}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-serif text-muted-foreground uppercase tracking-widest mb-1">Remaining</p>
-                  <p className={`text-xl sm:text-2xl font-serif ${ENTRIES_REMAINING < 50 ? 'text-red-400' : 'text-foreground'}`}>
+                  <p className={`text-lg sm:text-2xl font-serif break-words leading-tight ${ENTRIES_REMAINING < 50 ? 'text-red-400' : 'text-foreground'}`}>
                     {ENTRIES_REMAINING}
                   </p>
                 </div>
@@ -373,7 +373,7 @@ export function BushmillsExperience() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8">
             {PACKAGES.map((pkg) => {
               const isSelected = selectedPackage.qty === pkg.qty;
               return (

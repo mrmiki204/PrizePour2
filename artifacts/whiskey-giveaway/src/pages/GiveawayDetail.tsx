@@ -213,15 +213,21 @@ export function GiveawayDetail() {
 
         {/* Progress Bar — 5 steps */}
         <div className="mb-12">
-          <div className="flex justify-between items-center text-xs font-serif tracking-widest text-muted-foreground mb-4">
+          {/* Mobile: show only current step label */}
+          <div className="sm:hidden text-center text-xs font-serif tracking-widest text-primary mb-4 uppercase">
+            Step {step} of {TOTAL_STEPS} ·{' '}
+            {['Tickets', 'Details', 'Question', 'Payment', 'Confirmed'][step - 1]}
+          </div>
+          {/* Desktop: full step list */}
+          <div className="hidden sm:flex justify-between items-center text-xs font-serif tracking-widest text-muted-foreground mb-4">
             <span className={step >= 1 ? "text-primary" : ""}>Tickets</span>
-            <span className="hidden sm:inline">→</span>
+            <span>→</span>
             <span className={step >= 2 ? "text-primary" : ""}>Details</span>
-            <span className="hidden sm:inline">→</span>
+            <span>→</span>
             <span className={step >= 3 ? "text-primary" : ""}>Question</span>
-            <span className="hidden sm:inline">→</span>
+            <span>→</span>
             <span className={step >= 4 ? "text-primary" : ""}>Payment</span>
-            <span className="hidden sm:inline">→</span>
+            <span>→</span>
             <span className={step >= 5 ? "text-primary" : ""}>Confirmed</span>
           </div>
           <div className="h-1 bg-secondary rounded-full overflow-hidden">
