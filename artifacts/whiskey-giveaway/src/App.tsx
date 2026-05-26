@@ -13,6 +13,7 @@ import { Rules } from "@/pages/Rules";
 import { MyReferrals } from "@/pages/MyReferrals";
 import { Profile } from "@/pages/Profile";
 import { BushmillsExperience } from "@/pages/BushmillsExperience";
+import { HowItWorks } from "@/pages/HowItWorks";
 import NotFound from "@/pages/not-found";
 import { AgeGate } from "@/components/AgeGate";
 
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/my-referrals" component={MyReferrals} />
       <Route path="/profile" component={Profile} />
       <Route path="/experiences/bushmills" component={BushmillsExperience} />
+      <Route path="/how-it-works" component={HowItWorks} />
       <Route component={NotFound} />
     </Switch>
   );
