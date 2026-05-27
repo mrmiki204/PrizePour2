@@ -12,10 +12,14 @@ import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check,
 import { useGetGiveaway } from '@workspace/api-client-react';
 import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
 
-// ── Beta flag ──────────────────────────────────────────────────────────────
-// PrizePour is in beta. Real payments are disabled until launch.
-// Flip to `true` only once Stripe is connected and you're ready to take money.
-const PAYMENTS_ENABLED = false;
+// ── Beta / Payments flag ───────────────────────────────────────────────────
+// PrizePour is in beta. Payments are disabled by default. Set
+// `VITE_PAYMENTS_ENABLED=true` at build time on the frontend AND
+// `PAYMENTS_ENABLED=true` on the API server to enable the Stripe TEST-MODE
+// checkout flow. The server independently refuses live Stripe keys, so
+// even with both flags on, only test cards can be used.
+const PAYMENTS_ENABLED = import.meta.env.VITE_PAYMENTS_ENABLED === 'true';
+const TEST_MODE = PAYMENTS_ENABLED;
 
 const TICKET_PACKAGES = [
   { id: 1, qty: 1,  price: 2.99,  badge: null },
@@ -167,9 +171,17 @@ export function GiveawayDetail() {
     }
   };
 
-  // Handle returning from Stripe checkout with ?session_id=xxx
+  // Handle returning from Stripe checkout with ?session_id=xxx or ?checkout=cancelled
   useEffect(() => {
-    const sessionId = new URLSearchParams(window.location.search).get('session_id');
+    const params = new URLSearchParams(window.location.search);
+    const cancelled = params.get('checkout') === 'cancelled';
+    if (cancelled) {
+      window.history.replaceState({}, '', window.location.pathname);
+      setEntryError('Checkout cancelled — no payment was taken. You can try again whenever you like.');
+      setStep(4);
+      return;
+    }
+    const sessionId = params.get('session_id');
     if (!sessionId || !giveaway) return;
     window.history.replaceState({}, '', window.location.pathname);
     fetch(`/api/stripe/session/${sessionId}`)
@@ -614,6 +626,14 @@ export function GiveawayDetail() {
 
                 {PAYMENTS_ENABLED ? (
                   <>
+                    {TEST_MODE && (
+                      <div className="flex items-start gap-2.5 rounded-sm border border-amber-400/40 bg-amber-400/10 px-3 py-2.5">
+                        <span className="mt-1 w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
+                        <p className="text-xs font-serif text-amber-200/90 leading-snug">
+                          <span className="font-semibold text-amber-200">TEST MODE.</span> No real card will be charged. Use Stripe test card <span className="font-mono">4242 4242 4242 4242</span>, any future date and any 3-digit CVC.
+                        </p>
+                      </div>
+                    )}
                     <Button
                       className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base gap-2 disabled:opacity-50"
                       onClick={handlePayment}
@@ -622,10 +642,12 @@ export function GiveawayDetail() {
                       {isSubmitting ? (
                         <><Loader2 className="w-5 h-5 animate-spin" /> Redirecting to Stripe…</>
                       ) : (
-                        <><ShieldCheck className="w-5 h-5" /> Pay £{selectedPackage.price.toFixed(2)} — Secure Checkout</>
+                        <><ShieldCheck className="w-5 h-5" /> {TEST_MODE ? `Test Pay £${selectedPackage.price.toFixed(2)} — Stripe Test Checkout` : `Pay £${selectedPackage.price.toFixed(2)} — Secure Checkout`}</>
                       )}
                     </Button>
-                    <p className="text-center text-xs text-muted-foreground font-serif">Powered by Stripe · 256-bit SSL encryption</p>
+                    <p className="text-center text-xs text-muted-foreground font-serif">
+                      {TEST_MODE ? 'Powered by Stripe Test Mode · no real money moves' : 'Powered by Stripe · 256-bit SSL encryption'}
+                    </p>
                   </>
                 ) : (
                   <div className="relative overflow-hidden border border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-sm p-5 sm:p-6 space-y-4">

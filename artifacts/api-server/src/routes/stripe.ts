@@ -10,7 +10,25 @@ const router: IRouter = Router();
 // Real payments are disabled unless PAYMENTS_ENABLED=true is set in the
 // environment. Safe-by-default: any misconfiguration on Railway/prod keeps
 // checkout closed rather than charging real cards.
+//
+// LIVE KEYS ARE REFUSED. Even with PAYMENTS_ENABLED=true, the server will
+// only accept a Stripe TEST secret key (prefix `sk_test_`). A live key
+// (`sk_live_`) causes checkout to return 503 and logs an error. This
+// guarantees PrizePour cannot accidentally take real money during beta.
 const PAYMENTS_ENABLED = process.env.PAYMENTS_ENABLED === "true";
+
+function assertTestModeKey(stripe: { _apiKey?: string } | unknown): { ok: true } | { ok: false; reason: string } {
+  // Stripe SDK exposes the key on a private field; we re-check via a safer path below using stripe.apiKey if present.
+  const key = (stripe as { _apiKey?: string; apiKey?: string })?.apiKey ?? (stripe as { _apiKey?: string })?._apiKey ?? "";
+  if (!key) return { ok: false, reason: "Stripe key not detected" };
+  if (key.startsWith("sk_live_") || key.startsWith("rk_live_")) {
+    return { ok: false, reason: "Live Stripe key detected — refusing. PrizePour only accepts test keys (sk_test_…)." };
+  }
+  if (!key.startsWith("sk_test_") && !key.startsWith("rk_test_")) {
+    return { ok: false, reason: "Unrecognised Stripe key prefix — only test keys (sk_test_…) are accepted." };
+  }
+  return { ok: true };
+}
 
 /**
  * POST /api/stripe/checkout
@@ -42,6 +60,15 @@ router.post("/stripe/checkout", async (req, res) => {
 
   const stripe = await getUncachableStripeClient();
 
+  const guard = assertTestModeKey(stripe);
+  if (!guard.ok) {
+    req.log.error({ reason: guard.reason }, "Refusing to create checkout session — non-test Stripe key");
+    return res.status(503).json({
+      error: "Checkout is configured for test mode only. Connect a Stripe TEST key (sk_test_…) before enabling payments.",
+      testModeRequired: true,
+    });
+  }
+
   // Try to find an existing Stripe price by metadata.ticketQty
   // Falls back to inline price_data if seed script hasn't been run yet
   let priceConfig: Record<string, unknown>;
@@ -64,9 +91,9 @@ router.post("/stripe/checkout", async (req, res) => {
     };
   }
 
-  const domain = process.env.REPLIT_DOMAINS?.split(",")[0] ?? "localhost";
-  const successUrl = `https://${domain}/giveaway/${giveawayId}?session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = `https://${domain}/giveaway/${giveawayId}`;
+  const domain = process.env.PUBLIC_BASE_URL ?? `https://${process.env.REPLIT_DOMAINS?.split(",")[0] ?? "localhost"}`;
+  const successUrl = `${domain}/giveaway/${giveawayId}?session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${domain}/giveaway/${giveawayId}?checkout=cancelled`;
 
   const session = await stripe.checkout.sessions.create({
     customer_email: email,
@@ -82,6 +109,7 @@ router.post("/stripe/checkout", async (req, res) => {
       lastName,
       email,
       referralCode: referralCode ?? "",
+      test_mode: "true",
     },
   });
 

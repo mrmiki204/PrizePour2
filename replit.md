@@ -57,9 +57,42 @@ Exclusive whiskey giveaway platform where users enter draws to win rare, collect
 - Ticket capacity = 140% of prize value ÷ $4.99 (maxEntries formula)
 - Keep giveaway data in `src/data/giveaways.ts` — single source of truth
 
+## Stripe TEST MODE (beta)
+
+PrizePour runs in **test mode only** during beta. Real payments cannot be taken — the server actively refuses any Stripe key that doesn't start with `sk_test_`.
+
+**Three flags must all be true to enable test checkout:**
+
+1. Connect a Stripe **test-mode** account via the Replit Integrations tab (secret key starts with `sk_test_`).
+2. API server env: `PAYMENTS_ENABLED=true`
+3. Frontend build env: `VITE_PAYMENTS_ENABLED=true`
+
+If any of these is missing, the Step 4 button stays gated with the "Checkout opens at launch" panel.
+
+**Optional env:** `PUBLIC_BASE_URL` — full origin used for Stripe `success_url` / `cancel_url`. Defaults to `https://${REPLIT_DOMAINS[0]}`. Set on Railway to your `*.up.railway.app` or custom domain (e.g. `https://prizepour.up.railway.app`).
+
+**Test cards (Stripe test mode only):**
+- `4242 4242 4242 4242` — successful payment
+- `4000 0000 0000 9995` — declined (insufficient funds)
+- `4000 0025 0000 3155` — requires 3DS authentication
+- Any future expiry, any 3-digit CVC, any postcode.
+
+**Flow:**
+1. Visitor opens a giveaway → Steps 1–3 → Step 4 shows a yellow "TEST MODE" banner.
+2. Click "Test Pay £X — Stripe Test Checkout" → redirects to Stripe test checkout.
+3. **Success** → returns to `/giveaway/:id?session_id=...` → server verifies session, creates entry, frontend advances to Step 5 with ticket numbers + referral link.
+4. **Cancel** → returns to `/giveaway/:id?checkout=cancelled` → frontend stays on Step 4 with a friendly cancel notice.
+5. **Decline / failure** → Stripe shows the error inline; user can retry; no entry created.
+
+**Safety guarantees:**
+- Server refuses `sk_live_` keys with a 503 + log line.
+- Without `PAYMENTS_ENABLED=true`, server returns 503 on all checkout attempts.
+- Without `VITE_PAYMENTS_ENABLED=true`, the frontend never shows a Pay button.
+- All checkout sessions are tagged with `metadata.test_mode = "true"` for auditability.
+
 ## Gotchas
 
-- **Stripe not yet connected**: Go to Integrations tab → add Stripe. Then run `seed-products.ts` once to create ticket products. Checkout falls back to inline `price_data` until products exist.
+- **Stripe not yet connected**: Go to Integrations tab → add Stripe (test mode). Then run `seed-products.ts` once to create ticket products. Checkout falls back to inline `price_data` until products exist.
 - **Stripe webhook route**: Must be registered BEFORE `express.json()` in app.ts — already done correctly
 - **Never use `console.log` in server code** — use `req.log` in route handlers, `logger` elsewhere
 - Always run `pnpm --filter @workspace/api-spec run codegen` after changing `openapi.yaml`
