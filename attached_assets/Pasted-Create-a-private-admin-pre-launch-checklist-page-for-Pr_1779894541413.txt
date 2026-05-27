@@ -1,0 +1,86 @@
+Create a private admin/pre-launch checklist page for PrizePour.
+
+Goal:
+Add a simple internal checklist page so I can track what is ready before real payments and public launch.
+
+Page:
+Create a new page/route called:
+
+`/admin/pre-launch-checklist`
+
+Requirements:
+
+* Match the current PrizePour dark/gold luxury styling.
+* Make it mobile responsive.
+* Keep it simple and practical.
+* Add checklist sections with tick-box style items.
+
+Checklist sections:
+
+1. Website polish
+
+* Mobile layout checked
+* Hero section checked
+* Footer links checked
+* Active draws visible
+* Domain and HTTPS working
+
+2. Legal and trust
+
+* Terms of Service added
+* Privacy Policy added
+* Contest Rules added
+* Responsible Drinking / 18+ page added
+* How Winners Are Selected page added
+* Contact page added
+
+3. Giveaway flow
+
+* Active draws load
+* Draw detail page works
+* Entry steps work
+* Checkout disabled during beta
+* No accidental real payments possible
+
+4. Payments testing
+
+* Stripe test mode connected
+* Test payment succeeds
+* Failed payment handled
+* Cancelled checkout handled
+* Ticket entry created after successful test payment
+
+5. Launch readiness
+
+* Company registration checked
+* Business bank account ready
+* Stripe live keys not enabled yet
+* Admin can pause/disable draws
+* Final legal review completed
+
+Functionality:
+
+* Make checklist items visually tickable in the UI.
+* Save checklist state in localStorage so it persists in my browser.
+* Add a progress percentage at the top.
+* Add a warning banner:
+  “Internal checklist only. Do not enable live payments until every critical item is complete.”
+
+Security:
+
+* This page is for internal testing only.
+* Do not add it to the main public navigation.
+* It can be linked from the admin area if one exists, otherwise keep it as a hidden route.
+
+Important:
+
+* Do not enable payments.
+* Do not change Stripe live settings.
+* Do not break existing routes.
+
+After completion:
+
+* list files changed
+* explain how to access the checklist page
+* explain how checklist progress is saved
+* confirm if I need to push to GitHub for Railway deployment

@@ -17,6 +17,7 @@ import { HowItWorks } from "@/pages/HowItWorks";
 import { ResponsibleDrinking } from "@/pages/ResponsibleDrinking";
 import { Faq } from "@/pages/Faq";
 import { WinnerSelection } from "@/pages/WinnerSelection";
+import { PreLaunchChecklist } from "@/pages/PreLaunchChecklist";
 import NotFound from "@/pages/not-found";
 import { AgeGate } from "@/components/AgeGate";
 
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/giveaway/:id" component={GiveawayDetail} />
       <Route path="/draw/:id" component={DrawPage} />
       <Route path="/admin">{() => <AdminGuard><AdminDashboard /></AdminGuard>}</Route>
+      <Route path="/admin/pre-launch-checklist">{() => <AdminGuard><PreLaunchChecklist /></AdminGuard>}</Route>
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/rules" component={Rules} />
