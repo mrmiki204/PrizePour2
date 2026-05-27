@@ -220,18 +220,6 @@ export function GiveawayDetail() {
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Giveaways
         </Button>
 
-        {!PAYMENTS_ENABLED && (
-          <div className="mb-8 flex items-center gap-3 border border-primary/30 bg-primary/5 rounded-sm px-4 py-3">
-            <span className="inline-flex items-center gap-1.5 shrink-0 px-2 py-0.5 rounded-full border border-primary/40 bg-primary/15">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-serif text-primary uppercase tracking-[0.2em]">Beta</span>
-            </span>
-            <p className="text-xs sm:text-sm font-serif text-muted-foreground leading-snug">
-              Browse the full entry flow — checkout is disabled until launch. No real charges will be made.
-            </p>
-          </div>
-        )}
-
         {/* Progress Bar — 5 steps */}
         <div className="mb-12">
           {/* Mobile: show only current step label */}

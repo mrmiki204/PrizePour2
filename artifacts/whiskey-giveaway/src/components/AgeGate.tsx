@@ -20,6 +20,9 @@ export function AgeGate({ children }: { children: React.ReactNode }) {
 
   function deny() {
     setStatus('denied');
+    setTimeout(() => {
+      try { window.location.href = 'https://www.google.com'; } catch {}
+    }, 2200);
   }
 
   return (
@@ -52,7 +55,7 @@ export function AgeGate({ children }: { children: React.ReactNode }) {
               <div className="space-y-3">
                 <p className="text-xs font-serif tracking-widest text-amber-500/60 uppercase">Age Verification</p>
                 <h2 className="text-3xl font-serif text-white leading-snug">
-                  Are you 18 years or older?
+                  Are you 18 or over?
                 </h2>
                 <p className="text-sm text-amber-100/50 leading-relaxed">
                   PrizePour competitions involve alcohol and are strictly for adults. You must be 18 or over to enter.
@@ -62,15 +65,15 @@ export function AgeGate({ children }: { children: React.ReactNode }) {
               <div className="flex gap-4">
                 <button
                   onClick={allow}
-                  className="flex-1 h-14 rounded-sm bg-amber-600 hover:bg-amber-500 text-white font-serif text-lg tracking-wide transition-colors duration-200"
+                  className="flex-1 h-14 rounded-sm bg-amber-600 hover:bg-amber-500 text-white font-serif text-base sm:text-lg tracking-wide transition-colors duration-200 uppercase"
                 >
-                  Yes, I'm 18+
+                  Yes — Enter
                 </button>
                 <button
                   onClick={deny}
-                  className="flex-1 h-14 rounded-sm border border-amber-900/60 hover:border-amber-700/60 text-amber-100/60 hover:text-amber-100/80 font-serif text-lg tracking-wide transition-colors duration-200"
+                  className="flex-1 h-14 rounded-sm border border-amber-900/60 hover:border-amber-700/60 text-amber-100/60 hover:text-amber-100/80 font-serif text-base sm:text-lg tracking-wide transition-colors duration-200 uppercase"
                 >
-                  No
+                  No — Leave
                 </button>
               </div>
 

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import logoSrc from '@/assets/prizepour-logo.png';
 import { getProfile } from '@/pages/Profile';
+import { BetaBanner } from '@/components/layout/BetaBanner';
 
 interface NavbarProps {
   onScrollTo?: (id: string) => void;
@@ -47,6 +48,7 @@ export function Navbar({ onScrollTo }: NavbarProps) {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <BetaBanner />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 md:h-28 flex items-center justify-between">
         <button onClick={() => setLocation('/')} className="flex items-center" aria-label="PrizePour home">
           <img src={logoSrc} alt="PrizePour" className="h-12 sm:h-16 md:h-28 w-auto object-contain" />
