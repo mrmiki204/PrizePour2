@@ -1,0 +1,125 @@
+Polish and complete the PrizePour admin draw management system.
+
+Goals:
+
+* Fix admin layout issues
+* Load all existing collections (Patrón, Clonakilty, Bushmills, seeded draws)
+* Improve admin usability
+* Make draw management production-ready for beta testing
+
+PART 1 — FIX ADMIN LAYOUT / HEADER OVERLAP
+
+Problem:
+The admin header/beta banner/navigation overlaps page headings and content.
+
+Requirements:
+
+* Fix spacing so page headings are never hidden under the header.
+* “DRAW & ENTRY MANAGEMENT” must always be visible.
+* Add proper spacing below:
+
+  * beta banner
+  * navigation/header
+* Fix on mobile + desktop.
+* Do not redesign header.
+* Do not remove beta banner.
+* Keep luxury PrizePour styling.
+
+Test widths:
+
+* 320px
+* 375px
+* 390px
+* 430px
+* 768px
+* desktop
+
+PART 2 — LOAD ALL EXISTING COLLECTIONS
+
+Problem:
+Admin should show all existing collections/draws.
+
+Must include:
+
+* Patrón Collection
+* Clonakilty Collection
+* Bushmills Distillery Experience
+* Any seeded/public/private draw records
+
+Requirements:
+
+* Admin page must load ALL draws from DB.
+* Show active + inactive + hidden + paused + previous draws.
+* Public homepage should still only show public active draws.
+
+Add filter tabs:
+
+* All
+* Active
+* Hidden
+* Paused
+* Previous / Ended
+
+PART 3 — DRAW MANAGEMENT CONTROLS
+
+For each draw show:
+
+* draw image thumbnail
+* draw name
+* collection name
+* prize value
+* ticket price
+* tickets sold
+* tickets remaining
+* total tickets
+* draw end date
+* status badges
+
+Admin actions:
+
+* Activate / deactivate draw
+* Hide / show draw publicly
+* Pause entries
+* Edit ticket price
+* Edit total tickets
+* Edit tickets remaining
+* Edit draw end date
+* Edit description
+* Edit hero text/tagline
+* Save changes
+
+Add confirmation modal before:
+
+* hiding
+* deactivating
+* pausing
+
+PART 4 — UX POLISH
+
+Add:
+
+* success toast after save
+* loading states
+* empty state
+* mobile responsive cards
+* premium dark/gold styling
+* clear status colors/badges
+
+PART 5 — SAFETY
+
+Important:
+
+* Do NOT enable payments.
+* Do NOT break Stripe beta safety.
+* Do NOT expose admin publicly.
+* Keep admin password protection.
+* Do not break existing homepage giveaway rendering.
+
+After completion:
+
+* list files changed
+* explain how existing collections are loaded
+* confirm Patrón + Clonakilty appear
+* explain layout fixes
+* explain all admin controls
+* confirm if I need to push to GitHub for Railway deployment
