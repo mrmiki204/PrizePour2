@@ -6,12 +6,26 @@ import { entriesTable, referralRewardsTable } from "@workspace/db";
 
 const router: IRouter = Router();
 
+// ── Beta kill switch ──────────────────────────────────────────────────────
+// Real payments are disabled unless PAYMENTS_ENABLED=true is set in the
+// environment. Safe-by-default: any misconfiguration on Railway/prod keeps
+// checkout closed rather than charging real cards.
+const PAYMENTS_ENABLED = process.env.PAYMENTS_ENABLED === "true";
+
 /**
  * POST /api/stripe/checkout
  * Creates a Stripe Checkout session for a ticket purchase.
  * Returns { url } to redirect the user to.
  */
 router.post("/stripe/checkout", async (req, res) => {
+  if (!PAYMENTS_ENABLED) {
+    req.log.warn("Checkout attempt blocked — payments disabled (beta)");
+    return res.status(503).json({
+      error: "Checkout is disabled while PrizePour is in beta. Real entries open at launch.",
+      betaMode: true,
+    });
+  }
+
   const { giveawayId, ticketQty, firstName, lastName, email, amountCents, referralCode } = req.body as {
     giveawayId: number;
     ticketQty: number;

@@ -602,7 +602,7 @@ export function Home() {
                               className={`relative w-full text-primary-foreground font-semibold uppercase tracking-[0.15em] h-14 min-h-[52px] shadow-[0_8px_30px_-6px_rgba(234,146,55,0.55)] hover:translate-y-[-1px] transition-transform ${isPatronFeatured ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-primary hover:bg-primary/90'}`}
                               onClick={() => setLocation(isBushmillsFeatured ? '/experiences/bushmills' : `/giveaway/${featured.id}`)}
                             >
-                              Buy Tickets — Enter Now <ArrowRight className="w-4 h-4 ml-2" />
+                              View Draw — Preview Entry <ArrowRight className="w-4 h-4 ml-2" />
                             </Button>
                           </div>
                         </div>
@@ -765,7 +765,7 @@ export function Home() {
                     className="w-full h-14 min-h-[48px] bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-xs sm:text-sm font-serif px-3"
                     onClick={() => setLocation('/experiences/bushmills')}
                   >
-                    <span className="truncate">Enter the Draw — From £4.99</span>
+                    <span className="truncate">View Draw — Preview Entry</span>
                   </Button>
                 </div>
               </div>
@@ -883,7 +883,7 @@ export function Home() {
                         className="w-full h-14 min-h-[48px] bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-xs sm:text-sm font-serif px-4 sm:px-6"
                         onClick={() => setLocation(`/giveaway/${g.id}`)}
                       >
-                        <span className="truncate">Enter the Draw — From £2.99</span>
+                        <span className="truncate">View Draw — Preview Entry</span>
                       </Button>
                     </div>
                   </div>

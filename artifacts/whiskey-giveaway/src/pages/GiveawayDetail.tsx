@@ -8,9 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw, ShieldCheck, Lock, Mail } from 'lucide-react';
 import { useGetGiveaway } from '@workspace/api-client-react';
 import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
+
+// ── Beta flag ──────────────────────────────────────────────────────────────
+// PrizePour is in beta. Real payments are disabled until launch.
+// Flip to `true` only once Stripe is connected and you're ready to take money.
+const PAYMENTS_ENABLED = false;
 
 const TICKET_PACKAGES = [
   { id: 1, qty: 1,  price: 2.99,  badge: null },
@@ -133,6 +138,10 @@ export function GiveawayDetail() {
 
   const handlePayment = async () => {
     if (!giveaway) return;
+    if (!PAYMENTS_ENABLED) {
+      setEntryError('Checkout is disabled while PrizePour is in beta. Real entries open at launch.');
+      return;
+    }
     setEntryError('');
     setIsSubmitting(true);
     try {
@@ -210,6 +219,18 @@ export function GiveawayDetail() {
         <Button variant="ghost" className="mb-6 -ml-4 text-muted-foreground hover:text-foreground" onClick={() => setLocation('/')}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Giveaways
         </Button>
+
+        {!PAYMENTS_ENABLED && (
+          <div className="mb-8 flex items-center gap-3 border border-primary/30 bg-primary/5 rounded-sm px-4 py-3">
+            <span className="inline-flex items-center gap-1.5 shrink-0 px-2 py-0.5 rounded-full border border-primary/40 bg-primary/15">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="text-[10px] font-serif text-primary uppercase tracking-[0.2em]">Beta</span>
+            </span>
+            <p className="text-xs sm:text-sm font-serif text-muted-foreground leading-snug">
+              Browse the full entry flow — checkout is disabled until launch. No real charges will be made.
+            </p>
+          </div>
+        )}
 
         {/* Progress Bar — 5 steps */}
         <div className="mb-12">
@@ -560,7 +581,11 @@ export function GiveawayDetail() {
             >
               <div className="space-y-1">
                 <h2 className="text-3xl font-serif text-primary">Confirm Your Entry</h2>
-                <p className="text-muted-foreground text-sm">Review your details and proceed to secure checkout.</p>
+                <p className="text-muted-foreground text-sm">
+                  {PAYMENTS_ENABLED
+                    ? 'Review your details and proceed to secure checkout.'
+                    : 'Review your details — checkout will open during launch.'}
+                </p>
               </div>
 
               <div className="bg-card border border-border rounded-sm p-5 sm:p-8 space-y-6">
@@ -599,19 +624,53 @@ export function GiveawayDetail() {
                   </div>
                 )}
 
-                <Button
-                  className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base gap-2 disabled:opacity-50"
-                  onClick={handlePayment}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /> Redirecting to Stripe…</>
-                  ) : (
-                    <><ShieldCheck className="w-5 h-5" /> Pay £{selectedPackage.price.toFixed(2)} — Secure Checkout</>
-                  )}
-                </Button>
+                {PAYMENTS_ENABLED ? (
+                  <>
+                    <Button
+                      className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-base gap-2 disabled:opacity-50"
+                      onClick={handlePayment}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <><Loader2 className="w-5 h-5 animate-spin" /> Redirecting to Stripe…</>
+                      ) : (
+                        <><ShieldCheck className="w-5 h-5" /> Pay £{selectedPackage.price.toFixed(2)} — Secure Checkout</>
+                      )}
+                    </Button>
+                    <p className="text-center text-xs text-muted-foreground font-serif">Powered by Stripe · 256-bit SSL encryption</p>
+                  </>
+                ) : (
+                  <div className="relative overflow-hidden border border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-sm p-5 sm:p-6 space-y-4">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-full bg-primary/15 border border-primary/40 flex items-center justify-center shrink-0">
+                        <Lock className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-serif text-base text-primary leading-tight">Checkout opens at launch</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground font-serif leading-relaxed">
+                          PrizePour is currently in beta. We're not taking real entries yet — your card won't be charged and no tickets are issued.
+                        </p>
+                      </div>
+                    </div>
 
-                <p className="text-center text-xs text-muted-foreground font-serif">Powered by Stripe · 256-bit SSL encryption</p>
+                    <Button
+                      disabled
+                      className="w-full h-14 bg-primary/40 text-primary-foreground/80 uppercase tracking-widest text-sm sm:text-base gap-2 cursor-not-allowed pointer-events-none"
+                    >
+                      <Lock className="w-5 h-5" />
+                      Payments disabled · Beta
+                    </Button>
+
+                    <a
+                      href={`mailto:hello@prizepour.com?subject=Notify%20me%20at%20launch%20—%20${encodeURIComponent(giveaway.name)}`}
+                      className="flex items-center justify-center gap-2 text-xs sm:text-sm font-serif text-primary/90 hover:text-primary uppercase tracking-widest transition-colors"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      Notify me at launch
+                    </a>
+                  </div>
+                )}
               </div>
 
               <Button variant="ghost" className="w-full" onClick={() => setStep(3)}>← Back</Button>

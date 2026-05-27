@@ -191,7 +191,7 @@ export function BushmillsExperience() {
                   onClick={scrollToTickets}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground font-serif uppercase tracking-[0.15em] text-sm h-12 min-h-[48px] px-6"
                 >
-                  Enter the Draw <ArrowRight className="w-4 h-4 ml-2" />
+                  View Draw — Preview <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
                 <Button
                   size="lg"
