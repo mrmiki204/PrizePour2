@@ -60,7 +60,7 @@ router.post("/giveaways", requireAdmin, async (req, res): Promise<void> => {
     return;
   }
 
-  const { prizeValueNumeric, drawDate, isActive, ...rest } = parsed.data;
+  const { prizeValueNumeric, drawDate, isActive, ticketPriceGbp, ...rest } = parsed.data;
   const [giveaway] = await db
     .insert(giveawaysTable)
     .values({
@@ -68,6 +68,7 @@ router.post("/giveaways", requireAdmin, async (req, res): Promise<void> => {
       prizeValueNumeric: String(prizeValueNumeric),
       drawDate: new Date(drawDate),
       isActive: isActive ?? true,
+      ...(ticketPriceGbp !== undefined ? { ticketPriceGbp: String(ticketPriceGbp) } : {}),
     })
     .returning();
 
@@ -188,11 +189,13 @@ router.patch(
       return;
     }
 
-    const { prizeValueNumeric, drawDate, ...rest } = body.data;
+    const { prizeValueNumeric, drawDate, ticketPriceGbp, ...rest } = body.data;
     const updates: Record<string, unknown> = { ...rest };
     if (prizeValueNumeric !== undefined)
       updates.prizeValueNumeric = String(prizeValueNumeric);
     if (drawDate !== undefined) updates.drawDate = new Date(drawDate);
+    if (ticketPriceGbp !== undefined)
+      updates.ticketPriceGbp = String(ticketPriceGbp);
 
     const [updated] = await db
       .update(giveawaysTable)

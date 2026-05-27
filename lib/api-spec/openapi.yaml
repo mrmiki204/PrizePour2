@@ -306,7 +306,7 @@ components:
 
     Giveaway:
       type: object
-      required: [id, name, description, prizeValue, prizeValueNumeric, maxEntries, drawDate, isActive, isPublic, entriesPaused, entryCount, createdAt]
+      required: [id, name, description, prizeValue, prizeValueNumeric, maxEntries, drawDate, isActive, isPublic, entriesPaused, ticketPriceGbp, entryCount, createdAt]
       properties:
         id:
           type: integer
@@ -332,6 +332,11 @@ components:
           type: boolean
         entriesPaused:
           type: boolean
+        ticketPriceGbp:
+          type: string
+        heroTagline:
+          type: string
+          nullable: true
         entryCount:
           type: integer
         createdAt:
@@ -368,6 +373,11 @@ components:
           type: boolean
         entriesPaused:
           type: boolean
+        ticketPriceGbp:
+          type: number
+        heroTagline:
+          type: string
+          nullable: true
 
     GiveawayUpdate:
       type: object
@@ -398,6 +408,11 @@ components:
           type: boolean
         entriesPaused:
           type: boolean
+        ticketPriceGbp:
+          type: number
+        heroTagline:
+          type: string
+          nullable: true
 
     Entry:
       type: object

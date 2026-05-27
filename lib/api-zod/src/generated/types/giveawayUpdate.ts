@@ -21,4 +21,6 @@ export interface GiveawayUpdate {
   isActive?: boolean;
   isPublic?: boolean;
   entriesPaused?: boolean;
+  ticketPriceGbp?: number;
+  heroTagline?: string | null;
 }

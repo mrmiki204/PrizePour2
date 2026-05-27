@@ -21,6 +21,8 @@ export interface Giveaway {
   isActive: boolean;
   isPublic: boolean;
   entriesPaused: boolean;
+  ticketPriceGbp: string;
+  heroTagline?: string | null;
   entryCount: number;
   createdAt: string;
 }
@@ -40,6 +42,8 @@ export interface GiveawayInput {
   isActive?: boolean;
   isPublic?: boolean;
   entriesPaused?: boolean;
+  ticketPriceGbp?: number;
+  heroTagline?: string | null;
 }
 
 export interface GiveawayUpdate {
@@ -57,6 +61,8 @@ export interface GiveawayUpdate {
   isActive?: boolean;
   isPublic?: boolean;
   entriesPaused?: boolean;
+  ticketPriceGbp?: number;
+  heroTagline?: string | null;
 }
 
 export interface Entry {

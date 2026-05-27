@@ -37,6 +37,8 @@ interface EditForm {
   prizeValueNumeric: string;
   maxEntries: string;
   drawDate: string;
+  ticketPriceGbp: string;
+  heroTagline: string;
 }
 
 function formToInitial(g: Giveaway): EditForm {
@@ -46,6 +48,8 @@ function formToInitial(g: Giveaway): EditForm {
     prizeValueNumeric: g.prizeValueNumeric,
     maxEntries: String(g.maxEntries),
     drawDate: new Date(g.drawDate).toISOString().slice(0, 16),
+    ticketPriceGbp: g.ticketPriceGbp,
+    heroTagline: g.heroTagline ?? '',
   };
 }
 
@@ -145,6 +149,7 @@ export function AdminDraws() {
     const prizeNum = parseFloat(form.prizeValueNumeric);
     const maxEntries = parseInt(form.maxEntries, 10);
     const drawDateParsed = new Date(form.drawDate);
+    const ticketPrice = parseFloat(form.ticketPriceGbp);
 
     if (!form.description.trim()) {
       setFormError('Description cannot be empty.');
@@ -170,6 +175,20 @@ export function AdminDraws() {
       setFormError('Draw date is invalid.');
       return;
     }
+    if (isNaN(ticketPrice) || ticketPrice < 0.5 || ticketPrice > 50) {
+      setFormError('Ticket price must be between £0.50 and £50.00.');
+      return;
+    }
+
+    const priceChanged = Math.abs(ticketPrice - parseFloat(g.ticketPriceGbp)) > 0.001;
+    if (priceChanged) {
+      const ok = window.confirm(
+        `Change ticket price from £${parseFloat(g.ticketPriceGbp).toFixed(2)} to £${ticketPrice.toFixed(2)}?\n\n` +
+        `This affects the 140 % capacity formula and the single-ticket price shown across the site. ` +
+        `Existing Stripe products and bundle prices are NOT re-seeded automatically.`,
+      );
+      if (!ok) return;
+    }
 
     setSavingId(g.id);
     try {
@@ -181,6 +200,8 @@ export function AdminDraws() {
           prizeValueNumeric: prizeNum,
           maxEntries,
           drawDate: drawDateParsed.toISOString(),
+          ticketPriceGbp: ticketPrice,
+          heroTagline: form.heroTagline.trim() || null,
         },
       });
       await refetch();
@@ -453,7 +474,7 @@ export function AdminDraws() {
 
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm font-serif">
                         <InfoCell label="Prize value" value={g.prizeValue} accent />
-                        <InfoCell label="Ticket price" value={`£${TICKET_PRICE_GBP.toFixed(2)}`} />
+                        <InfoCell label="Ticket price" value={`£${parseFloat(g.ticketPriceGbp).toFixed(2)}`} />
                         <InfoCell
                           label="Tickets"
                           value={`${ticketsRemaining} left`}
@@ -604,18 +625,34 @@ export function AdminDraws() {
                                 onChange={(e) => setField('drawDate', e.target.value)}
                               />
                             </div>
-                            <div className="md:col-span-2 space-y-1">
-                              <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">
-                                Ticket price (read-only)
+                            <div className="space-y-1">
+                              <Label className="text-xs font-serif uppercase tracking-widest">
+                                Ticket price (£)
                               </Label>
                               <Input
-                                value={`£${TICKET_PRICE_GBP.toFixed(2)}`}
-                                disabled
-                                className="opacity-70 cursor-not-allowed"
+                                type="number"
+                                step="0.01"
+                                min="0.5"
+                                max="50"
+                                value={form.ticketPriceGbp}
+                                onChange={(e) => setField('ticketPriceGbp', e.target.value)}
                               />
                               <p className="text-[10px] text-muted-foreground font-serif">
-                                Ticket price is fixed at £{TICKET_PRICE_GBP.toFixed(2)} during beta (140 % capacity
-                                rule).
+                                Default £4.99. Changing this rescales the 140 % capacity formula and updates
+                                single-ticket price displays. Bundle prices on the entry page are separate.
+                              </p>
+                            </div>
+                            <div className="md:col-span-2 space-y-1">
+                              <Label className="text-xs font-serif uppercase tracking-widest">
+                                Hero tagline (optional)
+                              </Label>
+                              <Input
+                                value={form.heroTagline}
+                                onChange={(e) => setField('heroTagline', e.target.value)}
+                                placeholder="e.g. The world's rarest tequila collection — yours for £4.99."
+                              />
+                              <p className="text-[10px] text-muted-foreground font-serif">
+                                Shown above the prize name on the giveaway detail page. Leave blank to hide.
                               </p>
                             </div>
                           </div>

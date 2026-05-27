@@ -102,6 +102,8 @@ export const ListGiveawaysResponseItem = zod.object({
   isActive: zod.boolean(),
   isPublic: zod.boolean(),
   entriesPaused: zod.boolean(),
+  ticketPriceGbp: zod.string(),
+  heroTagline: zod.string().nullish(),
   entryCount: zod.number(),
   createdAt: zod.coerce.date(),
 });
@@ -122,6 +124,8 @@ export const CreateGiveawayBody = zod.object({
   isActive: zod.boolean().optional(),
   isPublic: zod.boolean().optional(),
   entriesPaused: zod.boolean().optional(),
+  ticketPriceGbp: zod.number().optional(),
+  heroTagline: zod.string().nullish(),
 });
 
 /**
@@ -156,6 +160,8 @@ export const GetGiveawayResponse = zod.object({
   isActive: zod.boolean(),
   isPublic: zod.boolean(),
   entriesPaused: zod.boolean(),
+  ticketPriceGbp: zod.string(),
+  heroTagline: zod.string().nullish(),
   entryCount: zod.number(),
   createdAt: zod.coerce.date(),
 });
@@ -178,6 +184,8 @@ export const UpdateGiveawayBody = zod.object({
   isActive: zod.boolean().optional(),
   isPublic: zod.boolean().optional(),
   entriesPaused: zod.boolean().optional(),
+  ticketPriceGbp: zod.number().optional(),
+  heroTagline: zod.string().nullish(),
 });
 
 export const UpdateGiveawayResponse = zod.object({
@@ -192,6 +200,8 @@ export const UpdateGiveawayResponse = zod.object({
   isActive: zod.boolean(),
   isPublic: zod.boolean(),
   entriesPaused: zod.boolean(),
+  ticketPriceGbp: zod.string(),
+  heroTagline: zod.string().nullish(),
   entryCount: zod.number(),
   createdAt: zod.coerce.date(),
 });
@@ -215,6 +225,8 @@ export const DeleteGiveawayResponse = zod.object({
   isActive: zod.boolean(),
   isPublic: zod.boolean(),
   entriesPaused: zod.boolean(),
+  ticketPriceGbp: zod.string(),
+  heroTagline: zod.string().nullish(),
   entryCount: zod.number(),
   createdAt: zod.coerce.date(),
 });

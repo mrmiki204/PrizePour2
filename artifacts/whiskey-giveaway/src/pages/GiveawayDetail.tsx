@@ -325,6 +325,11 @@ export function GiveawayDetail() {
                   })()}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent pointer-events-none" />
                   <div className="absolute bottom-6 left-6 right-6 space-y-4">
+                    {giveaway.heroTagline && (
+                      <p className="text-xs sm:text-sm font-serif italic text-primary/90 leading-snug">
+                        {giveaway.heroTagline}
+                      </p>
+                    )}
                     <h2 className="text-3xl font-serif leading-tight">{giveaway.name}</h2>
                     <div className="flex justify-between items-center text-sm font-serif">
                       <span className="text-primary">{giveaway.prizeValue}</span>

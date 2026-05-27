@@ -14,6 +14,8 @@ export const giveawaysTable = pgTable("giveaways", {
   isActive: boolean("is_active").notNull().default(true),
   isPublic: boolean("is_public").notNull().default(true),
   entriesPaused: boolean("entries_paused").notNull().default(false),
+  ticketPriceGbp: numeric("ticket_price_gbp", { precision: 6, scale: 2 }).notNull().default("4.99"),
+  heroTagline: text("hero_tagline"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

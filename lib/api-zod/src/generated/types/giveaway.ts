@@ -18,6 +18,8 @@ export interface Giveaway {
   isActive: boolean;
   isPublic: boolean;
   entriesPaused: boolean;
+  ticketPriceGbp: string;
+  heroTagline?: string | null;
   entryCount: number;
   createdAt: Date;
 }
