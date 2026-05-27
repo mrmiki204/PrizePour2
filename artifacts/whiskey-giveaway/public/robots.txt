@@ -1,2 +1,10 @@
 User-agent: *
 Allow: /
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /draw/
+Disallow: /profile
+Disallow: /my-referrals
+
+Sitemap: https://www.prizepour.com/sitemap.xml
