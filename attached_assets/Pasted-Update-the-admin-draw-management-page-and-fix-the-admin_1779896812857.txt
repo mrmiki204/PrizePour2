@@ -1,0 +1,92 @@
+Update the admin draw management page and fix the admin header overlap issue.
+
+Problems to fix:
+
+1. Existing collections are missing from admin
+   The admin draw management page works, but it does not show all existing/previous collections/draws already used on the website.
+
+Examples that must appear:
+
+* The Patrón Collection
+* The Clonakilty Collection
+* Bushmills Distillery Tour Experience
+* Any other seeded or existing collections
+
+2. Header overlap/layout issue
+   On the admin page, the top navigation/header is covering the “DRAW & ENTRY MANAGEMENT” text section (see attached screenshot). The content is sitting underneath the header instead of below it.
+
+Required fixes:
+
+ADMIN DRAWS
+
+* Display all giveaway/draw records in `/admin/draws`
+* Include:
+
+  * active draws
+  * hidden draws
+  * paused draws
+  * inactive draws
+  * ended/previous draws
+  * beta/test draws
+* Make sure Patrón and Clonakilty appear in admin.
+* If Bushmills is separate/static, include it or explain why.
+
+Add filters/tabs:
+
+* All Draws
+* Active
+* Hidden
+* Paused
+* Previous / Ended
+
+For each draw show:
+
+* name
+* image thumbnail
+* prize value
+* ticket price
+* tickets sold
+* tickets remaining
+* total tickets
+* draw end date
+* active/hidden/paused status
+
+Allow admin to:
+
+* activate/deactivate draw
+* hide/show draw publicly
+* pause entries
+* edit ticket price
+* edit total tickets
+* edit remaining tickets
+* edit draw end date
+* edit description
+* save changes safely
+
+HEADER / SPACING FIX
+Fix the admin page layout so the header/navigation no longer overlaps page content.
+
+Specifically:
+
+* “DRAW & ENTRY MANAGEMENT” must be fully visible below the header.
+* Add proper top spacing/padding/margin below the beta banner + navigation.
+* Ensure no page heading or content is hidden under the header.
+* Fix for mobile and desktop.
+* Test responsive layouts (320px, 375px, 390px, 430px, 768px, desktop).
+
+Important:
+
+* Keep the PrizePour luxury dark/gold style.
+* Do not redesign the header.
+* Do not remove the beta banner.
+* Only fix spacing/layering.
+* Public homepage should still only show active/visible draws.
+* Admin page should show everything.
+
+After completion:
+
+* list files changed
+* explain how existing collections are loaded into admin
+* confirm Patrón + Clonakilty appear
+* explain what spacing/layout fixes were made
+* confirm if I need to push to GitHub for Railway deployment

@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   LogOut,
   CheckCircle2,
+  Info,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -78,6 +79,7 @@ export function AdminDraws() {
   const [formError, setFormError] = useState<string>('');
   const [savedId, setSavedId] = useState<number | null>(null);
   const [confirm, setConfirm] = useState<ConfirmState>(emptyConfirm);
+  const [filter, setFilter] = useState<'all' | 'active' | 'hidden' | 'paused' | 'ended'>('all');
 
   const sorted = useMemo(
     () =>
@@ -87,6 +89,38 @@ export function AdminDraws() {
       }),
     [giveaways],
   );
+
+  const now = Date.now();
+  const counts = useMemo(() => {
+    const c = { all: sorted.length, active: 0, hidden: 0, paused: 0, ended: 0 };
+    for (const g of sorted) {
+      const ended = new Date(g.drawDate).getTime() < now;
+      if (g.isActive && g.isPublic && !g.entriesPaused && !ended) c.active++;
+      if (!g.isPublic) c.hidden++;
+      if (g.entriesPaused) c.paused++;
+      if (ended) c.ended++;
+    }
+    return c;
+  }, [sorted, now]);
+
+  const filtered = useMemo(() => {
+    return sorted.filter((g) => {
+      const ended = new Date(g.drawDate).getTime() < now;
+      switch (filter) {
+        case 'active':
+          return g.isActive && g.isPublic && !g.entriesPaused && !ended;
+        case 'hidden':
+          return !g.isPublic;
+        case 'paused':
+          return g.entriesPaused;
+        case 'ended':
+          return ended;
+        case 'all':
+        default:
+          return true;
+      }
+    });
+  }, [sorted, filter, now]);
 
   const startEdit = (g: Giveaway) => {
     setEditingId(g.id);
@@ -224,7 +258,7 @@ export function AdminDraws() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
-      <div className="flex-1 pt-20 sm:pt-24 md:pt-28 pb-16 max-w-6xl mx-auto w-full px-4 sm:px-6 space-y-6 sm:space-y-8">
+      <div className="flex-1 pt-28 sm:pt-32 md:pt-40 pb-16 max-w-6xl mx-auto w-full px-4 sm:px-6 space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
@@ -286,6 +320,62 @@ export function AdminDraws() {
           </div>
         </div>
 
+        {/* Static experiences explainer */}
+        <div className="border border-border rounded-sm p-3 sm:p-4 bg-secondary/20 text-xs sm:text-sm font-serif flex items-start gap-3 text-muted-foreground">
+          <Info className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
+          <div className="space-y-1">
+            <p>
+              <strong className="text-foreground">Bushmills Distillery Tour Experience</strong> is a static
+              experience landing page at{' '}
+              <Link href="/experiences/bushmills">
+                <a className="text-primary underline">/experiences/bushmills</a>
+              </Link>{' '}
+              — it is not a database draw, so it does not appear in this list. Static experiences must be edited in
+              code (<code className="text-foreground/80">src/pages/BushmillsExperience.tsx</code>).
+            </p>
+            <p className="text-muted-foreground/80">
+              All true draws (Patrón Collection, Clonakilty Collection, and any new ones you create) live in the
+              database and appear below.
+            </p>
+          </div>
+        </div>
+
+        {/* Filter tabs */}
+        {!isLoading && sorted.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 border-b border-border pb-3">
+            {(['all', 'active', 'hidden', 'paused', 'ended'] as const).map((key) => {
+              const label =
+                key === 'all'
+                  ? 'All Draws'
+                  : key === 'active'
+                    ? 'Active'
+                    : key === 'hidden'
+                      ? 'Hidden'
+                      : key === 'paused'
+                        ? 'Paused'
+                        : 'Previous / Ended';
+              const active = filter === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setFilter(key)}
+                  className={`px-3 py-1.5 rounded-sm text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-colors ${
+                    active
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-secondary/30 text-muted-foreground hover:text-foreground hover:border-primary/40'
+                  }`}
+                >
+                  {label}
+                  <span className={`ml-1.5 text-[10px] ${active ? 'text-primary/70' : 'text-muted-foreground/60'}`}>
+                    {counts[key]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {/* List */}
         {isLoading ? (
           <div className="flex items-center justify-center py-20 text-muted-foreground font-serif text-sm">
@@ -299,9 +389,13 @@ export function AdminDraws() {
             </Link>
             .
           </div>
+        ) : filtered.length === 0 ? (
+          <div className="bg-card border border-border rounded-sm p-10 text-center text-muted-foreground font-serif text-sm">
+            No draws match the <span className="text-primary">{filter}</span> filter.
+          </div>
         ) : (
           <div className="space-y-4">
-            {sorted.map((g) => {
+            {filtered.map((g) => {
               const isEditing = editingId === g.id;
               const isSaving = savingId === g.id;
               const isToggling = togglingId === g.id;

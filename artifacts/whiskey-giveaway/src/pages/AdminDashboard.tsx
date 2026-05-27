@@ -324,7 +324,7 @@ export function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
-      <div className="flex-1 pt-20 sm:pt-24 md:pt-28 pb-16 max-w-7xl mx-auto w-full px-4 sm:px-6 space-y-8 sm:space-y-10">
+      <div className="flex-1 pt-28 sm:pt-32 md:pt-40 pb-16 max-w-7xl mx-auto w-full px-4 sm:px-6 space-y-8 sm:space-y-10">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
