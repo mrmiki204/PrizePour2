@@ -54,6 +54,10 @@ app.use(
 );
 app.use(cors({ origin: true, credentials: true }));
 
+// Required so express-session honours Secure cookies behind Railway's / Replit's
+// HTTPS-terminating proxy (otherwise Secure cookies are silently dropped).
+app.set("trust proxy", 1);
+
 app.use(
   session({
     name: "pp.sid",
@@ -62,8 +66,11 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env["NODE_ENV"] === "production",
-      sameSite: process.env["NODE_ENV"] === "production" ? "none" : "lax",
+      // SameSite=None + Secure is required because the Replit preview loads the
+      // app inside a cross-site iframe — Lax cookies would be blocked there,
+      // breaking admin login. Replit dev and Railway prod both serve over HTTPS.
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   }),

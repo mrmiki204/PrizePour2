@@ -1,0 +1,85 @@
+Fix the persistent 401 Unauthorized issue when creating draws in the admin area.
+
+Problem:
+On `/admin/draws`, I can access the admin page, but when I click “Create Draw” I still get:
+
+`HTTP 401: Unauthorized — admin login required`
+
+This means the admin UI is visible, but the create/update draw API request is not being recognised as authenticated by the backend.
+
+Please investigate and implement the most reliable fix.
+
+Likely cause:
+
+* Admin page login state is stored on the frontend, but admin API POST requests are not authenticated correctly.
+* Railway/session cookies may not be persisted or sent correctly.
+* The backend `requireAdmin` middleware rejects create/update requests.
+
+Requirements:
+
+1. Debug the current admin auth flow
+
+* Check how `/admin` login works.
+* Check where admin auth is stored.
+* Check the `requireAdmin` middleware.
+* Check all `/api/admin/*` or admin draw routes.
+* Check frontend fetch/API calls for create/update draw.
+
+2. Fix create/update admin requests
+
+* Ensure Create Draw sends valid admin authentication to the backend.
+* Ensure Update Draw, Activate/Deactivate, Hide/Show, Pause Entries also work.
+* If using cookies/sessions, add `credentials: "include"` to all admin API fetch requests.
+* Ensure Express session/cookie settings work on Railway production with HTTPS.
+
+3. Add a reliable fallback if needed
+   If session cookies are unreliable, add a secure admin token/header fallback:
+
+* Store a temporary admin token after successful admin login.
+* Send it with admin API requests using a header such as:
+  `X-Admin-Token`
+* Backend should validate it safely against the existing admin login/session system or `ADMIN_PASSWORD`.
+* Do not expose admin endpoints publicly.
+* Do not remove admin password protection.
+* Do not hardcode secrets in frontend source.
+
+4. Improve error handling
+
+* If admin session expires, show:
+  “Admin session expired. Please log in again.”
+* Provide a clear button/link back to `/admin`.
+* Do not show raw HTTP errors to the user.
+
+5. Security requirements
+
+* Keep admin pages protected.
+* Do not allow unauthenticated users to create/edit draws.
+* Do not weaken security just to make it work.
+* Do not enable payments.
+* Do not expose `ADMIN_PASSWORD` to the frontend bundle.
+* Use Railway environment variable `ADMIN_PASSWORD` only on the server.
+
+6. Test thoroughly
+   Test:
+
+* Login to `/admin`
+* Open `/admin/draws`
+* Create a draw
+* Edit a draw
+* Activate/deactivate a draw
+* Hide/show a draw
+* Pause entries
+* Refresh page and try again
+* Test on Railway production if possible
+
+Expected result:
+When I am logged in as admin, I can create and edit draws without receiving 401 errors. If I am not logged in, admin write actions remain blocked.
+
+After completion:
+
+* explain the root cause
+* list files changed
+* explain exactly how admin authentication now works
+* confirm create draw works
+* confirm admin endpoints are still protected
+* confirm if I need to push to GitHub for Railway deployment
