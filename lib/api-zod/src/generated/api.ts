@@ -100,6 +100,8 @@ export const ListGiveawaysResponseItem = zod.object({
   drawDate: zod.coerce.date(),
   imageUrl: zod.string().nullish(),
   isActive: zod.boolean(),
+  isPublic: zod.boolean(),
+  entriesPaused: zod.boolean(),
   entryCount: zod.number(),
   createdAt: zod.coerce.date(),
 });
@@ -118,6 +120,8 @@ export const CreateGiveawayBody = zod.object({
   drawDate: zod.coerce.date(),
   imageUrl: zod.string().nullish(),
   isActive: zod.boolean().optional(),
+  isPublic: zod.boolean().optional(),
+  entriesPaused: zod.boolean().optional(),
 });
 
 /**
@@ -150,6 +154,8 @@ export const GetGiveawayResponse = zod.object({
   drawDate: zod.coerce.date(),
   imageUrl: zod.string().nullish(),
   isActive: zod.boolean(),
+  isPublic: zod.boolean(),
+  entriesPaused: zod.boolean(),
   entryCount: zod.number(),
   createdAt: zod.coerce.date(),
 });
@@ -170,6 +176,8 @@ export const UpdateGiveawayBody = zod.object({
   drawDate: zod.coerce.date().optional(),
   imageUrl: zod.string().nullish(),
   isActive: zod.boolean().optional(),
+  isPublic: zod.boolean().optional(),
+  entriesPaused: zod.boolean().optional(),
 });
 
 export const UpdateGiveawayResponse = zod.object({
@@ -182,6 +190,8 @@ export const UpdateGiveawayResponse = zod.object({
   drawDate: zod.coerce.date(),
   imageUrl: zod.string().nullish(),
   isActive: zod.boolean(),
+  isPublic: zod.boolean(),
+  entriesPaused: zod.boolean(),
   entryCount: zod.number(),
   createdAt: zod.coerce.date(),
 });
@@ -203,6 +213,8 @@ export const DeleteGiveawayResponse = zod.object({
   drawDate: zod.coerce.date(),
   imageUrl: zod.string().nullish(),
   isActive: zod.boolean(),
+  isPublic: zod.boolean(),
+  entriesPaused: zod.boolean(),
   entryCount: zod.number(),
   createdAt: zod.coerce.date(),
 });

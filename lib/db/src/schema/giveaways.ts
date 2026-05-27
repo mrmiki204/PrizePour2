@@ -12,6 +12,8 @@ export const giveawaysTable = pgTable("giveaways", {
   drawDate: timestamp("draw_date", { withTimezone: true }).notNull(),
   imageUrl: text("image_url"),
   isActive: boolean("is_active").notNull().default(true),
+  isPublic: boolean("is_public").notNull().default(true),
+  entriesPaused: boolean("entries_paused").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

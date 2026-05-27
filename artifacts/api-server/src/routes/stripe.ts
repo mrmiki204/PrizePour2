@@ -2,7 +2,8 @@ import { Router, type IRouter } from "express";
 import { getUncachableStripeClient } from "../stripeClient.js";
 import { storage } from "../storage.js";
 import { db } from "@workspace/db";
-import { entriesTable, referralRewardsTable } from "@workspace/db";
+import { entriesTable, giveawaysTable, referralRewardsTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 
 const router: IRouter = Router();
 
@@ -56,6 +57,19 @@ router.post("/stripe/checkout", async (req, res) => {
 
   if (!giveawayId || !ticketQty || !firstName || !lastName || !email || !amountCents) {
     return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const [giveaway] = await db
+    .select({ isActive: giveawaysTable.isActive, entriesPaused: giveawaysTable.entriesPaused })
+    .from(giveawaysTable)
+    .where(eq(giveawaysTable.id, giveawayId))
+    .limit(1);
+
+  if (!giveaway || !giveaway.isActive) {
+    return res.status(409).json({ error: "This draw is not currently active." });
+  }
+  if (giveaway.entriesPaused) {
+    return res.status(409).json({ error: "Entries for this draw are temporarily paused.", entriesPaused: true });
   }
 
   const stripe = await getUncachableStripeClient();

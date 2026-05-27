@@ -4,8 +4,8 @@ import type { Giveaway } from '@workspace/api-client-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { daysUntil } from '@/data/giveaways';
-import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2, LogOut } from 'lucide-react';
-import { useLocation } from 'wouter';
+import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2, LogOut, Settings2 } from 'lucide-react';
+import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -333,6 +333,16 @@ export function AdminDashboard() {
             <p className="text-muted-foreground text-xs sm:text-sm font-serif mt-1 uppercase tracking-widest">Draw & Entry Management</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            <Link href="/admin/draws">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 font-serif text-xs uppercase tracking-widest border-primary/40 text-primary hover:bg-primary/10"
+              >
+                <Settings2 className="w-3.5 h-3.5" />
+                Draw Management
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"

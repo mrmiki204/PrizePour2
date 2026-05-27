@@ -38,6 +38,7 @@ router.post("/entries", async (req, res): Promise<void> => {
     .select({
       maxEntries: giveawaysTable.maxEntries,
       isActive: giveawaysTable.isActive,
+      entriesPaused: giveawaysTable.entriesPaused,
     })
     .from(giveawaysTable)
     .where(eq(giveawaysTable.id, rest.giveawayId))
@@ -45,6 +46,11 @@ router.post("/entries", async (req, res): Promise<void> => {
 
   if (!giveaway || !giveaway.isActive) {
     res.status(409).json({ error: "This draw is not currently active." });
+    return;
+  }
+
+  if (giveaway.entriesPaused) {
+    res.status(409).json({ error: "Entries for this draw are temporarily paused." });
     return;
   }
 

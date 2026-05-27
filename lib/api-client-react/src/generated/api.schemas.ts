@@ -19,6 +19,8 @@ export interface Giveaway {
   drawDate: string;
   imageUrl?: string | null;
   isActive: boolean;
+  isPublic: boolean;
+  entriesPaused: boolean;
   entryCount: number;
   createdAt: string;
 }
@@ -36,6 +38,8 @@ export interface GiveawayInput {
   drawDate: string;
   imageUrl?: string | null;
   isActive?: boolean;
+  isPublic?: boolean;
+  entriesPaused?: boolean;
 }
 
 export interface GiveawayUpdate {
@@ -51,6 +55,8 @@ export interface GiveawayUpdate {
   drawDate?: string;
   imageUrl?: string | null;
   isActive?: boolean;
+  isPublic?: boolean;
+  entriesPaused?: boolean;
 }
 
 export interface Entry {

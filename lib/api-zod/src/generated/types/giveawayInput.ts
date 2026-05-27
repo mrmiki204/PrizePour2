@@ -19,4 +19,6 @@ export interface GiveawayInput {
   drawDate: Date;
   imageUrl?: string | null;
   isActive?: boolean;
+  isPublic?: boolean;
+  entriesPaused?: boolean;
 }
