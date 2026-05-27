@@ -210,7 +210,13 @@ export function AdminDraws() {
       setSavedId(g.id);
       setTimeout(() => setSavedId((c) => (c === g.id ? null : c)), 2500);
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Save failed.');
+      const msg = err instanceof Error ? err.message : 'Save failed.';
+      if (/401|unauthor/i.test(msg)) {
+        setFormError('Your admin session has expired. Reloading…');
+        setTimeout(() => window.location.reload(), 1200);
+      } else {
+        setFormError(msg);
+      }
     } finally {
       setSavingId(null);
     }
@@ -221,6 +227,14 @@ export function AdminDraws() {
     try {
       await updateGiveaway.mutateAsync({ id: g.id, data: { [field]: next } });
       await refetch();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '';
+      if (/401|unauthor/i.test(msg)) {
+        alert('Your admin session has expired. Please log in again.');
+        window.location.reload();
+      } else {
+        alert(msg || 'Update failed.');
+      }
     } finally {
       setTogglingId(null);
     }
