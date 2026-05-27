@@ -14,6 +14,9 @@ import { MyReferrals } from "@/pages/MyReferrals";
 import { Profile } from "@/pages/Profile";
 import { BushmillsExperience } from "@/pages/BushmillsExperience";
 import { HowItWorks } from "@/pages/HowItWorks";
+import { ResponsibleDrinking } from "@/pages/ResponsibleDrinking";
+import { Faq } from "@/pages/Faq";
+import { WinnerSelection } from "@/pages/WinnerSelection";
 import NotFound from "@/pages/not-found";
 import { AgeGate } from "@/components/AgeGate";
 
@@ -33,6 +36,9 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/experiences/bushmills" component={BushmillsExperience} />
       <Route path="/how-it-works" component={HowItWorks} />
+      <Route path="/responsible-drinking" component={ResponsibleDrinking} />
+      <Route path="/faq" component={Faq} />
+      <Route path="/how-winners-are-selected" component={WinnerSelection} />
       <Route component={NotFound} />
     </Switch>
   );
