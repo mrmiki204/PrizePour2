@@ -348,7 +348,6 @@ function LiveActivityTicker() {
 export function Home() {
   const [, setLocation] = useLocation();
   const { data: giveaways, isLoading: giveawaysLoading } = useListGiveaways();
-  const [showBanner, setShowBanner] = useState(true);
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
@@ -369,11 +368,6 @@ export function Home() {
     () => (giveaways ? [bushmillsFeatured, ...giveaways] : [bushmillsFeatured]),
     [giveaways, bushmillsFeatured],
   );
-
-  useEffect(() => {
-    const t = setTimeout(() => setShowBanner(false), 3000);
-    return () => clearTimeout(t);
-  }, []);
 
   const goToSlide = (i: number) => {
     setDirection(i > featuredIndex ? 1 : -1);
@@ -404,24 +398,6 @@ export function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
-      <AnimatePresence>
-        {showBanner && (
-          <motion.div
-            initial={{ y: '-100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '-100%' }}
-            transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-            className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center py-3 sm:py-5 px-4 sm:px-6"
-            style={{ background: 'linear-gradient(135deg, #3d1a05 0%, #1c0c03 100%)', borderBottom: '2px solid #ea9237' }}
-          >
-            <div className="text-center">
-              <p className="font-serif text-[10px] sm:text-xs tracking-widest text-amber-500/70 uppercase mb-1">Draw Status</p>
-              <p className="font-serif text-xl sm:text-3xl md:text-5xl text-amber-400 tracking-wide">No Active Draws</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <Navbar onScrollTo={scrollTo} />
 
       {/* ── Hero / Featured Draw ── */}
