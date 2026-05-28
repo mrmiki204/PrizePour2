@@ -8,8 +8,17 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, ArrowLeft, ShieldCheck, Users, Ticket, Lock, Package, ChevronDown, ChevronUp, Compass, Trophy } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import heroImg from '@/assets/images/hero.png';
+import patronCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_09_40_PM_1780002816388.png';
+import clonakiltyCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_04_51_PM_1780002816391.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
+
+function getCollectionHero(name: string): string | null {
+  const n = name.toLowerCase();
+  if (n.includes('patr')) return patronCollectionHero;
+  if (n.includes('clonakilty')) return clonakiltyCollectionHero;
+  return null;
+}
 
 
 const FAQS = [
@@ -743,8 +752,22 @@ export function Home() {
                   transition={{ duration: 0.6, delay: idx * 0.1 }}
                   className="bg-card border border-border rounded-sm overflow-hidden flex flex-col hover:border-primary/40 transition-colors"
                 >
-                  {/* Top: compact bottle gallery strip — fixed height, single row, capped count */}
+                  {/* Top: premium collection hero image (preferred) or bottle gallery strip (fallback) */}
                   {(() => {
+                    const hero = getCollectionHero(g.name);
+                    if (hero) {
+                      return (
+                        <div className="relative w-full overflow-hidden bg-black aspect-[16/9] sm:aspect-[21/9]">
+                          <img
+                            src={hero}
+                            alt={`${g.name} — premium collection artwork`}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        </div>
+                      );
+                    }
                     if (bottles.length === 0) return null;
                     const maxDesktop = 6;
                     const maxMobile = 4;

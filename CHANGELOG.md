@@ -20,6 +20,16 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Active Draw cards → premium collection hero artwork
+
+- **Change:** replaced the bottle gallery strip at the top of each Active Draw card with a single premium hero image per collection. Patrón card now shows "The PATRÓN Collection — 15 iconic expressions, worth over £1,950" artwork; Clonakilty card shows "The CLONAKILTY Collection — Premium Irish Whiskeys, worth over £500" artwork.
+- **Implementation:** new name-keyed mapping `getCollectionHero(name)` in `Home.tsx` returns the matching imported asset (Patrón → patron hero, Clonakilty → clonakilty hero). If a draw has no matching hero, the card transparently falls back to the existing capped bottle strip — so any future DB-driven draw works without code changes.
+- **Layout:** hero uses `aspect-[16/9] sm:aspect-[21/9] object-cover` — cinematic on desktop, scales cleanly on mobile, no empty box, fills the card image area edge-to-edge. `onError` hides broken images gracefully.
+- **Bottle data preserved:** `BottleList` with "Explore Full Collection" toggle still renders in the details panel below — every bottle name remains visible/explorable. `getGiveawayBottles()` and the underlying data are untouched, so detail pages and the live draw page still show all bottles. DB draw data, public visibility filter, and admin controls all untouched.
+- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx` (two imports + one helper + one render branch in the Active Draws card).
+- **Assets:** imported via Vite's `@assets` alias (`attached_assets/ChatGPT_Image_May_28,_2026,_10_09_40_PM_*.png` for Patrón, `*_10_04_51_PM_*.png` for Clonakilty) — Vite hashes them into the production bundle.
+- **Beta-safe:** no payment, admin, or server changes. Checkout still disabled.
+
 ### Active Draw cards → stacked premium layout
 
 - **Decision:** abandoned the side-by-side 50/50 layout for Active Draw cards. Even with `items-start`, splitting the card into gallery-column + details-column meant the gallery either stretched (blank box) or sat awkwardly half-height next to a much taller details column. A stacked layout cleanly eliminates the problem.

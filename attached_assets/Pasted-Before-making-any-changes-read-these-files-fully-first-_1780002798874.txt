@@ -1,0 +1,82 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Keep PrizePour in beta. Do not enable real payments. Keep `PAYMENTS_ENABLED` safety and admin protection untouched.
+
+Task:
+Replace the old product/bottle grid images for each live draw collection with the new single premium promotional collection images.
+
+New images:
+
+* Clonakilty Collection image: use the new Clonakilty promotional artwork
+* Patrón Collection image: use the new Patrón promotional artwork
+
+Goal:
+Each Active Draw card should display one clean, eye-catching hero image instead of multiple individual bottle/product thumbnails.
+
+Requirements:
+
+* Replace every image/grid shown for “The Clonakilty Collection” with the new Clonakilty image.
+* Replace every image/grid shown for “The Patrón Collection” with the new Patrón image.
+* Make sure each image matches the correct collection.
+* Remove or hide the old bottle thumbnail grid from the homepage Active Draw cards.
+* Keep bottle/product names and full collection data available in the text/details area.
+* Keep “Explore Full Collection” functionality if currently used.
+* Do not delete bottle/product data from the database.
+* Do not hardcode unrelated data.
+* Use DB-driven draw data where possible.
+* Add fallback handling so no broken images appear.
+
+Layout requirements:
+
+* Images should fit perfectly inside each draw card.
+* Use `object-fit: cover` or similar.
+* Image should fill the card image area without stretching/distorting.
+* Maintain a premium wide banner/card look.
+* Rounded corners/borders should match the existing luxury design.
+* Desktop: image should look cinematic and balanced.
+* Mobile: image should scale cleanly above the draw details.
+* No empty spacing inside the image box.
+* No cropped-off important text if avoidable.
+
+Recommended implementation:
+
+* Add the new images into the project assets/public image folder.
+* Update the seeded/default draw image fields for:
+
+  * `clonakilty-collection`
+  * `patron-collection`
+* Update homepage Active Draw card component to prefer the collection hero image over bottle grid thumbnails.
+* Keep bottle thumbnails only for detail pages or expandable collection sections if needed.
+* If a collection has a `heroImage`, `imageUrl`, or similar field, use that for the card.
+* If no image exists, use the existing fallback image.
+
+Test:
+
+1. Homepage Active Draws shows the new Clonakilty promotional image.
+2. Homepage Active Draws shows the new Patrón promotional image.
+3. Each image is matched to the correct draw.
+4. Images fit cleanly on desktop.
+5. Images fit cleanly on mobile.
+6. No old bottle grid appears in the main Active Draw card image area.
+7. No broken images.
+8. Admin still loads all draws.
+9. Public draw visibility rules still work.
+10. Checkout remains disabled.
+
+Update docs:
+
+* Add a short `CHANGELOG.md` entry:
+  “Replaced Active Draw product grids with premium collection hero artwork for Clonakilty and Patrón.”
+
+Only after testing in Replit:
+
+git status
+git add .
+git commit -m "Replace draw product grids with premium collection images"
+git push
+
+After Railway redeploys, verify the live homepage on desktop and mobile.
