@@ -20,6 +20,13 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Active Draw hero artwork → fit full image without cropping
+
+- **Problem:** previous hero used `aspect-[16/9] sm:aspect-[21/9] object-cover`, which cropped the top headline ("THE PATRÓN COLLECTION" / "THE CLONAKILTY COLLECTION") and the bottom "Enter Now" caption from each promo image.
+- **Fix:** hero wrapper changed to `aspect-[3/2] sm:aspect-[16/10] flex items-center justify-center bg-black`; image swapped from `object-cover` → `object-contain object-center`. Full artwork is now visible — no cropped text — with a premium black background filling any small letterboxing.
+- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx` (one className edit).
+- **Preserved:** name-keyed hero mapping, bottle-strip fallback for draws without a hero, `BottleList` "Explore Full Collection" in details panel, DB-driven data, admin controls, beta safety.
+
 ### Active Draw cards → premium collection hero artwork
 
 - **Change:** replaced the bottle gallery strip at the top of each Active Draw card with a single premium hero image per collection. Patrón card now shows "The PATRÓN Collection — 15 iconic expressions, worth over £1,950" artwork; Clonakilty card shows "The CLONAKILTY Collection — Premium Irish Whiskeys, worth over £500" artwork.

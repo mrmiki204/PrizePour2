@@ -1,0 +1,77 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Keep PrizePour in beta. Do not enable real payments. Keep `PAYMENTS_ENABLED` safety and admin protection untouched.
+
+Task:
+Fix the Active Draw promotional images so the full image is visible inside each draw card.
+
+Problem:
+The new Clonakilty and Patrón promotional images are being cropped inside the image box. Important text at the top and bottom is cut off.
+
+Goal:
+Show the full promotional image clearly without cropping.
+
+Required fix:
+
+* Find the Active Draw card image component/CSS.
+* Replace `object-fit: cover` with `object-fit: contain` for the collection hero/promo images.
+* Do not crop the image.
+* Keep the image centred.
+* Add a dark/black premium background behind the image so any empty space looks intentional.
+* Use a consistent aspect ratio that fits the generated promo images properly.
+
+Recommended CSS approach:
+
+* image wrapper:
+
+  * width: 100%
+  * aspect-ratio: 16 / 10 or 4 / 3
+  * background: dark/black luxury background
+  * overflow: hidden
+  * display: flex
+  * align-items: center
+  * justify-content: center
+
+* image:
+
+  * width: 100%
+  * height: 100%
+  * object-fit: contain
+  * object-position: center
+
+Important:
+
+* Do not stretch or distort images.
+* Do not crop important text.
+* Do not re-enable the old bottle grid.
+* Keep draw data DB-driven.
+* Keep fallback image support.
+* Keep mobile responsive.
+
+Test:
+
+1. Clonakilty image is fully visible.
+2. Patrón image is fully visible.
+3. No top/bottom text is cut off.
+4. Image box still looks premium, not broken.
+5. Desktop layout looks clean.
+6. Mobile layout looks clean.
+7. CTA buttons still work.
+8. Admin visibility rules still work.
+9. Checkout remains disabled.
+
+Update `CHANGELOG.md`:
+“Adjusted Active Draw promotional image fitting so full collection artwork displays without cropping.”
+
+Only after testing:
+
+git status
+git add .
+git commit -m "Fix active draw promotional image fitting"
+git push
+
+After Railway redeploys, check the live homepage again.

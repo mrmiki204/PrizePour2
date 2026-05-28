@@ -757,11 +757,11 @@ export function Home() {
                     const hero = getCollectionHero(g.name);
                     if (hero) {
                       return (
-                        <div className="relative w-full overflow-hidden bg-black aspect-[16/9] sm:aspect-[21/9]">
+                        <div className="relative w-full overflow-hidden bg-black aspect-[3/2] sm:aspect-[16/10] flex items-center justify-center">
                           <img
                             src={hero}
                             alt={`${g.name} — premium collection artwork`}
-                            className="absolute inset-0 w-full h-full object-cover"
+                            className="w-full h-full object-contain object-center"
                             loading="lazy"
                             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                           />
