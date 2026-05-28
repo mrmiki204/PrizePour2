@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
-import { useListGiveaways, useUpdateGiveaway } from '@workspace/api-client-react';
+import { useListGiveaways, useUpdateGiveaway, useDeleteGiveaway } from '@workspace/api-client-react';
 import type { Giveaway } from '@workspace/api-client-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -25,6 +25,8 @@ import {
   LogOut,
   CheckCircle2,
   Info,
+  Trash2,
+  Archive,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -59,6 +61,8 @@ interface ConfirmState {
   message: string;
   confirmLabel: string;
   destructive: boolean;
+  /** If set, user must type this exact string before the confirm button enables. */
+  requireType?: string;
   onConfirm: () => void;
 }
 
@@ -71,10 +75,17 @@ const emptyConfirm: ConfirmState = {
   onConfirm: () => {},
 };
 
+interface ToastState {
+  open: boolean;
+  tone: 'success' | 'error' | 'info';
+  message: string;
+}
+
 export function AdminDraws() {
   const [, setLocation] = useLocation();
   const { data: giveaways = [], isLoading, refetch, isFetching } = useListGiveaways({ all: true });
   const updateGiveaway = useUpdateGiveaway();
+  const deleteGiveaway = useDeleteGiveaway();
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<EditForm | null>(null);
@@ -83,7 +94,20 @@ export function AdminDraws() {
   const [formError, setFormError] = useState<string>('');
   const [savedId, setSavedId] = useState<number | null>(null);
   const [confirm, setConfirm] = useState<ConfirmState>(emptyConfirm);
+  const [confirmInput, setConfirmInput] = useState('');
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [toast, setToast] = useState<ToastState>({ open: false, tone: 'success', message: '' });
   const [filter, setFilter] = useState<'all' | 'active' | 'hidden' | 'paused' | 'ended'>('all');
+
+  const showToast = (tone: ToastState['tone'], message: string) => {
+    setToast({ open: true, tone, message });
+    setTimeout(() => setToast((t) => ({ ...t, open: false })), 4000);
+  };
+
+  const closeConfirm = () => {
+    setConfirm(emptyConfirm);
+    setConfirmInput('');
+  };
 
   const sorted = useMemo(
     () =>
@@ -244,8 +268,50 @@ export function AdminDraws() {
     }
   };
 
-  const askConfirm = (state: Omit<ConfirmState, 'open'>) =>
+  const askConfirm = (state: Omit<ConfirmState, 'open'>) => {
+    setConfirmInput('');
     setConfirm({ ...state, open: true });
+  };
+
+  const handleDelete = (g: Giveaway) => {
+    const hasEntries = g.entryCount > 0;
+    askConfirm({
+      title: hasEntries ? `Archive "${g.name}"?` : `Delete "${g.name}"?`,
+      message: hasEntries
+        ? `Are you sure you want to delete this draw? This action cannot be undone.\n\nThis draw has ${g.entryCount} paid entr${g.entryCount === 1 ? 'y' : 'ies'}, so it cannot be hard-deleted. It will be archived instead — hidden from the public site and deactivated, but all entries and ticket records are preserved for compliance.`
+        : `Are you sure you want to delete this draw? This action cannot be undone.\n\nThis draw has no entries, so it will be permanently removed from the database.\n\nType DELETE below to confirm.`,
+      confirmLabel: hasEntries ? 'Archive draw' : 'Delete permanently',
+      destructive: true,
+      requireType: hasEntries ? undefined : 'DELETE',
+      onConfirm: async () => {
+        setDeletingId(g.id);
+        try {
+          const res = await deleteGiveaway.mutateAsync({ id: g.id });
+          await refetch();
+          if (res.archived) {
+            showToast(
+              'info',
+              `"${res.name}" archived (kept ${res.entryCount} entries for records).`,
+            );
+          } else {
+            showToast('success', `"${res.name}" deleted.`);
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Delete failed.';
+          if (/401|unauthor/i.test(msg)) {
+            const { clearAdminToken } = await import('@/lib/adminToken');
+            clearAdminToken();
+            showToast('error', 'Admin session expired. Please log in again.');
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showToast('error', msg || 'Delete failed.');
+          }
+        } finally {
+          setDeletingId(null);
+        }
+      },
+    });
+  };
 
   const handleToggleActive = (g: Giveaway) => {
     if (g.isActive) {
@@ -560,15 +626,33 @@ export function AdminDraws() {
                     />
                     <div className="flex-1" />
                     {!isEditing ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="gap-2 font-serif text-xs uppercase tracking-widest"
-                        onClick={() => startEdit(g)}
-                        disabled={isToggling}
-                      >
-                        <Edit2 className="w-3.5 h-3.5" /> Edit details
-                      </Button>
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="gap-2 font-serif text-xs uppercase tracking-widest"
+                          onClick={() => startEdit(g)}
+                          disabled={isToggling || deletingId === g.id}
+                        >
+                          <Edit2 className="w-3.5 h-3.5" /> Edit details
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="gap-2 font-serif text-xs uppercase tracking-widest border-red-500/40 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500/60"
+                          onClick={() => handleDelete(g)}
+                          disabled={isToggling || deletingId === g.id}
+                        >
+                          {deletingId === g.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : g.entryCount > 0 ? (
+                            <Archive className="w-3.5 h-3.5" />
+                          ) : (
+                            <Trash2 className="w-3.5 h-3.5" />
+                          )}
+                          {g.entryCount > 0 ? 'Archive' : 'Delete'}
+                        </Button>
+                      </>
                     ) : (
                       <Button
                         size="sm"
@@ -727,7 +811,7 @@ export function AdminDraws() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setConfirm(emptyConfirm)}
+            onClick={closeConfirm}
           >
             <motion.div
               initial={{ y: 12, opacity: 0 }}
@@ -752,36 +836,95 @@ export function AdminDraws() {
                   <h3 className="font-serif text-base sm:text-lg text-foreground">
                     {confirm.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground font-serif mt-1">
+                  <p className="text-sm text-muted-foreground font-serif mt-1 whitespace-pre-line">
                     {confirm.message}
                   </p>
                 </div>
               </div>
+              {confirm.requireType && (
+                <div className="space-y-1">
+                  <Label className="text-xs font-serif uppercase tracking-widest text-muted-foreground">
+                    Type <span className="text-red-400">{confirm.requireType}</span> to confirm
+                  </Label>
+                  <Input
+                    autoFocus
+                    value={confirmInput}
+                    onChange={(e) => setConfirmInput(e.target.value)}
+                    placeholder={confirm.requireType}
+                    className="font-mono"
+                  />
+                </div>
+              )}
               <div className="flex justify-end gap-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   className="font-serif text-xs uppercase tracking-widest"
-                  onClick={() => setConfirm(emptyConfirm)}
+                  onClick={closeConfirm}
                 >
                   Cancel
                 </Button>
                 <Button
                   size="sm"
-                  className={`font-serif text-xs uppercase tracking-widest ${
+                  disabled={
+                    confirm.requireType !== undefined &&
+                    confirmInput !== confirm.requireType
+                  }
+                  className={`font-serif text-xs uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed ${
                     confirm.destructive
                       ? 'bg-red-500 hover:bg-red-600 text-white'
                       : 'bg-primary hover:bg-primary/90 text-primary-foreground'
                   }`}
                   onClick={() => {
-                    confirm.onConfirm();
-                    setConfirm(emptyConfirm);
+                    const cb = confirm.onConfirm;
+                    closeConfirm();
+                    cb();
                   }}
                 >
                   {confirm.confirmLabel}
                 </Button>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Toast */}
+      <AnimatePresence>
+        {toast.open && (
+          <motion.div
+            role="status"
+            initial={{ y: 24, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 24, opacity: 0 }}
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 sm:px-0 w-full sm:w-auto max-w-md"
+          >
+            <div
+              className={`flex items-start gap-3 px-4 py-3 rounded-sm border shadow-2xl font-serif text-sm backdrop-blur-md ${
+                toast.tone === 'success'
+                  ? 'bg-green-950/90 border-green-500/40 text-green-200'
+                  : toast.tone === 'error'
+                    ? 'bg-red-950/90 border-red-500/40 text-red-200'
+                    : 'bg-primary/10 border-primary/40 text-primary'
+              }`}
+            >
+              {toast.tone === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+              ) : toast.tone === 'error' ? (
+                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+              ) : (
+                <Archive className="w-4 h-4 mt-0.5 shrink-0" />
+              )}
+              <span className="leading-snug">{toast.message}</span>
+              <button
+                type="button"
+                onClick={() => setToast((t) => ({ ...t, open: false }))}
+                className="ml-2 opacity-60 hover:opacity-100 shrink-0"
+                aria-label="Dismiss"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

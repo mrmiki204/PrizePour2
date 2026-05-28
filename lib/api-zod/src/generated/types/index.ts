@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./deleteGiveawayResult";
 export * from "./entry";
 export * from "./entryInput";
 export * from "./errorResponse";

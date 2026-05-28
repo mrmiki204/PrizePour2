@@ -207,7 +207,7 @@ export const UpdateGiveawayResponse = zod.object({
 });
 
 /**
- * @summary Disable a giveaway draw
+ * @summary Delete a giveaway draw (hard-delete if no entries, otherwise archive)
  */
 export const DeleteGiveawayParams = zod.object({
   id: zod.coerce.number(),
@@ -216,19 +216,12 @@ export const DeleteGiveawayParams = zod.object({
 export const DeleteGiveawayResponse = zod.object({
   id: zod.number(),
   name: zod.string(),
-  description: zod.string(),
-  prizeValue: zod.string(),
-  prizeValueNumeric: zod.string(),
-  maxEntries: zod.number(),
-  drawDate: zod.coerce.date(),
-  imageUrl: zod.string().nullish(),
-  isActive: zod.boolean(),
-  isPublic: zod.boolean(),
-  entriesPaused: zod.boolean(),
-  ticketPriceGbp: zod.string(),
-  heroTagline: zod.string().nullish(),
+  archived: zod
+    .boolean()
+    .describe(
+      "true if the giveaway was soft-archived (had entries), false if it was hard-deleted from the database.",
+    ),
   entryCount: zod.number(),
-  createdAt: zod.coerce.date(),
 });
 
 /**

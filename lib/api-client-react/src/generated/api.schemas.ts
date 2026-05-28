@@ -65,6 +65,14 @@ export interface GiveawayUpdate {
   heroTagline?: string | null;
 }
 
+export interface DeleteGiveawayResult {
+  id: number;
+  name: string;
+  /** true if the giveaway was soft-archived (had entries), false if it was hard-deleted from the database. */
+  archived: boolean;
+  entryCount: number;
+}
+
 export interface Entry {
   id: number;
   giveawayId: number;

@@ -260,20 +260,66 @@ router.delete(
       return;
     }
 
-    const [disabled] = await db
-      .update(giveawaysTable)
-      .set({ isActive: false })
-      .where(eq(giveawaysTable.id, params.data.id))
-      .returning();
+    const id = params.data.id;
 
-    if (!disabled) {
-      res.status(404).json({ error: "Giveaway not found" });
-      return;
+    try {
+      // Fetch first to confirm existence and count entries.
+      const [existing] = await db
+        .select()
+        .from(giveawaysTable)
+        .where(eq(giveawaysTable.id, id));
+
+      if (!existing) {
+        res.status(404).json({ error: "Giveaway not found" });
+        return;
+      }
+
+      const entries = await db
+        .select({ id: entriesTable.id })
+        .from(entriesTable)
+        .where(eq(entriesTable.giveawayId, id));
+      const entryCount = entries.length;
+
+      if (entryCount === 0) {
+        // Safe to hard-delete: no entries reference this giveaway.
+        await db.delete(giveawaysTable).where(eq(giveawaysTable.id, id));
+        req.log.info({ giveawayId: id, name: existing.name }, "Giveaway hard-deleted");
+        res.json(
+          DeleteGiveawayResponse.parse({
+            id,
+            name: existing.name,
+            archived: false,
+            entryCount: 0,
+          }),
+        );
+        return;
+      }
+
+      // Has paid entries — never destroy. Archive instead (hide + deactivate).
+      await db
+        .update(giveawaysTable)
+        .set({ isActive: false, isPublic: false })
+        .where(eq(giveawaysTable.id, id));
+
+      req.log.info(
+        { giveawayId: id, name: existing.name, entryCount },
+        "Giveaway archived (has entries)",
+      );
+      res.json(
+        DeleteGiveawayResponse.parse({
+          id,
+          name: existing.name,
+          archived: true,
+          entryCount,
+        }),
+      );
+    } catch (err) {
+      const e = err as { code?: string; message?: string };
+      req.log.error({ err, giveawayId: id }, "Giveaway delete failed");
+      res
+        .status(500)
+        .json({ error: `Could not delete giveaway: ${e.message ?? "unknown server error"}` });
     }
-
-    const [withCount] = await withEntryCount([disabled]);
-    req.log.info({ giveawayId: disabled.id }, "Giveaway disabled");
-    res.json(DeleteGiveawayResponse.parse(withCount));
   },
 );
 

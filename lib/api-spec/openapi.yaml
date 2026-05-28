@@ -223,7 +223,7 @@ paths:
     delete:
       operationId: deleteGiveaway
       tags: [giveaways]
-      summary: Disable a giveaway draw
+      summary: Delete a giveaway draw (hard-delete if no entries, otherwise archive)
       parameters:
         - name: id
           in: path
@@ -232,11 +232,11 @@ paths:
             type: integer
       responses:
         "200":
-          description: Giveaway disabled
+          description: Giveaway deleted or archived
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Giveaway"
+                $ref: "#/components/schemas/DeleteGiveawayResult"
         "404":
           description: Giveaway not found
           content:
@@ -413,6 +413,20 @@ components:
         heroTagline:
           type: string
           nullable: true
+
+    DeleteGiveawayResult:
+      type: object
+      required: [id, name, archived, entryCount]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        archived:
+          type: boolean
+          description: true if the giveaway was soft-archived (had entries), false if it was hard-deleted from the database.
+        entryCount:
+          type: integer
 
     Entry:
       type: object

@@ -17,6 +17,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  DeleteGiveawayResult,
   Entry,
   EntryInput,
   ErrorResponse,
@@ -831,7 +832,7 @@ export const useUpdateGiveaway = <
 };
 
 /**
- * @summary Disable a giveaway draw
+ * @summary Delete a giveaway draw (hard-delete if no entries, otherwise archive)
  */
 export const getDeleteGiveawayUrl = (id: number) => {
   return `/api/giveaways/${id}`;
@@ -840,8 +841,8 @@ export const getDeleteGiveawayUrl = (id: number) => {
 export const deleteGiveaway = async (
   id: number,
   options?: RequestInit,
-): Promise<Giveaway> => {
-  return customFetch<Giveaway>(getDeleteGiveawayUrl(id), {
+): Promise<DeleteGiveawayResult> => {
+  return customFetch<DeleteGiveawayResult>(getDeleteGiveawayUrl(id), {
     ...options,
     method: "DELETE",
   });
@@ -892,7 +893,7 @@ export type DeleteGiveawayMutationResult = NonNullable<
 export type DeleteGiveawayMutationError = ErrorType<ErrorResponse>;
 
 /**
- * @summary Disable a giveaway draw
+ * @summary Delete a giveaway draw (hard-delete if no entries, otherwise archive)
  */
 export const useDeleteGiveaway = <
   TError = ErrorType<ErrorResponse>,
