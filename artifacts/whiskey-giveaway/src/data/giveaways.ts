@@ -24,6 +24,7 @@ import patronXoCafeImg from '@/assets/images/patron-xo-cafe.png';
 
 import heroClonakiltyImg from '@/assets/images/hero-clonakilty.png';
 import heroPatronImg from '@/assets/images/hero-patron.png';
+import heroBushmillsImg from '@/assets/images/bushmills-hero.png';
 
 export type { Giveaway } from '@workspace/api-client-react';
 
@@ -200,17 +201,39 @@ export const GIVEAWAY_BOTTLES: Record<number, Bottle[]> = {
   2: PATRON_BOTTLES,
 };
 
+// Bundled hero images by DB id (dev environment only — ids differ in prod).
 export const BUNDLED_IMAGE_MAP: Record<number, string> = {
   1: heroClonakiltyImg,
   2: heroPatronImg,
+};
+
+// Bundled hero images by exact giveaway name (stable across environments —
+// ids are auto-incremented per database, but names are unique and seeded).
+// This is the canonical fallback; the id map above is kept as a safety net.
+const BUNDLED_IMAGE_BY_NAME: Record<string, string> = {
+  'The Clonakilty Collection': heroClonakiltyImg,
+  'The Patrón Collection': heroPatronImg,
+  'Bushmills Distillery Tour Experience': heroBushmillsImg,
 };
 
 export function getGiveawayBottles(giveawayId: number): Bottle[] {
   return GIVEAWAY_BOTTLES[giveawayId] ?? [];
 }
 
-export function getGiveawayImage(id: number, imageUrl?: string | null): string | undefined {
-  if (imageUrl) return imageUrl;
+/**
+ * Resolve the image for a giveaway with this priority:
+ *   1. Admin-supplied `imageUrl` (custom override) — always wins if set.
+ *   2. Bundled image matched by exact giveaway name (stable across envs).
+ *   3. Bundled image matched by DB id (dev fallback).
+ *   4. `undefined` — callers should render their own placeholder.
+ */
+export function getGiveawayImage(
+  id: number,
+  imageUrl?: string | null,
+  name?: string | null,
+): string | undefined {
+  if (imageUrl && imageUrl.trim()) return imageUrl;
+  if (name && BUNDLED_IMAGE_BY_NAME[name]) return BUNDLED_IMAGE_BY_NAME[name];
   return BUNDLED_IMAGE_MAP[id];
 }
 

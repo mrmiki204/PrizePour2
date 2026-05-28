@@ -216,7 +216,7 @@ export function GiveawayDetail() {
     );
   }
 
-  const img = getGiveawayImage(giveaway.id, giveaway.imageUrl);
+  const img = getGiveawayImage(giveaway.id, giveaway.imageUrl, giveaway.name);
   const entryCount = giveaway.entryCount;
   const pct = Math.min((entryCount / giveaway.maxEntries) * 100, 100);
   const remaining = giveaway.maxEntries - entryCount;

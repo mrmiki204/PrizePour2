@@ -7,7 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { daysUntil } from '@/data/giveaways';
+import { daysUntil, getGiveawayImage } from '@/data/giveaways';
 import {
   ArrowLeft,
   Loader2,
@@ -524,20 +524,36 @@ export function AdminDraws() {
                   {/* Top row */}
                   <div className="p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5">
                     {/* Thumb */}
-                    <div className="w-full sm:w-32 h-32 shrink-0 bg-secondary/40 border border-border rounded-sm overflow-hidden flex items-center justify-center">
-                      {g.imageUrl ? (
-                        <img
-                          src={g.imageUrl}
-                          alt={g.name}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className="text-muted-foreground text-[10px] font-serif uppercase tracking-widest">
-                          No image
-                        </span>
-                      )}
-                    </div>
+                    {(() => {
+                      const thumb = getGiveawayImage(g.id, g.imageUrl, g.name);
+                      const isFallback = !g.imageUrl && !!thumb;
+                      return (
+                        <div className="w-full sm:w-32 h-32 shrink-0 bg-secondary/40 border border-border rounded-sm overflow-hidden flex items-center justify-center relative">
+                          {thumb ? (
+                            <>
+                              <img
+                                src={thumb}
+                                alt={g.name}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                              />
+                              {isFallback && (
+                                <span
+                                  className="absolute bottom-1 left-1 right-1 text-center bg-black/70 backdrop-blur text-[8px] font-serif text-muted-foreground uppercase tracking-widest px-1 py-0.5 rounded-sm"
+                                  title="No custom image URL set — using bundled default."
+                                >
+                                  Default
+                                </span>
+                              )}
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground text-[10px] font-serif uppercase tracking-widest">
+                              No image
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">

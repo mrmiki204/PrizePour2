@@ -449,9 +449,9 @@ export function Home() {
                   <div className="lg:col-span-3 relative min-h-[460px] sm:min-h-[480px] lg:min-h-[520px] lg:aspect-auto overflow-hidden bg-black">
                     {hasSpotlight ? (
                       <BottleSpotlight bottles={spotlightBottles} accent={spotlightAccent} />
-                    ) : featured && getGiveawayImage(featured.id, featured.imageUrl) ? (
+                    ) : featured && getGiveawayImage(featured.id, featured.imageUrl, featured.name) ? (
                       <img
-                        src={getGiveawayImage(featured.id, featured.imageUrl)}
+                        src={getGiveawayImage(featured.id, featured.imageUrl, featured.name)}
                         alt={featured?.name}
                         className="absolute inset-0 w-full h-full object-cover"
                       />

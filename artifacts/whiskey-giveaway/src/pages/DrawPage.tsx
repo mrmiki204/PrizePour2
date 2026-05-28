@@ -17,7 +17,7 @@ export function DrawPage() {
   const [lobbyCount, setLobbyCount] = useState(0);
   const entryCount = giveaway?.entryCount ?? 0;
 
-  const img = giveaway ? getGiveawayImage(giveaway.id, giveaway.imageUrl) : undefined;
+  const img = giveaway ? getGiveawayImage(giveaway.id, giveaway.imageUrl, giveaway.name) : undefined;
 
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | undefined;

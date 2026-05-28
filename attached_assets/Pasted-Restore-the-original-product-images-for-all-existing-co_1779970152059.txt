@@ -1,0 +1,68 @@
+Restore the original product images for all existing collections and fix missing Bushmills image.
+
+Problem:
+The admin/public draw system is no longer using the original product images consistently. Bushmills currently has no image and some collections may not be using their previous visuals.
+
+Goal:
+Bring back the original product images used before admin draw management changes.
+
+Requirements:
+
+1. Restore original images
+   Use the previously existing product/hero images for:
+
+* Patrón Collection
+* Clonakilty Collection
+* Bushmills Distillery Tour Experience
+
+Specifically:
+
+* Bushmills image is missing — restore the original Bushmills experience image used before admin changes.
+* Clonakilty should use its original bottle/collection image.
+* Patrón should use its original Patrón bottle/collection image.
+
+2. Image fallback system
+   If a draw has no image:
+
+* automatically fall back to the original/default collection image
+* never show broken image or empty placeholder
+* never show “No Image” for seeded/default collections
+
+3. Admin integration
+   In `/admin/draws`:
+
+* show image thumbnails correctly
+* existing seeded draws should automatically populate with original images
+* if admin image URL is blank, use original fallback image
+
+4. Public site
+   Ensure images appear correctly in:
+
+* homepage hero carousel
+* active draws section
+* giveaway cards
+* draw detail page
+* Bushmills experience page
+
+5. Safety
+
+* Do not break draw management
+* Do not remove admin editing
+* Keep custom image override support
+* If admin uploads/sets a custom image URL, use that instead of fallback
+
+Expected result:
+
+* Bushmills image returns
+* Patrón uses original image
+* Clonakilty uses original image
+* seeded/default draws always have visuals
+* no broken or missing images anywhere
+
+After completion:
+
+* explain where fallback images live
+* list files changed
+* confirm Bushmills image is restored
+* confirm public/admin pages use the correct images
+* confirm if I need to push to GitHub/Railway
