@@ -20,13 +20,20 @@ After every meaningful change:
 
 ## 2026-05-28
 
-### Fix Active Draw card empty spacing
+### Fix Active Draw card gallery column stretching
+
+- **Root cause (final):** previous attempt only centred the bottles inside a still-stretched left column — the blank space remained, just split above/below. CSS Grid items default to `align-items: stretch`, so the left gallery column was being forced to match the right details column's height.
+- **Fix:** changed the card grid from default stretch to `lg:items-start`, and added `lg:self-start lg:w-full` to the desktop bottle wrapper. Now the gallery column takes only the height it needs and sits at the top; the right details column drives the card height; the outer `bg-card` background fills the area beside/below the gallery seamlessly. No tall empty box remains.
+- Right info column padding kept at `sm:p-7 lg:p-8` and inner gap at `gap-5 sm:gap-6` from the previous pass — those tightening changes are good.
+- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx` — two small className edits.
+- **Risks:** pure CSS — no logic, DB, admin, or payment changes. Mobile (`<sm`) untouched. Bottle data, "Explore Full Collection", public visibility filter, and admin controls all preserved.
+
+### Fix Active Draw card empty spacing (superseded by the entry above)
 
 - **Root cause:** the Active Draws card uses `grid lg:grid-cols-2`. The right (info) column is naturally tall (description + bottle list + progress + countdown + CTA + trust line), so the grid stretches both columns to match. The left column's bottle rows have a fixed `aspect-[3/4]`, so they can't grow — they sat at the top of the stretched cell, leaving a large blank box below the bottles on desktop.
-- **Fix:** the desktop bottle-grid wrapper now has `lg:h-full lg:justify-center` so the rows distribute vertically inside the stretched cell (no more blank below). The right info column padding tightened from `sm:p-8 lg:p-10` → `sm:p-7 lg:p-8` and inner gap from `gap-6 sm:gap-8` → `gap-5 sm:gap-6` so the card itself doesn't grow as tall. Added explicit `lg:items-stretch` on the grid to make intent obvious.
-- **Why:** cards now feel tighter and more balanced — bottles sit visually centred opposite the text, premium luxury feel preserved.
-- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx` (one section, three small className edits).
-- **Risks:** pure CSS class adjustments — no logic, no DB, no admin/payment touch. Mobile (`<sm`) layout unchanged (it stacks vertically anyway). Bottle data, `Explore Full Collection` toggle, public visibility filter, and admin controls all untouched.
+- **Fix attempted (insufficient):** added `lg:h-full lg:justify-center` to centre the rows. This only redistributed the blank space — it did not remove it. Superseded by the entry above.
+- Right info column padding tightened from `sm:p-8 lg:p-10` → `sm:p-7 lg:p-8` and inner gap from `gap-6 sm:gap-8` → `gap-5 sm:gap-6` (kept — useful tightening).
+- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx`.
 
 ### Homepage trust & conversion improvements
 

@@ -1,0 +1,88 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Do not enable real payments. Keep beta mode, `PAYMENTS_ENABLED`, and admin protection untouched.
+
+Task:
+Fix the Active Draw card layout properly. The previous change only centred the bottle/product grid inside the left column, but the large empty box still remains.
+
+Problem:
+The left image/gallery column is stretching to the full height of the right details column. This creates a large empty area underneath the product images.
+
+Goal:
+The product/bottle gallery should NOT sit inside a tall empty column. The card should look balanced and premium with no wasted empty space.
+
+Required fix:
+Change the Active Draw card layout so the image/gallery area only takes the height it needs, instead of stretching to match the details column.
+
+Implementation guidance:
+
+* Find the component/CSS for the homepage Active Draw cards.
+* Inspect the outer card layout, image/gallery column, and details column.
+* Remove any `height: 100%`, large `min-height`, `flex: 1`, `align-items: stretch`, or grid stretching causing the left gallery column to fill the full card height.
+* Do not just center the gallery inside the empty space.
+* The gallery column should use `height: auto` and `align-self: start`.
+* The card should use a layout where:
+
+  * left gallery content sits at the top
+  * right details content sits beside it
+  * card height is controlled naturally by content
+  * no large blank panel remains below the gallery
+
+Preferred desktop layout:
+Use a grid/flex structure like:
+
+* Outer card:
+
+  * two columns on desktop
+  * left column = gallery
+  * right column = details
+  * align-items: start, not stretch
+
+* Gallery column:
+
+  * height: fit-content / auto
+  * align-self: start
+  * no large min-height
+  * no forced full-height background panel
+
+If the right details column is taller than the image gallery, do NOT extend the left image background down to match it. Let the background of the overall card handle the full card area instead.
+
+Alternative acceptable fix:
+Move the gallery into a compact top section of the card, then details underneath/alongside, so there is no empty image panel.
+
+Do not:
+
+* Do not remove bottle/product data.
+* Do not hardcode draw cards.
+* Do not break “Explore Full Collection”.
+* Do not affect admin draw visibility.
+* Do not affect public draw filtering.
+* Do not redesign the whole website.
+
+Test specifically:
+
+1. Patrón card has no large empty space below bottles.
+2. Clonakilty card has no large empty space below bottles.
+3. Bushmills card still works if visible.
+4. Desktop layout looks balanced.
+5. Mobile layout stacks cleanly.
+6. CTA buttons still work.
+7. Explore Full Collection still works.
+8. Admin still controls visibility correctly.
+9. Checkout remains disabled.
+
+After fixing, update `CHANGELOG.md` with:
+“Fixed Active Draw card gallery column stretching and removed empty product spacing.”
+
+Only after testing successfully, run:
+
+git status
+git add .
+git commit -m "Fix active draw gallery layout stretching"
+git push
+
+After Railway redeploys, verify the live homepage Active Draws section.

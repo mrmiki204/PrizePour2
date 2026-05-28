@@ -741,7 +741,7 @@ export function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: idx * 0.1 }}
-                  className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 lg:items-stretch hover:border-primary/40 transition-colors"
+                  className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 lg:items-start hover:border-primary/40 transition-colors"
                 >
                   {/* Left: bottle grid — cap columns on mobile so bottles don't shrink to nothing */}
                   {(() => {
@@ -792,7 +792,7 @@ export function Home() {
                         <div className="flex flex-col gap-px bg-border/30 sm:hidden">
                           {renderRows(mobileRows, mobileRowSize)}
                         </div>
-                        <div className="hidden sm:flex flex-col gap-px bg-border/30 lg:h-full lg:justify-center">
+                        <div className="hidden sm:flex flex-col gap-px bg-border/30 lg:self-start lg:w-full">
                           {renderRows(desktopRows, desktopRowSize)}
                         </div>
                       </>
