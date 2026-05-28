@@ -105,5 +105,6 @@ If any of these is missing, the Step 4 button stays gated with the "Checkout ope
 
 ## Pointers
 
+- **`PROJECT_CONTEXT.md`** at the repo root is the canonical living summary of the project (routes, schema, seeds, fixed issues, deploy workflow, AI do/don't rules). **Read it first**, and **keep it updated** whenever a major change ships — new route, new DB field, new seed, fixed bug, new safety rule, or deployment change.
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
 - See the `stripe` skill for Stripe integration setup and conventions
