@@ -5,13 +5,22 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ArrowLeft, ShieldCheck, Users, Ticket, Lock, Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ShieldCheck, Users, Ticket, Lock, Package, ChevronDown, ChevronUp, Compass, Trophy } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import heroImg from '@/assets/images/hero.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
 
 
 const FAQS = [
+  {
+    q: "Why is PrizePour currently in beta?",
+    a: "PrizePour is currently in beta while we test the platform, improve the experience and finalise compliance checks. Checkout is disabled during beta."
+  },
+  {
+    q: "How are winners announced?",
+    a: "Winners will be contacted directly and announced through PrizePour once each draw has closed and verification is complete."
+  },
   {
     q: "Is this legal?",
     a: "Yes. All draws are skill-testing question competitions, fully compliant with UK promotional contest law. No purchase necessary — free entry by mail-in is always available."
@@ -36,7 +45,7 @@ function scrollTo(id: string) {
 
 function BottleList({ bottles }: { bottles: { name: string }[] }) {
   const [expanded, setExpanded] = useState(false);
-  const COLLAPSED = 6;
+  const COLLAPSED = 4;
   const needsToggle = bottles.length > COLLAPSED;
   const shown = expanded || !needsToggle ? bottles : bottles.slice(0, COLLAPSED);
   const hiddenCount = bottles.length - COLLAPSED;
@@ -63,9 +72,9 @@ function BottleList({ bottles }: { bottles: { name: string }[] }) {
           className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-serif uppercase tracking-[0.15em] text-primary hover:text-amber-300 transition-colors"
         >
           {expanded ? (
-            <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
+            <>Show Less <ChevronUp className="w-3.5 h-3.5" /></>
           ) : (
-            <>Show all {bottles.length} bottles (+{hiddenCount}) <ChevronDown className="w-3.5 h-3.5" /></>
+            <>Explore Full Collection — +{hiddenCount} more included <ChevronDown className="w-3.5 h-3.5" /></>
           )}
         </button>
       )}
@@ -150,12 +159,11 @@ function CinematicBackdrop({ accent = 'amber' }: { accent?: 'amber' | 'emerald' 
 
 // ── Live activity ticker: rotating social-proof messages ──
 const ACTIVITY_MESSAGES = [
-  { icon: '🥃', text: 'John from Belfast just entered the Clonakilty draw' },
-  { icon: '⚡', text: '15 tickets sold in the last hour' },
-  { icon: '🌵', text: 'Sarah from Manchester won the Patrón Reposado bundle' },
-  { icon: '🏆', text: 'Over £42,000 in prizes awarded this year' },
-  { icon: '🎟️', text: 'James from Dublin just bought 5 tickets' },
-  { icon: '✨', text: 'Bushmills Distillery Tour — only 215 tickets left' },
+  { icon: '🏆', text: 'Recent Winner • Sarah M. — Manchester • Patrón Reposado Bundle' },
+  { icon: '🥃', text: 'Recent Winner • James D. — Dublin • Clonakilty Single Pot Still' },
+  { icon: '✨', text: 'Bushmills Distillery Tour Experience — premium VIP draw open soon' },
+  { icon: '🛡️', text: 'Every prize sourced from authorised retailers and independently verified' },
+  { icon: '⚖️', text: 'Transparent draws • Independently witnessed • Winners notified within 24 hours' },
 ];
 
 // ── Bottle spotlight: rotating premium bottle showcase with floating motion ──
@@ -418,11 +426,31 @@ export function Home() {
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif leading-tight px-2">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Premium Spirit Giveaways</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Win Rare Spirits &amp; Luxury Distillery Experiences</span>
             </h1>
             <p className="mt-4 sm:mt-5 mx-auto max-w-2xl text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed px-2">
-              Exciting giveaways of premium spirits, exclusive distillery tours, professional bar equipment and more...
+              Premium curated spirit collections, rare bottles and unforgettable whiskey experiences — built for collectors and enthusiasts.
             </p>
+            <p className="mt-3 sm:mt-4 text-[11px] sm:text-xs font-serif uppercase tracking-[0.25em] text-amber-200/80 px-2">
+              UK-based <span className="text-primary/60 mx-1.5">•</span> Transparent winners <span className="text-primary/60 mx-1.5">•</span> Premium verified prizes
+            </p>
+            <div className="mt-6 sm:mt-7 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-2">
+              <Button
+                size="lg"
+                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-[0.15em] h-12 min-h-[48px] px-6 shadow-[0_8px_30px_-6px_rgba(234,146,55,0.55)]"
+                onClick={() => scrollTo('giveaways')}
+              >
+                View Active Draws <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto border-primary/40 hover:border-primary text-foreground hover:text-primary font-semibold uppercase tracking-[0.15em] h-12 min-h-[48px] px-6 bg-card/50 backdrop-blur"
+                onClick={() => scrollTo('how-it-works')}
+              >
+                How It Works
+              </Button>
+            </div>
           </motion.div>
 
           <motion.div
@@ -567,8 +595,11 @@ export function Home() {
                               className={`relative w-full text-primary-foreground font-semibold uppercase tracking-[0.15em] h-14 min-h-[52px] shadow-[0_8px_30px_-6px_rgba(234,146,55,0.55)] hover:translate-y-[-1px] transition-transform ${isPatronFeatured ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-primary hover:bg-primary/90'}`}
                               onClick={() => setLocation(isBushmillsFeatured ? '/experiences/bushmills' : `/giveaway/${featured.id}`)}
                             >
-                              View Draw — Preview Entry <ArrowRight className="w-4 h-4 ml-2" />
+                              Preview Giveaway <ArrowRight className="w-4 h-4 ml-2" />
                             </Button>
+                            <p className="mt-3 text-center text-[10px] font-serif uppercase tracking-[0.25em] text-muted-foreground">
+                              Secure <span className="text-primary/60 mx-1">•</span> Transparent <span className="text-primary/60 mx-1">•</span> Beta Preview
+                            </p>
                           </div>
                         </div>
                       );
@@ -622,6 +653,56 @@ export function Home() {
               </Button>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── How It Works ── */}
+      <section id="how-it-works" className="py-16 sm:py-24 bg-card/40 border-y border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="mb-10 sm:mb-12 text-center">
+            <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">The Process</p>
+            <h2 className="text-3xl sm:text-4xl font-serif mb-4 leading-tight">How It Works</h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              Three simple steps — built for serious collectors and spirit enthusiasts.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {[
+              {
+                icon: Compass,
+                step: 'Step One',
+                title: 'Choose a Collection',
+                body: 'Browse curated whiskey, tequila and premium spirit experiences.',
+              },
+              {
+                icon: Lock,
+                step: 'Step Two',
+                title: 'Secure Your Entry',
+                body: 'PrizePour is currently in beta. Entry checkout is disabled while we finalise the platform.',
+              },
+              {
+                icon: Trophy,
+                step: 'Step Three',
+                title: 'Winner Announced',
+                body: 'Winners are selected transparently and prizes are professionally handled.',
+              },
+            ].map(({ icon: Icon, step, title, body }) => (
+              <div
+                key={title}
+                className="relative bg-card border border-border rounded-sm p-6 sm:p-7 hover:border-primary/40 transition-colors group"
+              >
+                <div className="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="text-[10px] font-serif text-primary uppercase tracking-[0.25em]">{step}</span>
+                </div>
+                <h3 className="font-serif text-lg sm:text-xl mb-2 text-foreground">{title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -726,7 +807,7 @@ export function Home() {
                         <h3 className="text-xl sm:text-3xl font-serif mt-2 mb-1 break-words leading-tight">{g.name}</h3>
                         <p className="text-2xl sm:text-4xl font-serif text-primary break-words leading-tight">{g.prizeValue}</p>
                       </div>
-                      <p className="text-muted-foreground text-sm leading-relaxed">{g.description}</p>
+                      <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">{g.description}</p>
 
                       <BottleList bottles={bottles} />
                     </div>
@@ -759,10 +840,13 @@ export function Home() {
                       <Button
                         size="lg"
                         className="w-full h-14 min-h-[48px] bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-xs sm:text-sm font-serif px-4 sm:px-6"
-                        onClick={() => setLocation(`/giveaway/${g.id}`)}
+                        onClick={() => setLocation(g.name === 'Bushmills Distillery Tour Experience' ? '/experiences/bushmills' : `/giveaway/${g.id}`)}
                       >
-                        <span className="truncate">View Draw — Preview Entry</span>
+                        <span className="truncate">Preview Giveaway</span>
                       </Button>
+                      <p className="text-center text-[10px] font-serif uppercase tracking-[0.25em] text-muted-foreground -mt-1">
+                        Secure <span className="text-primary/60 mx-1">•</span> Transparent <span className="text-primary/60 mx-1">•</span> Beta Preview
+                      </p>
                     </div>
                   </div>
                 </motion.div>
@@ -779,7 +863,7 @@ export function Home() {
           <div>
             <div className="mb-10 sm:mb-12 text-center">
               <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Why Us</p>
-              <h2 className="text-3xl sm:text-4xl font-serif mb-4 sm:mb-6 leading-tight">The collector's edge you've been looking for.</h2>
+              <h2 className="text-3xl sm:text-4xl font-serif mb-4 sm:mb-6 leading-tight">Transparent Draws. Premium Prizes. No Shortcuts.</h2>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                 PrizePour was built by enthusiasts for enthusiasts. We source direct from authorised retailers — no grey-market prizes, ever. Every draw is independently verified and every winner notified within 24 hours.
               </p>
@@ -814,20 +898,23 @@ export function Home() {
           <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">Everything you need to know before entering your first draw.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
-          {FAQS.map((faq, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="bg-card border border-border rounded-sm p-5 sm:p-6"
-            >
-              <h4 className="font-serif text-base sm:text-lg mb-3 text-foreground">{faq.q}</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
-            </motion.div>
-          ))}
+        <div className="max-w-3xl mx-auto">
+          <Accordion type="single" collapsible className="space-y-3 sm:space-y-4">
+            {FAQS.map((faq, i) => (
+              <AccordionItem
+                key={i}
+                value={`faq-${i}`}
+                className="bg-card border border-border rounded-sm px-5 sm:px-6 data-[state=open]:border-primary/40 transition-colors"
+              >
+                <AccordionTrigger className="font-serif text-base sm:text-lg text-foreground hover:text-primary hover:no-underline py-5 text-left">
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-5">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
 
         <div className="text-center mt-10 sm:mt-16">

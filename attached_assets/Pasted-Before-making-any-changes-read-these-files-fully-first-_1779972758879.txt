@@ -1,0 +1,315 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Treat them as the source of truth. Do not enable real payments. Keep PrizePour in beta. Keep `PAYMENTS_ENABLED` safety. Keep `ADMIN_PASSWORD` protection. Do not expose admin routes publicly. Preserve the luxury dark/gold theme.
+
+Task:
+Improve the PrizePour homepage section by section based on the homepage audit.
+
+Important:
+Do this in small safe stages. After each stage, test locally in Replit before moving to the next stage. Do not push to Git until all stages are finished and tested.
+
+---
+
+## Stage 1: Hero Section
+
+Improve the homepage hero clarity and conversion.
+
+Update hero messaging to feel more premium and clear.
+
+Use copy similar to:
+
+Headline:
+“Win Rare Spirits & Luxury Distillery Experiences”
+
+Subheadline:
+“Premium curated spirit collections, rare bottles and unforgettable whiskey experiences — built for collectors and enthusiasts.”
+
+Trust line:
+“UK-based • Transparent winners • Premium verified prizes”
+
+Add clear CTA buttons:
+
+* “View Active Draws”
+* “How It Works”
+
+Keep the dark/gold luxury styling. Do not redesign the whole page.
+
+Test:
+
+* Hero looks good on desktop
+* Hero looks good on mobile
+* CTA buttons scroll/link correctly
+
+---
+
+## Stage 2: Add “How It Works” Section
+
+Add a new section directly after the hero/featured draw area or before Active Draws.
+
+Use 3 premium cards:
+
+1. Choose a Collection
+   “Browse curated whiskey, tequila and premium spirit experiences.”
+
+2. Secure Your Entry
+   “PrizePour is currently in beta. Entry checkout is disabled while we finalise the platform.”
+
+3. Winner Announced
+   “Winners are selected transparently and prizes are professionally handled.”
+
+Important:
+Keep beta-safe wording. Do not imply live paid checkout is active.
+
+Test:
+
+* Section fits desktop layout
+* Section stacks nicely on mobile
+* Styling matches dark/gold brand
+
+---
+
+## Stage 3: Featured Draw Carousel Improvements
+
+Improve the featured draw section without changing core draw logic.
+
+Add:
+
+* visible prize value badge, e.g. “Worth £2,500+”
+* cleaner CTA wording:
+
+  * replace “View Draw — Preview Entry” with “View Collection” or “Preview Giveaway”
+* small trust line below CTA:
+  “Secure • Transparent • Beta Preview”
+* improve winner ticker wording:
+  “Recent Winner • Sarah M. — Manchester • Patrón Reposado Bundle”
+
+Do not fake checkout availability. Keep beta mode clear.
+
+Test:
+
+* Carousel still works
+* Arrows/dots still work
+* Draw data still comes from DB
+* Public visibility rules still work
+
+---
+
+## Stage 4: Active Draws Card Improvements
+
+Improve Active Draws cards for clarity and premium feel.
+
+For each draw card:
+
+* show prize value clearly
+* show ticket/entry price clearly, but beta-safe
+* show countdown
+* show ticket/progress bar
+* show short description only
+* keep CTA clear
+
+Change CTA wording to:
+“View Collection” or “Preview Giveaway”
+
+Simplify long text descriptions:
+
+* Patrón: make description shorter and easier to scan
+* Clonakilty: keep clean/simple
+* Bushmills: make experience feel premium
+
+Important:
+Do not hardcode draw cards separately from DB. Use existing draw data.
+
+Test:
+
+* Patrón, Clonakilty and Bushmills display correctly when eligible
+* Hidden/paused/inactive draws do not show publicly
+* Admin still shows all draws
+
+---
+
+## Stage 5: Simplify Patrón Bottle Display
+
+The Patrón bottle collage is too visually busy.
+
+Improve it by:
+
+* showing fewer featured bottles by default
+* keeping “show all bottles” functionality
+* using text such as “+11 more included”
+* renaming “SHOW ALL 15 BOTTLES” to “Explore Full Collection”
+* keeping the full list accessible
+
+Do not remove bottle data from the database/admin.
+
+Test:
+
+* Patrón card looks cleaner
+* Full bottle list can still be viewed
+* Mobile layout is not cluttered
+
+---
+
+## Stage 6: Bushmills Visual Fix
+
+Improve Bushmills section visuals.
+
+Requirements:
+
+* restore/use the previous original Bushmills image if it exists in the project
+* if missing, use the current fallback image system
+* no broken images
+* no “No Image” placeholders
+* Bushmills should feel like a premium distillery experience
+
+Keep `/experiences/bushmills` working.
+
+Test:
+
+* Bushmills image appears on homepage if public/active
+* Bushmills image appears on its detail/experience page
+* fallback works if image URL is empty
+
+---
+
+## Stage 7: Why Us Section Improvements
+
+Keep the existing section but improve the headline clarity.
+
+Replace vague headline with one of:
+
+Option A:
+“Premium Spirit Giveaways, Done Properly”
+
+Option B:
+“Built for Serious Spirit Collectors”
+
+Option C:
+“Transparent Draws. Premium Prizes. No Shortcuts.”
+
+Keep current trust points unless small wording improvements are needed.
+
+Test:
+
+* Section still looks premium
+* Icons and layout remain aligned
+* Mobile layout still works
+
+---
+
+## Stage 8: FAQ Improvements
+
+Improve FAQ section.
+
+Add these FAQs:
+
+1. “Why is PrizePour currently in beta?”
+   Answer:
+   “PrizePour is currently in beta while we test the platform, improve the experience and finalise compliance checks. Checkout is disabled during beta.”
+
+2. “How are winners announced?”
+   Answer:
+   “Winners will be contacted directly and announced through PrizePour once each draw has closed and verification is complete.”
+
+If possible, convert FAQ cards into expandable accordions. If that would require too much redesign, keep cards but improve spacing and readability.
+
+Test:
+
+* FAQ works on desktop
+* FAQ works on mobile
+* No layout bugs
+
+---
+
+## Stage 9: Footer Trust Improvements
+
+Improve footer credibility.
+
+Add or confirm footer links for:
+
+* Active Draws
+* Past Winners
+* How It Works
+* How Winners Are Selected
+* FAQ
+* Contact Us
+* Terms of Service
+* Privacy Policy
+* Contest Rules
+* Responsible Drinking / 18+
+
+Add a short beta notice:
+“PrizePour is currently in beta. Checkout is disabled while we finalise the experience.”
+
+Add location/trust wording:
+“UK / Northern Ireland based premium spirit giveaway platform.”
+
+Do not add fake company registration details unless they already exist.
+
+Test:
+
+* Footer looks professional
+* Links work or route safely
+* Mobile footer layout is clean
+
+---
+
+## Stage 10: Final Testing Before Git Push
+
+Before pushing, test all of this:
+
+Public homepage:
+
+* hero loads correctly
+* featured draw carousel works
+* Active Draws displays correctly
+* Patrón, Clonakilty and Bushmills display correctly based on admin status
+* hidden/paused/inactive draws do not show publicly
+* buttons work
+* no broken images
+* mobile layout works
+
+Admin:
+
+* `/admin` still protected
+* `/admin/draws` still protected
+* admin still shows all draws
+* activate/deactivate still affects public homepage
+* hide/show still affects public homepage
+* pause still affects public homepage
+* delete test draws still works safely
+
+Payments:
+
+* checkout remains disabled
+* real payments are NOT enabled
+* `PAYMENTS_ENABLED` safety remains untouched
+
+Update docs:
+
+* Update `CHANGELOG.md` with a short entry explaining the homepage conversion and trust improvements.
+* Update `PROJECT_CONTEXT.md` only if any structure/routes changed.
+
+Only after all testing passes, push to Git.
+
+Run:
+
+git status
+
+Review the changed files carefully.
+
+Then:
+
+git add .
+git commit -m "Improve homepage trust and conversion sections"
+git push
+
+After Railway auto deploys:
+
+* test live homepage
+* test live mobile view
+* test `/admin`
+* confirm public draw visibility still follows admin status

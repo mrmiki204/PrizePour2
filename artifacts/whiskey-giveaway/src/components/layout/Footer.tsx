@@ -28,7 +28,7 @@ export function Footer() {
             A transparent home for premium spirit prize draws — rare whiskies, distillery experiences, fine glassware and craft bar equipment. Capped, fair, and drawn live.
           </p>
 
-          {/* Beta + 18+ notes */}
+          {/* Beta + location + 18+ notes */}
           <div className="space-y-3 pt-2">
             <div className="inline-flex items-start gap-2.5 rounded-sm border border-primary/30 bg-primary/5 px-3 py-2.5 max-w-sm">
               <span className="mt-1 w-1.5 h-1.5 rounded-full bg-primary animate-pulse shrink-0" />
@@ -36,6 +36,9 @@ export function Footer() {
                 <span className="text-foreground/80">PrizePour is currently in beta.</span> Checkout is disabled while we finalise the experience.
               </p>
             </div>
+            <p className="text-xs sm:text-[13px] font-serif text-muted-foreground/90 leading-snug max-w-sm">
+              UK / Northern Ireland based premium spirit giveaway platform.
+            </p>
             <p className="text-xs sm:text-[13px] font-serif text-amber-200/70 tracking-wide">
               18+ only. Please drink responsibly.
             </p>

@@ -20,6 +20,22 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Homepage trust & conversion improvements
+
+- **Hero (Stage 1):** new headline "Win Rare Spirits & Luxury Distillery Experiences", premium subhead, trust line ("UK-based • Transparent winners • Premium verified prizes"), and two CTAs ("View Active Draws" → scrolls to `#giveaways`, "How It Works" → scrolls to new `#how-it-works`).
+- **How It Works (Stage 2 — NEW section):** 3-card section between the featured carousel and Active Draws — Choose a Collection / Secure Your Entry / Winner Announced. Card #2 carries the beta-safe wording: "PrizePour is currently in beta. Entry checkout is disabled while we finalise the platform."
+- **Featured carousel (Stage 3):** CTA renamed "View Draw — Preview Entry" → "Preview Giveaway"; added trust line "Secure • Transparent • Beta Preview" beneath it; live activity ticker messages rewritten to reflect transparent winners + beta tone (no fake live-sales counts).
+- **Active Draws cards (Stage 4):** CTA renamed to "Preview Giveaway"; long descriptions clamped to 3 lines via `line-clamp-3` (DB data untouched); same beta-safe trust line under each CTA. Bushmills card now routes to `/experiences/bushmills` like the featured carousel.
+- **Patrón bottle list (Stage 5):** `BottleList` collapsed default reduced from 6 → 4 bottles; toggle text changed from "Show all 15 bottles (+9)" to "Explore Full Collection — +11 more included". Full list still accessible.
+- **Bushmills (Stage 6):** no change needed — bundled fallback (`bushmills-hero.png` via `getGiveawayImage(id, imageUrl, name)`) already shipped earlier this date; verified path still resolves.
+- **Why Us (Stage 7):** headline changed from "The collector's edge you've been looking for." to "Transparent Draws. Premium Prizes. No Shortcuts."
+- **FAQ (Stage 8):** added 2 new FAQs at the top — "Why is PrizePour currently in beta?" and "How are winners announced?"; converted from static cards to a shadcn `Accordion` (collapsible, one open at a time) for cleaner reading and mobile layout.
+- **Footer (Stage 9):** added location/trust line "UK / Northern Ireland based premium spirit giveaway platform." beside the existing beta notice. All previously-required links (Active Draws, Past Winners, How It Works, How Winners Are Selected, FAQ, Contact Us, Terms of Service, Privacy Policy, Contest Rules, Responsible Drinking / 18+) were already present and route to existing pages.
+- **Why:** improve clarity, conversion, and trust signals while staying explicitly beta-safe — no implication of live paid checkout anywhere.
+- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx`, `artifacts/whiskey-giveaway/src/components/layout/Footer.tsx`.
+- **Safety verified:** checkout remains disabled (no `PAYMENTS_ENABLED` change); admin routes still behind `requireAdmin`; public visibility rules untouched (still `isActive AND isPublic AND !entriesPaused AND drawDate >= now`); draw data still 100% DB-driven via `useListGiveaways`; luxury dark/gold theme preserved.
+- **Risks:** none functional. Typecheck errors that exist in `src/components/ui/button-group.tsx` and `src/components/ui/calendar.tsx` are **pre-existing shadcn-component issues**, untouched by this work.
+
 ### Project memory system: SYSTEM_RULES.md + CHANGELOG.md
 
 - Created `SYSTEM_RULES.md` as the permanent source of truth for business rules, safety constraints, admin/public visibility logic, seeded draws, styling, engineering, and deploy workflow.

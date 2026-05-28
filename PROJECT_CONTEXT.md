@@ -87,7 +87,7 @@ If any flag is missing, the Step 4 button stays gated with a "Checkout opens at 
 
 | Path | File | Purpose |
 |---|---|---|
-| `/` | `pages/Home.tsx` | Hero with featured draw, Active Draws grid (capacity bars + countdowns), trust section, FAQ, winners. |
+| `/` | `pages/Home.tsx` | Hero (headline + trust line + "View Active Draws" / "How It Works" CTAs) → featured-draw carousel → **`#how-it-works`** 3-card section → **`#giveaways`** Active Draws grid → "Why Us" → **`#about`** FAQ (accordion) → winners. All CTAs say "Preview Giveaway" with a "Secure • Transparent • Beta Preview" trust line. |
 | `/giveaway/:id` | `pages/GiveawayDetail.tsx` | 4-step entry flow: tickets → details → Stripe checkout → confirmation + referral link. |
 | `/draw/:id` | `pages/DrawPage.tsx` | Live cinematic draw animation (lobby → spinner → reveal). |
 | `/experiences/bushmills` | `pages/BushmillsExperience.tsx` | Dedicated Bushmills landing page (uses its own static images). |
