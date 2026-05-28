@@ -1,0 +1,286 @@
+# PrizePour — Project Context
+
+> Living summary of the PrizePour codebase as of the latest commit. Keep this file up to date when major features land so future AI sessions don't lose context or hallucinate. **This file is documentation only — do not import it from code.**
+
+---
+
+## 1. Project overview
+
+**PrizePour** is a premium UK whiskey / spirits giveaway platform. Visitors buy tickets to enter draws for rare or collectible bottles and curated experiences. Inspired by Prize Guy.
+
+- **Status:** Private beta. Stripe runs in **TEST MODE ONLY** — no real money can be taken.
+- **Capacity rule:** `maxEntries = ceil(prizeValueNumeric * 1.4 / ticketPriceGbp)`. Default ticket price is £4.99 but Bushmills uses £10.00. This guarantees revenue covers the prize cost with margin.
+
+### Stack
+
+- **Monorepo:** pnpm workspaces (`@workspace/*` package naming)
+- **Runtime:** Node.js 24, TypeScript 5.9
+- **Frontend:** React 18 + Vite, Tailwind, shadcn/ui, framer-motion, wouter (routing), TanStack Query
+- **API:** Express 5
+- **Database:** PostgreSQL via Drizzle ORM
+- **Payments:** Stripe (Replit integration) + `stripe-replit-sync`
+- **Validation:** Zod (`zod/v4`), `drizzle-zod`
+- **API codegen:** Orval from `lib/api-spec/openapi.yaml` → `lib/api-client-react`, `lib/api-zod`
+- **Build:** esbuild (CJS bundle for the server)
+
+### Hosting & deployment
+
+- **Development:** Replit workspace (this environment) with a Replit-managed Postgres dev DB. Workflows run automatically:
+  - `artifacts/api-server: API Server`
+  - `artifacts/whiskey-giveaway: web`
+  - `artifacts/prizepour-mobile: expo`
+  - `artifacts/mockup-sandbox: Component Preview Server`
+- **Production:** **Railway** (own Postgres). The repo is pushed to GitHub and Railway auto-deploys on push to main.
+- **Local proxy:** All artifacts are reached through `localhost:80` (path-based routing — never call service ports directly).
+
+### Main domains
+
+- Replit dev preview (proxied iframe)
+- Railway production: typically `https://<service>.up.railway.app` (and any custom domain configured on Railway)
+- `PUBLIC_BASE_URL` env var should be set on Railway so Stripe `success_url` / `cancel_url` use the right origin.
+
+### Beta / payment safety rules
+
+Three flags must all be true for any checkout to function:
+
+1. Stripe connected via Replit Integrations with a **test-mode** secret key (must start with `sk_test_`). The server actively refuses `sk_live_` keys with a 503 + log line.
+2. API server env: `PAYMENTS_ENABLED=true`
+3. Frontend build env: `VITE_PAYMENTS_ENABLED=true`
+
+If any flag is missing, the Step 4 button stays gated with a "Checkout opens at launch" panel. Every checkout session is tagged `metadata.test_mode = "true"` for auditability.
+
+**Stripe test cards:** `4242 4242 4242 4242` (success), `4000 0000 0000 9995` (declined), `4000 0025 0000 3155` (3DS). Any future expiry, any 3-digit CVC, any postcode.
+
+---
+
+## 2. Important safety rules
+
+**Hard rules — never violate without explicit user instruction:**
+
+- ❌ **Do not enable real payments.** Never flip `PAYMENTS_ENABLED` or `VITE_PAYMENTS_ENABLED` to `true` in production without explicit, repeated user confirmation.
+- ❌ **Do not accept `sk_live_` Stripe keys.** The server already refuses them — do not remove this guard.
+- ❌ **Do not remove the `requireAdmin` middleware** from any admin route. Admin is protected by `ADMIN_PASSWORD` (already a secret) via session cookies signed with `SESSION_SECRET`.
+- ❌ **Do not expose admin routes publicly** (no anonymous links, no auto-login, no bypass for "convenience").
+- ❌ **Do not use `console.log` in server code** — use `req.log` in route handlers, the singleton `logger` elsewhere. Skill: `pnpm-workspace`.
+- ❌ **Do not log or print secret values** (Stripe keys, session secret, admin password, DATABASE_URL contents).
+- ✅ **Always run `pnpm --filter @workspace/api-spec run codegen`** after changing `openapi.yaml`.
+- ✅ **Always run `pnpm --filter @workspace/db run push`** in dev after changing DB schema, AND update `artifacts/api-server/src/lib/ensureSchema.ts` to mirror the change so Railway self-heals on next boot.
+
+---
+
+## 3. Current routes / pages
+
+### Public frontend (`artifacts/whiskey-giveaway`)
+
+| Path | File | Purpose |
+|---|---|---|
+| `/` | `pages/Home.tsx` | Hero with featured draw, Active Draws grid (capacity bars + countdowns), trust section, FAQ, winners. |
+| `/giveaway/:id` | `pages/GiveawayDetail.tsx` | 4-step entry flow: tickets → details → Stripe checkout → confirmation + referral link. |
+| `/draw/:id` | `pages/DrawPage.tsx` | Live cinematic draw animation (lobby → spinner → reveal). |
+| `/experiences/bushmills` | `pages/BushmillsExperience.tsx` | Dedicated Bushmills landing page (uses its own static images). |
+| `/terms` | `pages/Terms.tsx` | Terms of Service. |
+| `/privacy` | `pages/Privacy.tsx` | Privacy Policy. |
+| `/rules` | `pages/Rules.tsx` | Official Contest Rules. |
+
+### Admin frontend (protected by `ADMIN_PASSWORD`)
+
+| Path | File | Purpose |
+|---|---|---|
+| `/admin` | `pages/AdminDashboard.tsx` | Entry stats, total revenue, tickets sold, active draw count, searchable entry table. |
+| `/admin/draws` | `pages/AdminDraws.tsx` | Draw management — toggle active / public / paused, edit fields, eligibility status row showing exactly why a draw is or isn't visible publicly. |
+
+### API routes (`artifacts/api-server/src/routes/`)
+
+Mounted under `/api`:
+
+- `GET /api/healthz` — health check
+- `GET /api/giveaways` — public list. Filters: `isActive=true AND isPublic=true AND entriesPaused=false AND drawDate >= now()`.
+- `GET /api/giveaways?all=true` — **admin-only** (requireAdmin); returns every draw including hidden/inactive/paused/ended.
+- `GET /api/giveaways/:id` — single draw by id (public)
+- `GET /api/giveaways/lookup/by-name/:name` — single draw by exact name (public; used by the static Bushmills page)
+- `POST /api/giveaways` — admin; create draw
+- `PATCH /api/giveaways/:id` — admin; update draw (toggles + edits)
+- `DELETE /api/giveaways/:id` — admin; delete if no entries, else soft-deactivate
+- `POST /api/giveaways/:id/winner` — admin; pick winner
+- `POST /api/entries` — public; create entry (requires verified Stripe session)
+- `POST /api/stripe/checkout` — public (but gated by `PAYMENTS_ENABLED`); creates a Stripe Checkout Session
+- `POST /api/stripe/webhook` — Stripe webhook (registered BEFORE `express.json()` in `app.ts`)
+- `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/me` — admin auth
+- `GET /api/admin/stats` — admin; dashboard stats
+- Rewards routes for referrals (`/api/rewards/*`)
+
+---
+
+## 4. Database and draw model
+
+Schema lives in `lib/db/src/schema/` (Drizzle). Three tables:
+
+### `giveaways`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | serial PK | Auto-increment — **differs across environments** |
+| `name` | text NOT NULL | Unique by convention; used for stable cross-env lookup |
+| `description` | text NOT NULL | |
+| `prize_value` | text NOT NULL | Display string e.g. `"Worth Over £500"` |
+| `prize_value_numeric` | numeric(10,2) NOT NULL | Drives capacity calculation |
+| `max_entries` | integer NOT NULL | Computed at seed time: `ceil(prizeValueNumeric * 1.4 / ticketPriceGbp)` |
+| `draw_date` | timestamptz NOT NULL | |
+| `image_url` | text NULL | Admin override; null falls back to bundled image |
+| `is_active` | boolean NOT NULL DEFAULT true | Admin master switch |
+| `is_public` | boolean NOT NULL DEFAULT true | Visible on homepage |
+| `entries_paused` | boolean NOT NULL DEFAULT false | Pause ticket sales without hiding |
+| `ticket_price_gbp` | numeric(6,2) NOT NULL DEFAULT 4.99 | Bushmills uses 10.00 |
+| `hero_tagline` | text NULL | Optional label on cards e.g. "Luxury Experience" |
+| `created_at` | timestamptz NOT NULL DEFAULT now() | |
+
+### `entries`
+
+`id, giveaway_id, first_name, last_name, email, ticket_qty, ticket_numbers (text[]), amount_paid, referral_code, stripe_session_id, created_at`.
+
+- `stripe_session_id` provides **idempotency** — verifying the same session twice returns the existing entry rather than creating a duplicate.
+
+### `referral_rewards`
+
+`id, referral_code, referee_entry_id, free_tickets, status, claimed_giveaway_id, claimed_entry_id, created_at, claimed_at`.
+
+### How public visibility works
+
+A draw appears on the public homepage / Active Draws section **iff all four conditions hold**:
+
+1. `is_active = true`
+2. `is_public = true`
+3. `entries_paused = false`
+4. `draw_date >= now()`
+
+This is enforced server-side in `routes/giveaways.ts` for `GET /api/giveaways`.
+
+### How admin visibility works
+
+`/admin/draws` calls `GET /api/giveaways?all=true` with the admin session cookie, returning every row regardless of state. Each card displays an "Eligible for public Active Draws: Yes/No" status row, and if "No" it lists the exact reason(s) — `not active`, `hidden`, `entries paused`, `draw date passed`. The eligibility logic in the UI is intentionally identical to the server filter so they can never drift.
+
+---
+
+## 5. Currently seeded draws
+
+Seeded automatically on first boot of a fresh database by `seedGiveaways()` in `artifacts/api-server/src/index.ts`. Seeding is **idempotent and name-keyed** — each default is inserted only if no row with that exact `name` exists. Existing rows are never modified, so admin edits in production are preserved across redeploys.
+
+| Name | Prize | Tickets | Price | Default state |
+|---|---|---|---|---|
+| **The Clonakilty Collection** | Worth Over £500 (£481 numeric) | 147 | £4.99 | active, public |
+| **The Patrón Collection** | Worth Over £1,950 (£1984.15 numeric) | 557 | £4.99 | active, public |
+| **Bushmills Distillery Tour Experience** | Worth Over £2,500 | 250 | £10.00 | active, **hidden** (`isPublic=false`) — toggle visible in admin to publish |
+
+Bottle/product imagery lives in `artifacts/whiskey-giveaway/src/data/giveaways.ts` (`COLLECTION_BOTTLES`, `PATRON_BOTTLES`). Bushmills landing-page assets are in `src/assets/images/bushmills-*.png`.
+
+### Image fallback chain
+
+`getGiveawayImage(id, imageUrl, name)` in `src/data/giveaways.ts`:
+
+1. Admin-supplied `imageUrl` (custom override) — always wins
+2. Bundled image matched by **exact name** (stable across envs)
+3. Bundled image matched by **id** (dev safety net)
+4. `undefined` — caller renders its own placeholder
+
+Bundled hero images: `hero-clonakilty.png`, `hero-patron.png`, `bushmills-hero.png`.
+
+---
+
+## 6. Known issues already fixed
+
+| Issue | Fix |
+|---|---|
+| Admin login session not persisting | Session cookies signed with `SESSION_SECRET`, `requireAdmin` middleware on all admin routes. |
+| Create-draw endpoint failing on new fields | `POST /api/giveaways` accepts the full Zod schema generated from `giveawaysTable`. |
+| Public list out of sync with admin toggles | Public `/api/giveaways` filter now requires `isActive AND isPublic AND NOT entriesPaused AND drawDate >= now()`. Admin uses `?all=true`. |
+| Clonakilty "missing" from public list while showing Active in admin | Was correctly excluded due to `entriesPaused=true`. Admin `/admin/draws` now displays an explicit "Eligible for public Active Draws: Yes/No" row with the exact reason — so the cause is visible at a glance. |
+| Bushmills had no image; admin thumbnail showed "No image" for any draw with null `imageUrl` | Added Bushmills to `BUNDLED_IMAGE_BY_NAME`. Admin thumbnail now uses `getGiveawayImage(id, imageUrl, name)` with a small "Default" badge when the fallback is used. Custom URL still overrides. |
+| Hardcoded Bushmills entries on the homepage | Removed — Home.tsx now renders only DB-backed draws. |
+| Railway "No giveaways yet" on `/admin` (production DB issue) | See section 7 — fixed and pending deploy. |
+
+---
+
+## 7. Current production issue
+
+**Symptom (now fixed in code, awaiting deploy):** Live Railway `/admin` showed `Total entries: 0`, `Active draws: 0`, "No giveaways yet" even though local Replit admin worked.
+
+**Root cause:**
+
+1. `artifacts/api-server/src/lib/ensureSchema.ts` was stale — it created the `giveaways` table with only the original columns and was never updated when `is_public`, `entries_paused`, `ticket_price_gbp`, `hero_tagline` were added. On Railway's empty Postgres it created an out-of-date table, then every `SELECT` against the new schema failed silently with "column does not exist". The seed function caught the error and downgraded it to a warning, so the server kept running with an empty table.
+2. Bushmills wasn't in the startup seed — only Clonakilty and Patrón were (`seed-bushmills.ts` is a manual script, not part of boot).
+
+**Fix shipped (pending push to GitHub → Railway redeploy):**
+
+- `ensureSchema.ts` rewritten to mirror the current schema exactly + adds `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` for every column added after the original baseline, so existing Railway DBs self-heal.
+- Startup seed in `index.ts` now uses a name-keyed diff: insert only rows whose `name` doesn't already exist. Existing rows are never touched.
+- Bushmills added as the third default seed (`isPublic=false` so it stays hidden by default — admin can publish it).
+- Boot logs now print: `Boot: connecting to database` → `Database schema ensured ...` → `Default giveaways seeded ...` (or `... already seeded — nothing to insert`) → `Giveaway table summary { total, active, public, paused, names }`. Seed errors log at `error` level.
+
+**To verify after deploy:** check Railway logs for the boot sequence above, then `curl https://<app>.up.railway.app/api/giveaways?all=true` should return 3 rows. The admin page should now show all three draws.
+
+---
+
+## 8. Deployment workflow
+
+```bash
+# 1. Test in Replit first
+pnpm run typecheck                                          # full repo typecheck
+pnpm --filter @workspace/api-server run typecheck           # server only
+pnpm --filter @workspace/whiskey-giveaway run typecheck     # web only
+
+# Workflows auto-restart on file changes. Verify in the preview pane.
+
+# 2. Commit and push
+git status
+git add .
+git commit -m "<message>"
+git push
+
+# 3. Railway auto-deploys from main.
+#    Watch Railway logs for the boot sequence:
+#      "Boot: connecting to database"
+#      "Database schema ensured (tables + columns up to date)"
+#      "Default giveaways seeded on startup" (first deploy) OR
+#        "Default giveaways already seeded — nothing to insert"
+#      "Giveaway table summary { total, active, public, paused, names }"
+
+# 4. Test live
+#    - https://<app>.up.railway.app/                  (public homepage)
+#    - https://<app>.up.railway.app/admin             (login with ADMIN_PASSWORD)
+#    - https://<app>.up.railway.app/admin/draws       (all three draws visible)
+#    - curl https://<app>.up.railway.app/api/giveaways           → eligible draws only
+#    - curl https://<app>.up.railway.app/api/giveaways?all=true  → admin-auth-required; all rows
+```
+
+**Important:** Never run `pnpm dev` at the workspace root — use workflows (Replit) or Railway's start command. Individual artifacts need `PORT` and `BASE_PATH` env vars wired by the workflow / Railway service config.
+
+---
+
+## Rules for future AI assistants
+
+### Do
+
+- ✅ **Read `replit.md` first**, then this file, then any skill that's directly relevant (`stripe`, `pnpm-workspace`, `database`).
+- ✅ **Keep this file accurate.** When you ship a meaningful change (new route, new field, new seed, fixed bug, new safety rule), update the relevant section in the same task.
+- ✅ **Mirror DB schema changes in `ensureSchema.ts`** AND run `pnpm --filter @workspace/db run push` in dev. Forgetting the former is what broke Railway last time.
+- ✅ **Update both seed name + name-based image fallback** when adding a new default draw, so its image renders without an admin URL.
+- ✅ **Use the eligibility helper logic** (active + public + not paused + draw in future) anywhere you need to know if a draw is publicly visible — never reinvent it.
+- ✅ **Run typecheck (`pnpm --filter ... run typecheck`)** before suggesting a deploy. `build` may fail from the shell because it needs workflow-provided env vars.
+- ✅ **Use `req.log` / `logger`** for all server logging.
+- ✅ **Use the Stripe integration** via `getStripeSync()` — do not instantiate raw Stripe clients.
+- ✅ **Suggest pushing to GitHub / redeploying Railway** whenever a change affects production behavior.
+
+### Don't
+
+- ❌ **Do not enable real payments** (`PAYMENTS_ENABLED=true` with a `sk_live_` key) unless the user explicitly confirms, repeatedly. The server already refuses `sk_live_` — leave that guard alone.
+- ❌ **Do not bypass `requireAdmin`** or weaken admin auth in any way.
+- ❌ **Do not hardcode draws in frontend pages.** Everything must be DB-backed via `GET /api/giveaways`. The only acceptable static asset is bundled imagery.
+- ❌ **Do not use `console.log` in server code.**
+- ❌ **Do not edit `lib/api-client-react/` or `lib/api-zod/`** — they're generated. Edit `lib/api-spec/openapi.yaml` and run codegen.
+- ❌ **Do not rely on DB ids being stable across environments** (Clonakilty might be id=1 in dev and id=42 in prod). Match by `name` for cross-env lookups (bundled images, seeds).
+- ❌ **Do not log secrets** or echo env var values into the chat.
+- ❌ **Do not assume Railway DB == Replit DB.** They are completely separate Postgres instances.
+- ❌ **Do not run destructive git commands** (`git reset --hard`, `git push --force`, etc.) without explicit user approval — delegate to a project task if asked.
+- ❌ **Do not introduce new top-level packages** outside the established workspace layout (`artifacts/*`, `lib/*`, `scripts/`).
+
+When in doubt: read the relevant skill in `.local/skills/`, then ask the user a focused clarifying question instead of guessing.
