@@ -5,6 +5,52 @@ import { runMigrations } from "stripe-replit-sync";
 import { getStripeSync } from "./stripeClient.js";
 import { db, giveawaysTable } from "@workspace/db";
 
+type SeedRow = typeof giveawaysTable.$inferInsert;
+
+// Default draws seeded on first boot of a fresh database (e.g. Railway prod).
+// Keyed by exact `name` so seeding is idempotent across restarts — we look up
+// each row by name and only insert the ones that are missing. Existing rows
+// are NEVER touched (admin edits in production are preserved).
+const DEFAULT_GIVEAWAYS: SeedRow[] = [
+  {
+    name: "The Clonakilty Collection",
+    description:
+      "One winner takes home a selected range of Clonakilty Distillery expressions — professionally packed and shipped insured to your door.",
+    prizeValue: "Worth Over £500",
+    prizeValueNumeric: "481.00",
+    maxEntries: 147,
+    drawDate: new Date("2026-05-27T15:07:27.766Z"),
+    imageUrl: null,
+    isActive: true,
+  },
+  {
+    name: "The Patrón Collection",
+    description:
+      "Fifteen iconic expressions from the world-renowned Patrón distillery — from crisp Silver to the ultra-rare Gran Patrón Burdeos, plus the Roca collection, Estate Release, Ahumado, El Cielo, El Alto, Cristalino, Citrónge and XO Café. Professionally packed and shipped insured to your door.",
+    prizeValue: "Worth Over £1,950",
+    prizeValueNumeric: "1984.15",
+    maxEntries: 557,
+    drawDate: new Date("2026-06-13T18:00:00.000Z"),
+    imageUrl: null,
+    isActive: true,
+  },
+  {
+    name: "Bushmills Distillery Tour Experience",
+    description:
+      "Win a premium Bushmills experience including a guided distillery tour, whiskey tasting experience, exclusive extras and luxury spirit-inspired rewards.",
+    prizeValue: "Worth Over £2,500",
+    prizeValueNumeric: "2500.00",
+    maxEntries: 250,
+    drawDate: new Date("2026-08-01T18:00:00.000Z"),
+    imageUrl: null,
+    ticketPriceGbp: "10.00",
+    heroTagline: "Luxury Experience",
+    isActive: true,
+    isPublic: false,
+    entriesPaused: false,
+  },
+];
+
 const rawPort = process.env["PORT"];
 
 if (!rawPort) {
@@ -19,54 +65,72 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
+/**
+ * Idempotent seed: inserts any DEFAULT_GIVEAWAYS rows whose `name` does not
+ * already exist in the giveaways table. Existing rows are left untouched, so
+ * admin edits in production (toggles, custom imageUrl, etc.) are preserved
+ * across restarts and redeploys.
+ */
 async function seedGiveaways() {
   try {
     const existing = await db.select().from(giveawaysTable);
-    if (existing.length > 0) {
+    const existingNames = new Set(existing.map((g) => g.name));
+    const missing = DEFAULT_GIVEAWAYS.filter(
+      (g) => !existingNames.has(g.name),
+    );
+
+    if (missing.length === 0) {
       const activeCount = existing.filter((g) => g.isActive).length;
       logger.info(
-        { count: existing.length, activeCount },
-        "Giveaways already seeded — skipping",
+        { total: existing.length, activeCount },
+        "Default giveaways already seeded — nothing to insert",
       );
       if (activeCount === 0) {
         logger.warn(
-          "Seeded giveaways exist but none are active — homepage Active Draws section will be empty",
+          "No active giveaways — homepage Active Draws section will be empty",
         );
       }
       return;
     }
 
-    const rows = await db
+    const inserted = await db
       .insert(giveawaysTable)
-      .values([
-        {
-          name: "The Clonakilty Collection",
-          description:
-            "One winner takes home a selected range of Clonakilty Distillery expressions — professionally packed and shipped insured to your door.",
-          prizeValue: "Worth Over £500",
-          prizeValueNumeric: "481.00",
-          maxEntries: 147,
-          drawDate: new Date("2026-05-27T15:07:27.766Z"),
-          imageUrl: null,
-          isActive: true,
-        },
-        {
-          name: "The Patrón Collection",
-          description:
-            "Fifteen iconic expressions from the world-renowned Patrón distillery — from crisp Silver to the ultra-rare Gran Patrón Burdeos, plus the Roca collection, Estate Release, Ahumado, El Cielo, El Alto, Cristalino, Citrónge and XO Café. Professionally packed and shipped insured to your door.",
-          prizeValue: "Worth Over £1,950",
-          prizeValueNumeric: "1984.15",
-          maxEntries: 557,
-          drawDate: new Date("2026-06-13T18:00:00.000Z"),
-          imageUrl: null,
-          isActive: true,
-        },
-      ])
+      .values(missing)
       .returning();
 
-    logger.info({ count: rows.length }, "Giveaways seeded on startup");
+    logger.info(
+      {
+        insertedCount: inserted.length,
+        insertedNames: inserted.map((g) => g.name),
+        alreadyPresent: existing.length,
+        totalAfterSeed: existing.length + inserted.length,
+      },
+      "Default giveaways seeded on startup",
+    );
   } catch (err) {
-    logger.warn({ err }, "Giveaway seed failed (non-fatal)");
+    logger.error({ err }, "Giveaway seed failed (non-fatal — server will still start)");
+  }
+}
+
+/**
+ * Log a summary of the giveaways table after seeding so operators can confirm
+ * via Railway logs whether the live DB has the expected default draws.
+ */
+async function logGiveawaySummary() {
+  try {
+    const all = await db.select().from(giveawaysTable);
+    logger.info(
+      {
+        total: all.length,
+        active: all.filter((g) => g.isActive).length,
+        public: all.filter((g) => g.isPublic).length,
+        paused: all.filter((g) => g.entriesPaused).length,
+        names: all.map((g) => g.name),
+      },
+      "Giveaway table summary",
+    );
+  } catch (err) {
+    logger.warn({ err }, "Could not read giveaways table for summary");
   }
 }
 
@@ -99,8 +163,13 @@ async function initStripe() {
   }
 }
 
+logger.info(
+  { hasDatabaseUrl: !!process.env.DATABASE_URL },
+  "Boot: connecting to database",
+);
 await ensureSchema();
 await seedGiveaways();
+await logGiveawaySummary();
 await initStripe();
 
 app.listen(port, (err) => {
