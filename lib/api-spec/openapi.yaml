@@ -167,6 +167,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /giveaways/lookup/by-name/{name}:
+    get:
+      operationId: lookupGiveawayByName
+      tags: [giveaways]
+      summary: Look up a giveaway by exact name (public, used by static landing pages to bind to a DB-managed draw)
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Giveaway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Giveaway"
+        "404":
+          description: Giveaway not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /giveaways/{id}:
     get:
       operationId: getGiveaway

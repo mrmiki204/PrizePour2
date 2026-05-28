@@ -1,0 +1,55 @@
+Add the Bushmills Distillery Tour Experience to the admin draw control panel.
+
+Current problem:
+The admin page currently says Bushmills is a static experience page at `/experiences/bushmills` and is not a database draw, so it does not appear in the admin list.
+
+Goal:
+I want Bushmills to appear in `/admin/draws` alongside Patrón and Clonakilty so it can be managed from the admin control panel.
+
+Requirements:
+
+* Add Bushmills Distillery Tour Experience as a database-backed draw/experience record.
+* Show it in the admin draw list.
+* It should appear under “All Draws”.
+* If inactive/hidden, it should also appear under the correct filter tab.
+* Keep the existing Bushmills public landing page working.
+* Do not remove `/experiences/bushmills`.
+* If possible, connect the static Bushmills page to the database record so admin changes can affect it.
+* If not possible yet, at least create a linked admin-managed draw record for Bushmills.
+
+Suggested Bushmills details:
+
+* Name: Bushmills Distillery Tour Experience
+* Collection name: Bushmills Distillery Experience
+* Prize value label: Worth Over £2,500
+* Prize value numeric: 2500
+* Ticket price: £10.00
+* Total tickets: 250
+* Tickets sold: 0
+* Tickets remaining: 250
+* Status: Hidden / Beta
+* Hero tagline: Luxury Experience
+* Description: Win a premium Bushmills experience including a guided distillery tour, whiskey tasting experience, exclusive extras and luxury spirit-inspired rewards.
+
+Admin controls:
+
+* Allow admin to activate/deactivate Bushmills.
+* Allow admin to hide/show it publicly.
+* Allow admin to pause entries.
+* Allow editing of price, tickets, date, description, and status.
+* Keep admin password protection.
+
+Important:
+
+* Do not enable payments.
+* Do not break Patrón or Clonakilty.
+* Do not remove the existing Bushmills experience page.
+* Public homepage should only show Bushmills if it is active and visible.
+* Admin should show Bushmills regardless of active/hidden status.
+
+After completion:
+
+* explain whether Bushmills is now database-backed or only linked in admin
+* list files changed
+* confirm it appears in `/admin/draws`
+* confirm if I need to push to GitHub/Railway

@@ -142,6 +142,31 @@ export const GetGiveawayWinnerResponse = zod.object({
 });
 
 /**
+ * @summary Look up a giveaway by exact name (public, used by static landing pages to bind to a DB-managed draw)
+ */
+export const LookupGiveawayByNameParams = zod.object({
+  name: zod.coerce.string(),
+});
+
+export const LookupGiveawayByNameResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string(),
+  prizeValue: zod.string(),
+  prizeValueNumeric: zod.string(),
+  maxEntries: zod.number(),
+  drawDate: zod.coerce.date(),
+  imageUrl: zod.string().nullish(),
+  isActive: zod.boolean(),
+  isPublic: zod.boolean(),
+  entriesPaused: zod.boolean(),
+  ticketPriceGbp: zod.string(),
+  heroTagline: zod.string().nullish(),
+  entryCount: zod.number(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
  * @summary Get a single giveaway by ID
  */
 export const GetGiveawayParams = zod.object({

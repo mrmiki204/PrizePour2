@@ -174,6 +174,31 @@ router.get(
   },
 );
 
+router.get(
+  "/giveaways/lookup/by-name/:name",
+  async (req, res): Promise<void> => {
+    const name = decodeURIComponent(String(req.params.name ?? "")).trim();
+    if (!name) {
+      res.status(400).json({ error: "Name is required" });
+      return;
+    }
+
+    const [giveaway] = await db
+      .select()
+      .from(giveawaysTable)
+      .where(eq(giveawaysTable.name, name));
+
+    if (!giveaway) {
+      res.status(404).json({ error: "Giveaway not found" });
+      return;
+    }
+
+    const [withCount] = await withEntryCount([giveaway]);
+    req.log.info({ giveawayId: giveaway.id, name }, "Looked up giveaway by name");
+    res.json(GetGiveawayResponse.parse(withCount));
+  },
+);
+
 router.get("/giveaways/:id", async (req, res): Promise<void> => {
   const params = GetGiveawayParams.safeParse(req.params);
   if (!params.success) {

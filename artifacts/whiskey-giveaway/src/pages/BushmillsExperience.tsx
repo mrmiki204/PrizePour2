@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
+import { useLookupGiveawayByName } from '@workspace/api-client-react';
 import {
   ArrowRight,
   ArrowLeft,
@@ -28,13 +29,22 @@ import bushmillsTasting from '@/assets/images/bushmills-tasting.png';
 import bushmillsSuite from '@/assets/images/bushmills-suite.png';
 import bushmillsBottles from '@/assets/images/bushmills-bottles.png';
 
-const PRIZE_VALUE_GBP = 2500;
-const TICKET_PRICE = 4.99;
-const MAX_ENTRIES = Math.ceil((PRIZE_VALUE_GBP * 1.4) / TICKET_PRICE); // 702
-const ENTRIES_SOLD = 487;
-const ENTRIES_REMAINING = MAX_ENTRIES - ENTRIES_SOLD;
-const DAYS_UNTIL_DRAW = 72;
-const DRAW_DATE_LABEL = '1 August 2026';
+const BUSHMILLS_NAME = 'Bushmills Distillery Tour Experience';
+
+// Static fallbacks — used only if the DB record is missing (e.g. before seed is run).
+const FALLBACK_PRIZE_VALUE_GBP = 2500;
+const FALLBACK_TICKET_PRICE = 10.0;
+const FALLBACK_MAX_ENTRIES = 250;
+const FALLBACK_ENTRIES_SOLD = 0;
+const FALLBACK_DRAW_DATE = new Date('2026-08-01T18:00:00.000Z');
+
+function formatDrawDate(d: Date): string {
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function daysUntil(d: Date): number {
+  return Math.max(0, Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+}
 
 const PACKAGES = [
   { qty: 1, price: 4.99, label: 'Single', perTicket: 4.99 },
@@ -112,7 +122,27 @@ export function BushmillsExperience() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [email, setEmail] = useState('');
 
-  const pctSold = Math.min((ENTRIES_SOLD / MAX_ENTRIES) * 100, 100);
+  // Bind to the admin-managed DB record so price / ticket count / draw date /
+  // tagline / description can be edited from /admin/draws. Falls back to
+  // hardcoded marketing defaults if the DB record is missing.
+  const { data: dbGiveaway } = useLookupGiveawayByName(
+    encodeURIComponent(BUSHMILLS_NAME),
+  );
+
+  const drawDateObj = dbGiveaway ? new Date(dbGiveaway.drawDate) : FALLBACK_DRAW_DATE;
+  const PRIZE_VALUE_GBP = dbGiveaway
+    ? Math.round(parseFloat(dbGiveaway.prizeValueNumeric))
+    : FALLBACK_PRIZE_VALUE_GBP;
+  const TICKET_PRICE = dbGiveaway ? parseFloat(dbGiveaway.ticketPriceGbp) : FALLBACK_TICKET_PRICE;
+  const MAX_ENTRIES = dbGiveaway?.maxEntries ?? FALLBACK_MAX_ENTRIES;
+  const ENTRIES_SOLD = dbGiveaway?.entryCount ?? FALLBACK_ENTRIES_SOLD;
+  const ENTRIES_REMAINING = Math.max(MAX_ENTRIES - ENTRIES_SOLD, 0);
+  const DAYS_UNTIL_DRAW = daysUntil(drawDateObj);
+  const DRAW_DATE_LABEL = formatDrawDate(drawDateObj);
+  const HERO_TAGLINE = dbGiveaway?.heroTagline?.trim() || 'Featured Experience · Limited Tickets';
+  const DB_DESCRIPTION = dbGiveaway?.description ?? null;
+
+  const pctSold = MAX_ENTRIES > 0 ? Math.min((ENTRIES_SOLD / MAX_ENTRIES) * 100, 100) : 0;
 
   function handleReserve() {
     toast({
@@ -167,7 +197,7 @@ export function BushmillsExperience() {
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/40 bg-primary/10 backdrop-blur-sm">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 <span className="text-[10px] sm:text-xs font-serif text-primary uppercase tracking-[0.25em]">
-                  Featured Experience · Limited Tickets
+                  {HERO_TAGLINE}
                 </span>
               </div>
 
@@ -180,9 +210,8 @@ export function BushmillsExperience() {
               </h1>
 
               <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl">
-                A luxury Irish whiskey getaway for two on the wild Causeway Coast. Private distillery tour,
-                rare expression tasting, two nights at the historic Bushmills Inn, and a four-bottle take-home
-                collection — including the prized 21-Year-Old Single Malt.
+                {DB_DESCRIPTION ??
+                  'A luxury Irish whiskey getaway for two on the wild Causeway Coast. Private distillery tour, rare expression tasting, two nights at the historic Bushmills Inn, and a four-bottle take-home collection — including the prized 21-Year-Old Single Malt.'}
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">

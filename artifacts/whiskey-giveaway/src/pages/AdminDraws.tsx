@@ -432,22 +432,22 @@ export function AdminDraws() {
           </div>
         </div>
 
-        {/* Static experiences explainer */}
+        {/* Bushmills DB-binding note */}
         <div className="border border-border rounded-sm p-3 sm:p-4 bg-secondary/20 text-xs sm:text-sm font-serif flex items-start gap-3 text-muted-foreground">
           <Info className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
           <div className="space-y-1">
             <p>
-              <strong className="text-foreground">Bushmills Distillery Tour Experience</strong> is a static
-              experience landing page at{' '}
+              <strong className="text-foreground">Bushmills Distillery Tour Experience</strong> is now a
+              database-managed draw. Edits made here (price, tickets, draw date, description, hero tagline,
+              hide/show, pause) flow live to the landing page at{' '}
               <Link href="/experiences/bushmills">
                 <a className="text-primary underline">/experiences/bushmills</a>
-              </Link>{' '}
-              — it is not a database draw, so it does not appear in this list. Static experiences must be edited in
-              code (<code className="text-foreground/80">src/pages/BushmillsExperience.tsx</code>).
+              </Link>
+              .
             </p>
             <p className="text-muted-foreground/80">
-              All true draws (Patrón Collection, Clonakilty Collection, and any new ones you create) live in the
-              database and appear below.
+              The page itself stays accessible by direct URL even when set to <em>Hidden</em>; it is only removed
+              from the public homepage grid.
             </p>
           </div>
         </div>

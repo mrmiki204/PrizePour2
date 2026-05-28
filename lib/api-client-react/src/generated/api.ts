@@ -658,6 +658,94 @@ export function useGetGiveawayWinner<
 }
 
 /**
+ * @summary Look up a giveaway by exact name (public, used by static landing pages to bind to a DB-managed draw)
+ */
+export const getLookupGiveawayByNameUrl = (name: string) => {
+  return `/api/giveaways/lookup/by-name/${name}`;
+};
+
+export const lookupGiveawayByName = async (
+  name: string,
+  options?: RequestInit,
+): Promise<Giveaway> => {
+  return customFetch<Giveaway>(getLookupGiveawayByNameUrl(name), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getLookupGiveawayByNameQueryKey = (name: string) => {
+  return [`/api/giveaways/lookup/by-name/${name}`] as const;
+};
+
+export const getLookupGiveawayByNameQueryOptions = <
+  TData = Awaited<ReturnType<typeof lookupGiveawayByName>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  name: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof lookupGiveawayByName>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getLookupGiveawayByNameQueryKey(name);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof lookupGiveawayByName>>
+  > = ({ signal }) => lookupGiveawayByName(name, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!name,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof lookupGiveawayByName>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type LookupGiveawayByNameQueryResult = NonNullable<
+  Awaited<ReturnType<typeof lookupGiveawayByName>>
+>;
+export type LookupGiveawayByNameQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Look up a giveaway by exact name (public, used by static landing pages to bind to a DB-managed draw)
+ */
+
+export function useLookupGiveawayByName<
+  TData = Awaited<ReturnType<typeof lookupGiveawayByName>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  name: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof lookupGiveawayByName>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getLookupGiveawayByNameQueryOptions(name, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
  * @summary Get a single giveaway by ID
  */
 export const getGetGiveawayUrl = (id: number) => {
