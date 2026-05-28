@@ -12,6 +12,7 @@ import patronCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_09_40_P
 import clonakiltyCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_04_51_PM_1780002816391.png';
 import bushmillsCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_21_53_PM_1780003380341.png';
 import macallanCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_51_35_PM_1780005130054.png';
+import macallanHeroSlide from '@assets/ChatGPT_Image_May_28,_2026,_11_06_11_PM_1780005983787.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
 
@@ -378,6 +379,7 @@ export function Home() {
     { name: 'The Patrón Collection', image: patronCollectionHero },
     { name: 'The Clonakilty Collection', image: clonakiltyCollectionHero },
     { name: 'Bushmills Distillery Tour Experience', image: bushmillsCollectionHero },
+    { name: 'The Macallan Luxury Scotch Collection', image: macallanHeroSlide },
   ], []);
 
   const goToSlide = (i: number) => {
