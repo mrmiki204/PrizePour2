@@ -1,0 +1,57 @@
+Fix the live Railway admin page showing “No giveaways yet” even though draws exist in Replit/admin locally.
+
+Problem:
+After pushing to GitHub and deploying to Railway, the live admin page at `/admin` shows:
+
+* Total entries: 0
+* Total revenue: £0.00
+* Tickets sold: 0
+* Active draws: 0
+* “No giveaways yet”
+
+But locally/Replit the draws exist and the admin system was working.
+
+Likely issue:
+Railway production database does not have the seeded/default draw records, or the admin API is reading a different/empty database than local Replit.
+
+Requirements:
+
+* Investigate why Railway `/admin` shows no draws.
+* Check whether the production Railway PostgreSQL database contains the default seeded draws.
+* Ensure default draws seed into Railway production if missing.
+* Seed or restore:
+
+  * The Patrón Collection
+  * The Clonakilty Collection
+  * Bushmills Distillery Tour Experience
+* Make seeding idempotent so it does not duplicate draws every restart.
+* Ensure admin `/admin` and `/admin/draws` load all production database draws.
+* Ensure public Active Draws still only show active/visible/not-paused/not-ended draws.
+* Ensure admin shows hidden/inactive/paused/previous draws too.
+* Add clear server logs on startup:
+
+  * database connected
+  * schema ensured
+  * seeded draws created or already exist
+  * number of draws found
+* If the issue is API filtering, fix the admin endpoint so it fetches all draws, not just active ones.
+* If the issue is schema mismatch, ensure production database has required columns.
+* Do not enable payments.
+* Do not break admin password protection.
+
+Expected result:
+On live Railway production:
+
+* `/admin` should show Patrón, Clonakilty and Bushmills if they exist/are seeded.
+* Admin stats should reflect real draws.
+* “No giveaways yet” should disappear.
+* Draws should persist after refresh/redeploy.
+* Public homepage should still respect active/visible status.
+
+After completion:
+
+* explain the root cause
+* list files changed
+* explain whether Railway DB needed seeding or schema fix
+* confirm how to test live production
+* confirm if I need to push to GitHub/Railway
