@@ -20,6 +20,17 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Rebuilt homepage hero slideshow using premium collection artwork and simplified hero conversion layout
+
+- **What:** Replaced the old featured-draw hero (grid layout with `BottleSpotlight`/`RotatingTagline`, live-draw badges, progress bar, countdown, prize-value block, "Preview Giveaway" CTA, `LiveActivityTicker`, "View All Draws" ghost button) with a clean cinematic slideshow that cycles the three premium collection posters (Patrón, Clonakilty, Bushmills).
+- **Why:** New promotional artwork already carries the headline, value, and "Enter Now" CTA — stacking heavy raffle UI on top was busy and competed with the embedded poster text. Active Draws (below the hero) already own countdowns, capacity bars, bottle lists, and per-draw CTAs.
+- **Hero overlay (simplified, above the slideshow):** small "Featured Collections" label, headline "Win Premium Spirits & Luxury Experiences", short supporting copy, two CTAs (View Active Draws / How It Works), and the UK-based • Transparent winners • Premium verified prizes trust strip. Nothing overlaid on the artwork itself except the prev/next arrows.
+- **Image fitting:** `aspect-[3/2] sm:aspect-[16/9]` wrapper with black background + `object-contain object-center` — no cropping of poster text on any device. Crossfade transition (`AnimatePresence` opacity + subtle scale), gentle 7s auto-advance, arrows + dots for manual nav.
+- **State cleanup:** removed `featuredIndex`/`featuredGiveaways`/`isPatronFeatured`/`isClonakiltyFeatured`/`hasSpotlight`/`spotlight*`/`accent*`/`remainingTickets`/`isUrgent` from `Home()`; replaced with `slideIndex` + `heroSlides` (static premium artwork array). Active Draws section remains fully DB-driven via `useListGiveaways`. Helper components `BottleSpotlight`, `RotatingTagline`, `LiveActivityTicker`, `CinematicBackdrop` are now unused but left in the file to keep this diff surgical.
+- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx` (hero section + state).
+- **Safety preserved:** PrizePour beta status unchanged, no `PAYMENTS_ENABLED` touched, `ADMIN_PASSWORD` untouched, no DB/API/route changes, admin still protected, Active Draw visibility rules untouched.
+- **Test before push:** preview the homepage desktop + mobile, confirm slideshow rotates across all three posters with no text cropping, confirm the two CTAs scroll to `#giveaways` and `#how-it-works`, confirm Active Draws cards below still render correctly.
+
 ### Bushmills hero artwork added
 
 - Added Bushmills Distillery Tour Experience promotional artwork ("THE WORLD'S OLDEST LICENSED WHISKEY DISTILLERY • 1608 — Worth Over £2,500") to the name-keyed `getCollectionHero` mapping in `Home.tsx`. The Bushmills Active Draw card now shows the full premium artwork instead of falling back to the bottle strip.

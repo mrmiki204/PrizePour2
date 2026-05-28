@@ -366,84 +366,74 @@ function LiveActivityTicker() {
 export function Home() {
   const [, setLocation] = useLocation();
   const { data: giveaways, isLoading: giveawaysLoading } = useListGiveaways();
-  const [featuredIndex, setFeaturedIndex] = useState(0);
+  const [slideIndex, setSlideIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
-  // Featured carousel & Active Draws grid both come strictly from the public
-  // API — which filters to: isActive AND isPublic AND !entriesPaused AND drawDate >= now.
-  // Admin status changes (deactivate / hide / pause / past draw date) therefore
-  // automatically remove a draw from the homepage. No hardcoded entries.
-  const featuredGiveaways = useMemo(() => giveaways ?? [], [giveaways]);
+  // Hero slideshow: pure brand showcase using premium collection artwork.
+  // Active Draws section (below) handles all the per-draw detail (countdown,
+  // progress, bottles, CTA) — kept fully DB-driven via useListGiveaways().
+  const heroSlides = useMemo(() => [
+    { name: 'The Patrón Collection', image: patronCollectionHero },
+    { name: 'The Clonakilty Collection', image: clonakiltyCollectionHero },
+    { name: 'Bushmills Distillery Tour Experience', image: bushmillsCollectionHero },
+  ], []);
 
   const goToSlide = (i: number) => {
-    if (featuredGiveaways.length === 0) return;
-    setDirection(i > featuredIndex ? 1 : -1);
-    setFeaturedIndex(((i % featuredGiveaways.length) + featuredGiveaways.length) % featuredGiveaways.length);
+    const n = heroSlides.length;
+    setDirection(i > slideIndex ? 1 : -1);
+    setSlideIndex(((i % n) + n) % n);
   };
-  const nextSlide = () => goToSlide(featuredIndex + 1);
-  const prevSlide = () => goToSlide(featuredIndex - 1);
+  const nextSlide = () => goToSlide(slideIndex + 1);
+  const prevSlide = () => goToSlide(slideIndex - 1);
 
-  const featured = featuredGiveaways[featuredIndex];
-  const isBushmillsFeatured =
-    !!featured && featured.name === 'Bushmills Distillery Tour Experience';
-  const isPatronFeatured = featured?.id === 2;
-  const isClonakiltyFeatured = featured?.id === 1;
-  const hasSpotlight = isPatronFeatured || isClonakiltyFeatured;
-  const spotlightBottles = isPatronFeatured
-    ? PATRON_BOTTLES.filter(b => PATRON_SPOTLIGHT_NAMES.includes(b.name))
-    : isClonakiltyFeatured
-      ? COLLECTION_BOTTLES.filter(b => CLONAKILTY_SPOTLIGHT_NAMES.includes(b.name))
-      : [];
-  const spotlightTaglines = isPatronFeatured ? PATRON_TAGLINES : isClonakiltyFeatured ? CLONAKILTY_TAGLINES : [];
-  const spotlightAccent: SpotlightAccent = isPatronFeatured ? 'emerald' : 'amber';
-  const accent: 'amber' | 'emerald' = isPatronFeatured ? 'emerald' : 'amber';
-  const accentText = isPatronFeatured ? 'text-emerald-300' : 'text-primary';
-  const accentBorder = isPatronFeatured ? 'border-emerald-400/40' : 'border-primary/30';
-  const accentDot = isPatronFeatured ? 'bg-emerald-400' : 'bg-primary';
-  const accentBgSoft = isPatronFeatured ? 'bg-emerald-500/10' : 'bg-primary/10';
-  const remainingTickets = featured ? featured.maxEntries - featured.entryCount : 0;
-  const isUrgent = remainingTickets > 0 && remainingTickets <= 50;
+  // Gentle auto-advance — 7s. Pauses naturally on tab blur (interval doesn't fire when throttled).
+  useEffect(() => {
+    const id = setInterval(() => {
+      setDirection(1);
+      setSlideIndex((i) => (i + 1) % heroSlides.length);
+    }, 7000);
+    return () => clearInterval(id);
+  }, [heroSlides.length]);
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
       <Navbar onScrollTo={scrollTo} />
 
-      {/* ── Hero / Featured Draw ── */}
+      {/* ── Hero / Premium Collection Showcase ── */}
       <section className="relative pt-28 sm:pt-32 md:pt-36 pb-12 sm:pb-16 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <motion.img
             src={heroImg}
             alt=""
-            className="w-full h-full object-cover opacity-20"
+            className="w-full h-full object-cover opacity-15"
             initial={{ scale: 1 }}
             animate={{ scale: 1.08 }}
             transition={{ duration: 24, ease: 'easeInOut', repeat: Infinity, repeatType: 'reverse' }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background" />
         </div>
-        <CinematicBackdrop accent={accent} />
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
+          {/* Premium brand intro — clean overlay above the artwork, no draw clutter */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-8"
+            className="text-center mb-8 sm:mb-10"
           >
-            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${accentBorder} ${accentBgSoft} mb-4 transition-colors duration-700`}>
-              <span className={`w-2 h-2 rounded-full ${accentDot} animate-pulse`} />
-              <span className={`text-[10px] font-serif ${accentText} uppercase tracking-[0.2em]`}>
-                {isPatronFeatured ? 'Featured Tequila Draw' : 'Featured Draw'}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 mb-4">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-[10px] font-serif text-primary uppercase tracking-[0.25em]">
+                Featured Collections
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif leading-tight px-2">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">Win Rare Spirits &amp; Luxury Distillery Experiences</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">
+                Win Premium Spirits &amp; Luxury Experiences
+              </span>
             </h1>
             <p className="mt-4 sm:mt-5 mx-auto max-w-2xl text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed px-2">
-              Premium curated spirit collections, rare bottles and unforgettable whiskey experiences — built for collectors and enthusiasts.
-            </p>
-            <p className="mt-3 sm:mt-4 text-[11px] sm:text-xs font-serif uppercase tracking-[0.25em] text-amber-200/80 px-2">
-              UK-based <span className="text-primary/60 mx-1.5">•</span> Transparent winners <span className="text-primary/60 mx-1.5">•</span> Premium verified prizes
+              Curated premium whiskey, tequila and distillery experiences for collectors and enthusiasts.
             </p>
             <div className="mt-6 sm:mt-7 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-2">
               <Button
@@ -462,8 +452,12 @@ export function Home() {
                 How It Works
               </Button>
             </div>
+            <p className="mt-5 sm:mt-6 text-[11px] sm:text-xs font-serif uppercase tracking-[0.25em] text-amber-200/80 px-2">
+              UK-based <span className="text-primary/60 mx-1.5">•</span> Transparent winners <span className="text-primary/60 mx-1.5">•</span> Premium verified prizes
+            </p>
           </motion.div>
 
+          {/* Cinematic premium collection slideshow — artwork does the selling */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -472,197 +466,59 @@ export function Home() {
           >
             <div className="absolute -inset-6 bg-primary/15 blur-3xl rounded-full pointer-events-none" />
 
-            <div className="relative bg-card/70 backdrop-blur border border-border rounded-sm shadow-2xl overflow-hidden">
-              <AnimatePresence initial={false} custom={direction} mode="wait">
-                <motion.div
-                  key={featuredIndex}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="grid lg:grid-cols-5"
-                >
-                  {/* ── Image (3/5) — taller on mobile so badges + bottle + title don't collide ── */}
-                  <div className="lg:col-span-3 relative min-h-[460px] sm:min-h-[480px] lg:min-h-[520px] lg:aspect-auto overflow-hidden bg-black">
-                    {hasSpotlight ? (
-                      <BottleSpotlight bottles={spotlightBottles} accent={spotlightAccent} />
-                    ) : featured && getGiveawayImage(featured.id, featured.imageUrl, featured.name) ? (
-                      <img
-                        src={getGiveawayImage(featured.id, featured.imageUrl, featured.name)}
-                        alt={featured?.name}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-b from-amber-900/60 to-black flex items-center justify-center">
-                        <Package className="w-24 h-24 text-primary/40" />
-                      </div>
-                    )}
-                    {!hasSpotlight && <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />}
-                    <div className="absolute inset-0 lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-card/95" />
+            <div className="relative bg-black border border-border rounded-sm shadow-2xl overflow-hidden">
+              <div className="relative w-full aspect-[3/2] sm:aspect-[16/9]">
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.img
+                    key={slideIndex}
+                    src={heroSlides[slideIndex].image}
+                    alt={heroSlides[slideIndex].name}
+                    className="absolute inset-0 w-full h-full object-contain object-center select-none"
+                    draggable={false}
+                    initial={{ opacity: 0, scale: 1.02 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.99 }}
+                    transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  />
+                </AnimatePresence>
 
-                    {/* Top badges — stack on mobile so left + right groups never collide */}
-                    <div className="absolute top-4 sm:top-4 left-4 sm:left-4 right-4 sm:right-4 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-2 z-10">
-                      <div className="flex flex-col gap-2 items-start min-w-0">
-                        <span className={`text-primary-foreground text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg ${isPatronFeatured ? 'bg-emerald-500' : 'bg-primary'}`}>
-                          Live Draw
-                        </span>
-                        {isUrgent ? (
-                          <motion.span
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: [1, 1.05, 1] }}
-                            transition={{ scale: { duration: 1.4, repeat: Infinity } }}
-                            className="bg-red-600/95 text-white text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm shadow-lg border border-red-300/40 max-w-full truncate"
-                          >
-                            Only {remainingTickets} Tickets Left
-                          </motion.span>
-                        ) : (
-                          <span className="bg-black/70 backdrop-blur text-white/90 text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border border-white/10 max-w-full truncate">
-                            {isBushmillsFeatured ? 'VIP Experience Draw' : 'Limited Entries'}
-                          </span>
-                        )}
-                      </div>
-                      {featured && (
-                        <span className="self-start sm:self-auto bg-black/70 backdrop-blur text-white text-[10px] font-serif uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border border-white/10 max-w-full truncate">
-                          {isBushmillsFeatured
-                            ? 'Luxury Experience'
-                            : isPatronFeatured
-                              ? `${getGiveawayBottles(featured.id).length} Patrón Bottles`
-                              : `${getGiveawayBottles(featured.id).length} Bottles`}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Bottom name on mobile — gradient scrim for guaranteed contrast */}
-                    {featured && (
-                      <div className="absolute bottom-0 left-0 right-0 px-5 pt-10 pb-6 sm:p-6 lg:hidden bg-gradient-to-t from-black via-black/75 to-transparent">
-                        <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-3">Win The Special Collection</p>
-                        <h2 className="text-lg sm:text-2xl font-serif text-white leading-snug break-words">{featured.name}</h2>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* ── Info (2/5) — generous mobile padding + spacing ── */}
-                  <div className="lg:col-span-2 px-6 py-8 sm:p-6 lg:p-8 flex flex-col justify-between gap-8 sm:gap-6 bg-card/95">
-                    <div className="space-y-7 sm:space-y-4">
-                      <div className="hidden lg:block">
-                        {hasSpotlight
-                          ? <RotatingTagline lines={spotlightTaglines} accent={spotlightAccent} />
-                          : <p className="text-[10px] font-serif text-primary uppercase tracking-[0.2em] mb-2">Win The Special Collection</p>}
-                        <h2 className="text-2xl sm:text-3xl xl:text-4xl font-serif text-white leading-tight break-words">{featured?.name}</h2>
-                      </div>
-
-                      <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3 pt-4 sm:pt-2 border-t border-border/40 min-w-0">
-                        <span className="text-[10px] font-serif text-muted-foreground uppercase tracking-[0.2em] shrink-0">Prize Value</span>
-                        <span className="text-2xl sm:text-2xl lg:text-4xl font-serif text-primary break-words leading-tight">{featured?.prizeValue}</span>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{featured?.description}</p>
-                    </div>
-
-                    {/* Progress + countdown */}
-                    {featured && (() => {
-                      const pct = Math.min((featured.entryCount / featured.maxEntries) * 100, 100);
-                      const remaining = featured.maxEntries - featured.entryCount;
-                      return (
-                        <div className="space-y-6 sm:space-y-4">
-                          <div>
-                            <div className="flex justify-between items-center text-[11px] font-serif mb-2 sm:mb-1.5 gap-3">
-                              <span className="text-muted-foreground uppercase tracking-widest truncate">{featured.entryCount} / {featured.maxEntries} sold</span>
-                              <span className={`shrink-0 ${remaining <= 20 ? 'text-red-400' : 'text-primary'}`}>{remaining} left</span>
-                            </div>
-                            <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                              <motion.div
-                                key={featuredIndex}
-                                className={`h-full rounded-full ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
-                                initial={{ width: 0 }}
-                                animate={{ width: `${pct}%` }}
-                                transition={{ duration: 0.9, ease: 'easeOut' }}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-3 pt-4 sm:pt-2 border-t border-border/40">
-                            <div className="min-w-0">
-                              <p className="text-[9px] font-serif text-muted-foreground uppercase tracking-[0.2em] mb-1">Draw Ends In</p>
-                              <CountdownTimer daysToAdd={daysUntil(featured.drawDate)} />
-                            </div>
-                            <div className="text-right">
-                              <p className="text-[9px] font-serif text-muted-foreground uppercase tracking-[0.2em] mb-1">Entry</p>
-                              <p className="text-lg sm:text-xl font-serif text-white">£4.99</p>
-                            </div>
-                          </div>
-
-                          <div className="relative">
-                            <motion.div
-                              aria-hidden
-                              className={`absolute -inset-1 rounded-md blur-md ${isPatronFeatured ? 'bg-emerald-500/60' : 'bg-primary/60'}`}
-                              animate={{ opacity: [0.35, 0.75, 0.35] }}
-                              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                            />
-                            <Button
-                              size="lg"
-                              className={`relative w-full text-primary-foreground font-semibold uppercase tracking-[0.15em] h-14 min-h-[52px] shadow-[0_8px_30px_-6px_rgba(234,146,55,0.55)] hover:translate-y-[-1px] transition-transform ${isPatronFeatured ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-primary hover:bg-primary/90'}`}
-                              onClick={() => setLocation(isBushmillsFeatured ? '/experiences/bushmills' : `/giveaway/${featured.id}`)}
-                            >
-                              Preview Giveaway <ArrowRight className="w-4 h-4 ml-2" />
-                            </Button>
-                            <p className="mt-3 text-center text-[10px] font-serif uppercase tracking-[0.25em] text-muted-foreground">
-                              Secure <span className="text-primary/60 mx-1">•</span> Transparent <span className="text-primary/60 mx-1">•</span> Beta Preview
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+                {/* Carousel arrows — overlaid on artwork, subtle so they don't compete */}
+                {heroSlides.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={prevSlide}
+                      aria-label="Previous collection"
+                      className="absolute top-1/2 left-2 sm:left-3 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-primary/80 text-white hover:text-primary-foreground border border-white/10 hover:border-primary flex items-center justify-center transition-all duration-200"
+                    >
+                      <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextSlide}
+                      aria-label="Next collection"
+                      className="absolute top-1/2 right-2 sm:right-3 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-primary/80 text-white hover:text-primary-foreground border border-white/10 hover:border-primary flex items-center justify-center transition-all duration-200"
+                    >
+                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
 
-            {/* Carousel arrows (overlay on slide) */}
-            {featuredGiveaways.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={prevSlide}
-                  aria-label="Previous featured draw"
-                  className="absolute top-[22%] sm:top-1/2 left-2 sm:left-3 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-transparent hover:bg-primary/80 text-white hover:text-primary-foreground border border-transparent hover:border-primary flex items-center justify-center transition-all duration-200 hover:scale-105"
-                >
-                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={nextSlide}
-                  aria-label="Next featured draw"
-                  className="absolute top-[22%] sm:top-1/2 right-2 sm:right-3 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-transparent hover:bg-primary/80 text-white hover:text-primary-foreground border border-transparent hover:border-primary flex items-center justify-center transition-all duration-200 hover:scale-105"
-                >
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              </>
-            )}
-
             {/* Carousel dots */}
-            {featuredGiveaways.length > 1 && (
+            {heroSlides.length > 1 && (
               <div className="flex items-center justify-center gap-2 mt-6">
-                {featuredGiveaways.map((_, i) => (
+                {heroSlides.map((s, i) => (
                   <button
-                    key={i}
+                    key={s.name}
                     onClick={() => goToSlide(i)}
-                    aria-label={`Show featured draw ${i + 1}`}
-                    className={`rounded-full transition-all duration-300 h-1.5 ${i === featuredIndex ? 'bg-primary w-8' : 'bg-primary/30 hover:bg-primary/50 w-2'}`}
+                    aria-label={`Show ${s.name}`}
+                    className={`rounded-full transition-all duration-300 h-1.5 ${i === slideIndex ? 'bg-primary w-8' : 'bg-primary/30 hover:bg-primary/50 w-2'}`}
                   />
                 ))}
               </div>
             )}
-
-            <LiveActivityTicker />
-
-            <div className="flex justify-center mt-4">
-              <Button variant="ghost" className="text-muted-foreground hover:text-primary text-xs font-serif uppercase tracking-[0.2em]" onClick={() => scrollTo('giveaways')}>
-                View All Draws <ArrowRight className="w-3 h-3 ml-2" />
-              </Button>
-            </div>
           </motion.div>
         </div>
       </section>

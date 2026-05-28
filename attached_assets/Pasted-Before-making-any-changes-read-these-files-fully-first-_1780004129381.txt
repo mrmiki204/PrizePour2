@@ -1,0 +1,311 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Treat them as the source of truth.
+
+Important rules:
+
+* PrizePour stays in beta
+* Do NOT enable real payments
+* Keep `PAYMENTS_ENABLED` safety
+* Keep `ADMIN_PASSWORD` protection
+* Do not expose admin routes publicly
+* Keep luxury dark/gold styling
+* Keep mobile responsive
+* Test locally in Replit before Git push
+
+Task:
+Upgrade the homepage hero slideshow into a premium cinematic brand section using the new promotional collection artwork.
+
+Goal:
+Replace the current hero/featured draw slideshow with a cleaner, luxury-feeling carousel using the new premium collection posters:
+
+* Patrón Collection promotional artwork
+* Clonakilty Collection promotional artwork
+* Bushmills Distillery Tour Experience promotional artwork
+
+The new hero should feel more like a premium luxury brand website and less like a busy raffle UI.
+
+Important design principle:
+The images now do most of the selling.
+
+Therefore:
+SIMPLIFY the hero overlay.
+
+Do NOT stack large amounts of text/UI on top of the artwork.
+
+The hero should create:
+
+* desire
+* trust
+* premium feel
+* click intent
+
+The Active Draw cards will handle:
+
+* countdowns
+* progress bars
+* bottle lists
+* detailed information
+
+---
+
+## Stage 1 — Add Hero Artwork Assets
+
+Use the new premium artwork as slideshow assets:
+
+1. Patrón hero image
+2. Clonakilty hero image
+3. Bushmills hero image
+
+Requirements:
+
+* add to public/assets/images or existing image folder
+* optimized for web
+* preserve quality
+* no stretching
+* no cropping of embedded poster text
+
+If needed:
+generate resized desktop/mobile variants.
+
+Recommended ratio:
+
+* desktop hero: wide cinematic (16:9 or close)
+* mobile hero: safe crop / responsive scaling
+
+Test:
+
+* images load correctly
+* no broken paths
+* fast loading
+* good visual quality
+
+---
+
+## Stage 2 — Replace Hero Slideshow Backgrounds
+
+Replace current hero slide backgrounds with:
+
+* Patrón artwork
+* Clonakilty artwork
+* Bushmills artwork
+
+Remove dependence on old bottle grid/old static featured draw images.
+
+Requirements:
+
+* smooth carousel transitions
+* preserve existing slideshow logic if stable
+* responsive on desktop and mobile
+* no cropped-off text inside artwork
+* maintain luxury feel
+
+Image fitting rules:
+
+* prefer `object-fit: contain`
+* center image
+* dark premium background behind image
+* avoid cutting off poster text
+* use responsive wrapper
+
+Recommended hero container:
+
+* large premium cinematic section
+* balanced spacing
+* full-width feeling
+* not excessively tall on mobile
+
+Test:
+
+* all slides rotate correctly
+* no image clipping
+* mobile hero looks premium
+* desktop hero looks premium
+
+---
+
+## Stage 3 — Simplify Hero Overlay (Important)
+
+The new artwork already contains marketing messaging.
+
+Reduce overlay clutter.
+
+REMOVE from hero:
+
+* countdown timers
+* ticket counters
+* long descriptions
+* bottle lists
+* busy featured draw information
+* duplicated prize value blocks
+
+Do NOT overlay heavy UI.
+
+Replace with a clean premium overlay only.
+
+Target hero content:
+
+Small label:
+FEATURED COLLECTIONS
+
+Headline:
+“Win Premium Spirits & Luxury Experiences”
+
+Supporting text:
+“Curated premium whiskey, tequila and distillery experiences for collectors and enthusiasts.”
+
+Buttons:
+Primary:
+“View Active Draws”
+
+Secondary:
+“How It Works”
+
+Small trust strip underneath:
+“UK-based • Transparent winners • Premium verified prizes”
+
+Keep typography elegant and premium.
+
+Requirements:
+
+* text readable over images
+* subtle dark gradient overlay allowed
+* avoid blocking artwork
+* keep luxury styling
+
+Test:
+
+* hero readable on all slides
+* CTA buttons work
+* mobile text spacing good
+* no overlap issues
+
+---
+
+## Stage 4 — Improve Hero Layout & Composition
+
+Hero should feel cinematic and premium.
+
+Requirements:
+
+* hero centered visually
+* content positioned elegantly
+* subtle dark overlay gradient for readability
+* premium spacing
+* restrained animations only
+
+Do NOT:
+
+* clutter hero
+* over-animate
+* make it feel like a gambling website
+* make it feel cheap
+
+Target feeling:
+Luxury spirits brand × premium experience platform.
+
+Reference feeling:
+Luxury whisky website / premium watch brand / high-end spirits campaign.
+
+Test:
+
+* desktop looks premium
+* mobile looks premium
+* no text clipping
+* no awkward empty spacing
+
+---
+
+## Stage 5 — Generate Missing Hero Artwork Variants (If Needed)
+
+If current images do not scale perfectly:
+
+Generate matching premium variants.
+
+Requirements:
+
+* same luxury dark/gold aesthetic
+* cinematic composition
+* readable at hero size
+* premium lighting
+* consistent typography
+* consistent PrizePour visual identity
+
+Create if needed:
+
+1. Mobile-safe crops
+2. Wide desktop hero variants
+3. Reduced-text versions if hero becomes visually crowded
+
+Keep consistent across:
+
+* Patrón
+* Clonakilty
+* Bushmills
+
+---
+
+## Stage 6 — Final Homepage Testing
+
+Test homepage thoroughly:
+
+Hero:
+
+* slideshow works
+* images visible
+* no cropping
+* buttons work
+* text readable
+* premium feel
+* mobile responsive
+
+Active Draws:
+
+* still DB-driven
+* still displays correct collections
+* visibility rules still work
+
+Admin:
+
+* `/admin` protected
+* `/admin/draws` protected
+* activate/deactivate still affects public visibility
+
+Payments:
+
+* checkout remains disabled
+* `PAYMENTS_ENABLED` untouched
+
+Performance:
+
+* no oversized images
+* homepage loads smoothly
+
+Update docs:
+Add `CHANGELOG.md` entry:
+
+“Rebuilt homepage hero slideshow using premium collection artwork and simplified hero conversion layout.”
+
+Only after all testing passes:
+
+git status
+
+Review changed files carefully.
+
+Then:
+
+git add .
+git commit -m "Upgrade hero slideshow with premium collection artwork"
+git push
+
+After Railway redeploys:
+
+* test homepage desktop
+* test homepage mobile
+* verify hero slideshow
+* verify Active Draws still function
+* verify admin still works
