@@ -358,6 +358,22 @@ export async function customFetch<T = unknown>(
     }
   }
 
+  // Attach admin token from sessionStorage when present. This is the reliable
+  // fallback for cross-site iframe contexts where session cookies are blocked
+  // by the browser even with SameSite=None. Server middleware accepts either
+  // a valid session cookie OR a valid X-Admin-Token.
+  if (
+    typeof sessionStorage !== "undefined" &&
+    !headers.has("x-admin-token")
+  ) {
+    try {
+      const adminToken = sessionStorage.getItem("pp.adminToken");
+      if (adminToken) headers.set("x-admin-token", adminToken);
+    } catch {
+      /* sessionStorage may throw in sandboxed contexts — ignore */
+    }
+  }
+
   const requestInfo = { method, url: resolveUrl(input) };
 
   const response = await fetch(input, {

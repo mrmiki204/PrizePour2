@@ -212,8 +212,10 @@ export function AdminDraws() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Save failed.';
       if (/401|unauthor/i.test(msg)) {
-        setFormError('Your admin session has expired. Reloading…');
-        setTimeout(() => window.location.reload(), 1200);
+        const { clearAdminToken } = await import('@/lib/adminToken');
+        clearAdminToken();
+        setFormError('Admin session expired. Please log in again.');
+        setTimeout(() => window.location.reload(), 1500);
       } else {
         setFormError(msg);
       }
@@ -230,7 +232,9 @@ export function AdminDraws() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : '';
       if (/401|unauthor/i.test(msg)) {
-        alert('Your admin session has expired. Please log in again.');
+        const { clearAdminToken } = await import('@/lib/adminToken');
+        clearAdminToken();
+        alert('Admin session expired. Please log in again.');
         window.location.reload();
       } else {
         alert(msg || 'Update failed.');
@@ -286,7 +290,14 @@ export function AdminDraws() {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    const { getAdminToken, clearAdminToken } = await import('@/lib/adminToken');
+    const token = getAdminToken();
+    await fetch('/api/admin/logout', {
+      method: 'POST',
+      credentials: 'include',
+      headers: token ? { 'X-Admin-Token': token } : undefined,
+    });
+    clearAdminToken();
     setLocation('/');
   };
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AdminLogin } from '@/pages/AdminLogin';
 import { Loader2 } from 'lucide-react';
+import { clearAdminToken, getAdminToken } from '@/lib/adminToken';
 
 interface AdminGuardProps {
   children: React.ReactNode;
@@ -15,8 +16,17 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   async function checkAuth() {
     try {
-      const res = await fetch('/api/admin/me', { credentials: 'include' });
-      setStatus(res.ok ? 'authed' : 'unauthed');
+      const token = getAdminToken();
+      const res = await fetch('/api/admin/me', {
+        credentials: 'include',
+        headers: token ? { 'X-Admin-Token': token } : undefined,
+      });
+      if (res.ok) {
+        setStatus('authed');
+      } else {
+        clearAdminToken();
+        setStatus('unauthed');
+      }
     } catch {
       setStatus('unauthed');
     }

@@ -203,7 +203,14 @@ export function AdminDashboard() {
   const deleteGiveaway = useDeleteGiveaway();
 
   const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    const { getAdminToken, clearAdminToken } = await import('@/lib/adminToken');
+    const token = getAdminToken();
+    await fetch('/api/admin/logout', {
+      method: 'POST',
+      credentials: 'include',
+      headers: token ? { 'X-Admin-Token': token } : undefined,
+    });
+    clearAdminToken();
     setLocation('/');
   };
 
