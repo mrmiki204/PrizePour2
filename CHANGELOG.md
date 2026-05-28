@@ -20,6 +20,20 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Fixed admin all-draw loading and confirmed Macallan seeded draw visibility in admin
+
+- **Symptom:** Live `/admin` showed `Active Draws: 0` and "No giveaways yet"; Macallan was invisible in admin even though it had seeded correctly. Public homepage continued to show the 3 eligible draws — so the DB was healthy, only the admin fetch was broken.
+- **Root cause:** Yesterday's security fix for `GET /api/giveaways?all=true` only checked `req.session?.isAdmin === true`. But the admin UI doesn't use session cookies — it authenticates with the `x-admin-token` header (HMAC-signed token stored in `localStorage`, the same scheme the `requireAdmin` middleware accepts). So every admin call to `?all=true` was being 401'd, which TanStack Query swallowed → empty list → "No giveaways yet". Public `/api/giveaways` was unaffected (no auth check), which is why the homepage kept working.
+- **Fix:** Extracted the dual-mode auth check from `requireAdmin` into a reusable `isAdminAuthed(req)` predicate (checks session OR validates the `x-admin-token` header). Replaced the session-only check in `GET /api/giveaways` with `isAdminAuthed(req)` so the admin UI's token-header requests pass while unauthenticated requests still return 401.
+- **Files:** `artifacts/api-server/src/middleware/adminAuth.ts` (new export `isAdminAuthed`), `artifacts/api-server/src/routes/giveaways.ts` (use it for the `?all=true` gate).
+- **Verified locally (curl):**
+  - `GET /api/giveaways?all=true` with no auth → `401` ✅
+  - `GET /api/giveaways?all=true` with admin token header → returns all **4** draws including `The Macallan Luxury Scotch Collection` ✅
+  - `GET /api/giveaways` (no auth) → returns **3** eligible draws (Clonakilty, Patrón, Bushmills), no Macallan ✅
+- **Macallan seed confirmation:** server boot logs show `Default giveaways already seeded — nothing to insert` once present; `Giveaway table summary { total: 4, active: 3, public: 3, paused: 1 }`. Seed is name-keyed idempotent — re-runs only insert missing rows, never modifies existing ones, so admin edits in production are preserved.
+- **After deploy:** Railway boots with the existing schema (no migration needed). The same admin token mechanism is used in prod, so the fix lands as-is. Expected post-deploy state: `/admin` and `/admin/draws` show all 4 draws including Macallan (inactive + hidden + paused row with eligibility "No — not active, hidden, entries paused"); public homepage still shows only the 3 eligible draws.
+- **Safety preserved:** `PAYMENTS_ENABLED`, `ADMIN_PASSWORD`, `requireAdmin` middleware, `sk_test_` guard — all untouched. No DB schema change. No new endpoints.
+
 ### Hardened `GET /api/giveaways?all=true` with admin auth (security fix)
 
 - **What:** Added a session-based admin check at the top of `GET /api/giveaways` so the `?all=true` branch (which returns inactive/hidden/paused/ended draws) now returns `401 Unauthorized` for any caller without an admin session. Verified: `curl /api/giveaways?all=true` without admin login returns 401; admin UI still works because it sends the session cookie.

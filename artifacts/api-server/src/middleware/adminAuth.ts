@@ -42,6 +42,18 @@ function verifyToken(token: string | undefined): TokenStatus {
   return "valid";
 }
 
+/**
+ * Returns true if the request carries valid admin auth — either an
+ * authenticated session OR a valid `x-admin-token` header. Use this in
+ * handlers that need a conditional admin gate (e.g. `GET /api/giveaways`
+ * which is public by default but admin-only when called with `?all=true`).
+ */
+export function isAdminAuthed(req: Request): boolean {
+  if (req.session?.isAdmin === true) return true;
+  const header = req.header("x-admin-token") ?? undefined;
+  return verifyToken(header) === "valid";
+}
+
 export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   if (req.session?.isAdmin === true) {
     next();

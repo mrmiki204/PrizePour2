@@ -15,7 +15,7 @@ import {
 } from "@workspace/api-zod";
 import { sendWinnerEmail } from "../emailService.js";
 import { logger } from "../lib/logger.js";
-import { requireAdmin } from "../middleware/adminAuth.js";
+import { requireAdmin, isAdminAuthed } from "../middleware/adminAuth.js";
 
 const router: IRouter = Router();
 
@@ -42,9 +42,15 @@ router.get("/giveaways", async (req, res): Promise<void> => {
   // `?all=true` returns hidden/inactive/paused/ended draws and must be
   // admin-only — otherwise anyone could enumerate unpublished draws
   // (e.g. the Macallan Collection seeded as inactive+hidden+paused).
-  if (showAll && req.session?.isAdmin !== true) {
+  // Accepts either an admin session OR a valid `x-admin-token` header
+  // (same dual-mode as the `requireAdmin` middleware), so the admin UI
+  // — which uses the token header from localStorage — works correctly.
+  if (showAll && !isAdminAuthed(req)) {
     req.log.warn(
-      { hasSession: !!req.session?.isAdmin },
+      {
+        hasSession: !!req.session?.isAdmin,
+        hasTokenHeader: !!req.header("x-admin-token"),
+      },
       "Rejected unauthenticated ?all=true on /api/giveaways",
     );
     res.status(401).json({ error: "Unauthorized — admin login required" });

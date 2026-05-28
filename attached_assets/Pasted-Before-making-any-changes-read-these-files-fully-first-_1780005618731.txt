@@ -1,0 +1,110 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Keep PrizePour in beta. Do not enable real payments. Keep `PAYMENTS_ENABLED` safety and `ADMIN_PASSWORD` protection untouched.
+
+URGENT BUG:
+Live `/admin` shows:
+
+* Active Draws: 0
+* Giveaway Draws: “No giveaways yet”
+
+But public live draws exist on the site.
+
+Also:
+The new Macallan Luxury Scotch Collection is not visible anywhere, including admin.
+
+Goal:
+Fix admin draw loading and confirm Macallan draw was seeded correctly.
+
+Investigate first, do not guess.
+
+Check:
+
+1. What API/query `/admin` uses to load draws.
+2. What API/query homepage uses to load draws.
+3. Whether admin and homepage use different endpoints, filters, tables, schemas, or databases.
+4. Whether admin is accidentally filtering only active/public draws.
+5. Whether admin requires a different response shape after recent layout/image changes.
+6. Whether Railway production database has seeded draws.
+7. Whether Macallan seed exists and runs idempotently.
+
+Required behaviour:
+Admin must show ALL draws:
+
+* Patrón Collection
+* Clonakilty Collection
+* Bushmills Distillery Tour Experience
+* Macallan Luxury Scotch Collection
+* active
+* inactive
+* hidden
+* paused
+* ended
+
+Public homepage must ONLY show draws where:
+
+* active = true
+* visible/public = true
+* paused = false
+* not ended
+
+Macallan default status:
+
+* active = false
+* visible/public = false
+* paused = true
+
+So Macallan should NOT show publicly by default, but MUST show in admin.
+
+Fix requirements:
+
+* Make admin use the correct all-draws fetch/query.
+* Do not filter hidden/inactive/paused draws out of admin.
+* Ensure seeded draws exist in production DB.
+* Ensure Macallan is included in the idempotent seed function.
+* Do not create duplicate seeded draws.
+* If a seeded draw already exists, update missing fields only.
+* Add/keep startup logs:
+
+  * DB connected
+  * seed started
+  * seeded draw created/already exists
+  * final draw count
+* Add temporary debug logs if needed:
+
+  * admin draw count
+  * public draw count
+  * database URL/provider being used without exposing secrets
+
+Test:
+
+1. Replit/local `/admin` shows all seeded draws.
+2. Replit/local homepage only shows public eligible draws.
+3. Macallan appears in admin.
+4. Macallan does not appear publicly unless activated, made visible, and unpaused.
+5. Activate Macallan in admin and confirm it appears publicly.
+6. Hide/pause Macallan and confirm it disappears publicly.
+7. Patrón, Clonakilty and Bushmills still work.
+8. Checkout remains disabled.
+9. Admin remains password protected.
+
+Update `CHANGELOG.md`:
+“Fixed admin all-draw loading and confirmed Macallan seeded draw visibility in admin.”
+
+Only after testing locally:
+
+git status
+git add .
+git commit -m "Fix admin draw loading and Macallan seeding"
+git push
+
+After Railway redeploys:
+
+* check live `/admin`
+* confirm all draws appear
+* confirm Macallan is in admin
+* confirm public homepage only shows eligible draws
