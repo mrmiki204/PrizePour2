@@ -20,6 +20,12 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Bushmills hero artwork added
+
+- Added Bushmills Distillery Tour Experience promotional artwork ("THE WORLD'S OLDEST LICENSED WHISKEY DISTILLERY • 1608 — Worth Over £2,500") to the name-keyed `getCollectionHero` mapping in `Home.tsx`. The Bushmills Active Draw card now shows the full premium artwork instead of falling back to the bottle strip.
+- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx` (one import + one mapping line).
+- **Preserved:** same `object-contain` fit + black letterbox as Patrón/Clonakilty so the full image is visible. No DB, admin, or payment changes.
+
 ### Active Draw hero artwork → fit full image without cropping
 
 - **Problem:** previous hero used `aspect-[16/9] sm:aspect-[21/9] object-cover`, which cropped the top headline ("THE PATRÓN COLLECTION" / "THE CLONAKILTY COLLECTION") and the bottom "Enter Now" caption from each promo image.
