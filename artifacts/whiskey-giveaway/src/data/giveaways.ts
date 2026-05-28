@@ -25,6 +25,7 @@ import patronXoCafeImg from '@/assets/images/patron-xo-cafe.png';
 import heroClonakiltyImg from '@/assets/images/hero-clonakilty.png';
 import heroPatronImg from '@/assets/images/hero-patron.png';
 import heroBushmillsImg from '@/assets/images/bushmills-hero.png';
+import heroMacallanImg from '@/assets/images/hero-macallan.png';
 
 export type { Giveaway } from '@workspace/api-client-react';
 
@@ -214,6 +215,7 @@ const BUNDLED_IMAGE_BY_NAME: Record<string, string> = {
   'The Clonakilty Collection': heroClonakiltyImg,
   'The Patrón Collection': heroPatronImg,
   'Bushmills Distillery Tour Experience': heroBushmillsImg,
+  'The Macallan Luxury Scotch Collection': heroMacallanImg,
 };
 
 export function getGiveawayBottles(giveawayId: number): Bottle[] {

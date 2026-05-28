@@ -20,6 +20,24 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Hardened `GET /api/giveaways?all=true` with admin auth (security fix)
+
+- **What:** Added a session-based admin check at the top of `GET /api/giveaways` so the `?all=true` branch (which returns inactive/hidden/paused/ended draws) now returns `401 Unauthorized` for any caller without an admin session. Verified: `curl /api/giveaways?all=true` without admin login returns 401; admin UI still works because it sends the session cookie.
+- **Why:** `PROJECT_CONTEXT.md` and `SYSTEM_RULES.md` both documented this endpoint as admin-only, but the implementation didn't enforce it. That meant anyone could enumerate hidden draws (including the newly seeded Macallan Collection, which is intentionally inactive+hidden+paused until admin enables it). Code review (architect) flagged this directly as breaking the "hidden until admin enables" guarantee.
+- **Files:** `artifacts/api-server/src/routes/giveaways.ts` (one inline auth gate at the top of `GET /giveaways`).
+- **Behavior unchanged for:** public `/api/giveaways` (still returns only eligible draws), admin UI (`/admin`, `/admin/draws`) which calls with admin cookie, all write endpoints (already had `requireAdmin`).
+
+### Added Macallan Luxury Scotch Collection draw with premium hero artwork and admin support
+
+- **What:** New seeded draw `The Macallan Luxury Scotch Collection` — £9.99 per ticket, prize value "Worth Over £2,500", 6 premium Macallan bottles (12 Double Cask, 12 Sherry Oak, 15 Double Cask, 18 Sherry Oak, Rare Cask, Harmony Collection), capacity 351 (`ceil(2500 × 1.4 / 9.99)`), draw date 2026-10-15.
+- **Why:** Premium luxury Scotch tier to complement Patrón/Clonakilty/Bushmills, with promotional artwork already commissioned. Kept hidden/paused by default so it only goes public when admin enables it.
+- **Default state (per spec):** `isActive=false`, `isPublic=false`, `entriesPaused=true`. Admin enables via `/admin/draws` (toggles active → public → unpause). All four public-visibility conditions must hold before it appears on the homepage.
+- **Hero artwork:** Saved to `artifacts/whiskey-giveaway/src/assets/images/hero-macallan.png` and registered in `BUNDLED_IMAGE_BY_NAME` (`getGiveawayImage` fallback by exact name — admin custom URL still wins). Active Draw card uses the full poster via `getCollectionHero('macallan')` with `object-contain` on black bg — same treatment as Patrón/Clonakilty/Bushmills. No bottle thumbnail grid (poster already lists all 6).
+- **Files:** `artifacts/api-server/src/index.ts` (seed), `artifacts/whiskey-giveaway/src/data/giveaways.ts` (image fallback), `artifacts/whiskey-giveaway/src/pages/Home.tsx` (`getCollectionHero` mapping).
+- **DB / schema:** no schema change required — uses existing `giveaways` columns. Seed is idempotent + name-keyed, so Railway self-seeds on next boot (logs will show `insertedCount: 1, insertedNames: ["The Macallan Luxury Scotch Collection"]`). Admin edits in production are preserved.
+- **Safety preserved:** beta status unchanged, `PAYMENTS_ENABLED` untouched, `ADMIN_PASSWORD` untouched, `requireAdmin` middleware unchanged, no API/route surface changes. Step-4 checkout gate still applies.
+- **Verified in Replit:** API logs show `Default giveaways seeded on startup insertedCount: 1` and `Giveaway table summary total: 4, active: 3, public: 3, paused: 1` — Macallan is the paused/inactive/hidden one, invisible on the public homepage, visible in `/admin` and `/admin/draws` with the eligibility row explaining why.
+
 ### Rebuilt homepage hero slideshow using premium collection artwork and simplified hero conversion layout
 
 - **What:** Replaced the old featured-draw hero (grid layout with `BottleSpotlight`/`RotatingTagline`, live-draw badges, progress bar, countdown, prize-value block, "Preview Giveaway" CTA, `LiveActivityTicker`, "View All Draws" ghost button) with a clean cinematic slideshow that cycles the three premium collection posters (Patrón, Clonakilty, Bushmills).

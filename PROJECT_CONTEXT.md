@@ -183,6 +183,7 @@ Seeded automatically on first boot of a fresh database by `seedGiveaways()` in `
 | **The Clonakilty Collection** | Worth Over £500 (£481 numeric) | 147 | £4.99 | active, public |
 | **The Patrón Collection** | Worth Over £1,950 (£1984.15 numeric) | 557 | £4.99 | active, public |
 | **Bushmills Distillery Tour Experience** | Worth Over £2,500 | 250 | £10.00 | active, **hidden** (`isPublic=false`) — toggle visible in admin to publish |
+| **The Macallan Luxury Scotch Collection** | Worth Over £2,500 | 351 | £9.99 | **inactive + hidden + paused** by default — admin enables all three toggles in `/admin/draws` to publish |
 
 Bottle/product imagery lives in `artifacts/whiskey-giveaway/src/data/giveaways.ts` (`COLLECTION_BOTTLES`, `PATRON_BOTTLES`). Bushmills landing-page assets are in `src/assets/images/bushmills-*.png`.
 
@@ -195,7 +196,7 @@ Bottle/product imagery lives in `artifacts/whiskey-giveaway/src/data/giveaways.t
 3. Bundled image matched by **id** (dev safety net)
 4. `undefined` — caller renders its own placeholder
 
-Bundled hero images: `hero-clonakilty.png`, `hero-patron.png`, `bushmills-hero.png`.
+Bundled hero images: `hero-clonakilty.png`, `hero-patron.png`, `bushmills-hero.png`, `hero-macallan.png`.
 
 ---
 

@@ -39,6 +39,18 @@ router.get("/giveaways", async (req, res): Promise<void> => {
   const query = ListGiveawaysQueryParams.safeParse(req.query);
   const showAll = query.success && query.data.all === true;
 
+  // `?all=true` returns hidden/inactive/paused/ended draws and must be
+  // admin-only — otherwise anyone could enumerate unpublished draws
+  // (e.g. the Macallan Collection seeded as inactive+hidden+paused).
+  if (showAll && req.session?.isAdmin !== true) {
+    req.log.warn(
+      { hasSession: !!req.session?.isAdmin },
+      "Rejected unauthenticated ?all=true on /api/giveaways",
+    );
+    res.status(401).json({ error: "Unauthorized — admin login required" });
+    return;
+  }
+
   const rows = showAll
     ? await db.select().from(giveawaysTable).orderBy(giveawaysTable.createdAt)
     : await db

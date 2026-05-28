@@ -92,6 +92,7 @@ Three default draws are inserted by `seedGiveaways()` in `artifacts/api-server/s
 | 1 | **The Patrón Collection** | Worth Over £1,950 (£1984.15 numeric) | £4.99 | active + public | `hero-patron.png` |
 | 2 | **The Clonakilty Collection** | Worth Over £500 (£481 numeric) | £4.99 | active + public | `hero-clonakilty.png` |
 | 3 | **Bushmills Distillery Tour Experience** | Worth Over £2,500 | £10.00 | active + **hidden** (`isPublic=false`) — admin publishes it manually | `bushmills-hero.png` |
+| 4 | **The Macallan Luxury Scotch Collection** | Worth Over £2,500 (£2500.00 numeric) | £9.99 | **inactive + hidden + paused** (`isActive=false`, `isPublic=false`, `entriesPaused=true`) — admin enables all three toggles to publish | `hero-macallan.png` |
 
 ### Image requirements
 

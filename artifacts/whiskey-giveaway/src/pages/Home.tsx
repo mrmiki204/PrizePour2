@@ -11,6 +11,7 @@ import heroImg from '@/assets/images/hero.png';
 import patronCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_09_40_PM_1780002816388.png';
 import clonakiltyCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_04_51_PM_1780002816391.png';
 import bushmillsCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_21_53_PM_1780003380341.png';
+import macallanCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_51_35_PM_1780005130054.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
 
@@ -19,6 +20,7 @@ function getCollectionHero(name: string): string | null {
   if (n.includes('patr')) return patronCollectionHero;
   if (n.includes('clonakilty')) return clonakiltyCollectionHero;
   if (n.includes('bushmills')) return bushmillsCollectionHero;
+  if (n.includes('macallan')) return macallanCollectionHero;
   return null;
 }
 

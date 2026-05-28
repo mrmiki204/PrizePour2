@@ -35,6 +35,23 @@ const DEFAULT_GIVEAWAYS: SeedRow[] = [
     isActive: true,
   },
   {
+    name: "The Macallan Luxury Scotch Collection",
+    description:
+      "An extraordinary collection of premium Macallan Scotch whiskies — featuring rare cask expressions, aged single malts and collector favourites: Macallan 12 Year Double Cask, 12 Year Sherry Oak, 15 Year Double Cask, 18 Year Sherry Oak, Rare Cask and the Harmony Collection. Professionally handled, packed and insured.",
+    prizeValue: "Worth Over £2,500",
+    prizeValueNumeric: "2500.00",
+    // ceil(2500 * 1.4 / 9.99) = ceil(350.35) = 351
+    maxEntries: 351,
+    drawDate: new Date("2026-10-15T18:00:00.000Z"),
+    imageUrl: null,
+    ticketPriceGbp: "9.99",
+    heroTagline: "Luxury Scotch Whisky",
+    // Per spec: hidden + paused by default until admin enables in /admin/draws.
+    isActive: false,
+    isPublic: false,
+    entriesPaused: true,
+  },
+  {
     name: "Bushmills Distillery Tour Experience",
     description:
       "Win a premium Bushmills experience including a guided distillery tour, whiskey tasting experience, exclusive extras and luxury spirit-inspired rewards.",

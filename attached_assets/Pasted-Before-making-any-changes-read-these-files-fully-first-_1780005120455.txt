@@ -1,0 +1,267 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Treat them as the source of truth.
+
+Important rules:
+
+* PrizePour remains in beta
+* DO NOT enable real payments
+* Keep `PAYMENTS_ENABLED` safety
+* Keep `ADMIN_PASSWORD` protection
+* Do not expose admin routes publicly
+* Keep luxury dark/gold styling
+* Keep DB-driven draw management
+* Keep mobile responsive
+* Test in Replit before Git push
+
+Task:
+Create a brand-new draw for PrizePour:
+
+# New Draw
+
+**The Macallan Luxury Scotch Collection**
+
+Goal:
+Add a premium luxury whisky draw that feels aspirational, expensive, collectible and visually premium.
+
+The draw must be manageable from admin and fully DB-driven.
+
+---
+
+## Stage 1 — Create the New Draw Model Entry
+
+Create a new seeded/default draw:
+
+Slug:
+`macallan-luxury-collection`
+
+Title:
+`The Macallan Luxury Scotch Collection`
+
+Short title:
+`Macallan Collection`
+
+Category:
+`Luxury Scotch Whisky`
+
+Prize Value:
+`Worth Over £2,500`
+
+Ticket/Entry Price:
+`£9.99`
+
+Collection size:
+6 premium bottles
+
+Status:
+
+* active = false
+* visible/public = false
+* paused = true
+
+Reason:
+Keep hidden/beta by default until manually activated in admin.
+
+The draw should appear in:
+
+* `/admin`
+* `/admin/draws`
+
+Admin must be able to:
+
+* activate/deactivate
+* hide/show
+* pause/unpause
+* edit
+* delete safely if needed
+
+---
+
+## Stage 2 — Product Collection
+
+Create the collection using premium Macallan bottles.
+
+Use realistic, premium expressions such as:
+
+1. Macallan 12 Year Double Cask
+2. Macallan 12 Year Sherry Oak
+3. Macallan 15 Year Double Cask
+4. Macallan 18 Year Sherry Oak
+5. Macallan Rare Cask
+6. Macallan Harmony Collection (or premium limited edition)
+
+Requirements:
+
+* correct bottle names
+* premium presentation
+* accurate ordering
+* premium/high-quality product imagery
+* no broken images
+* fallback image support
+
+Do not hardcode the UI separately from draw data.
+
+---
+
+## Stage 3 — Generate Premium Promotional Hero Artwork
+
+Generate a premium cinematic promotional image for:
+
+**The Macallan Luxury Scotch Collection**
+
+Design direction:
+
+* ultra premium
+* luxury Scotch whisky aesthetic
+* dark wood + gold accents
+* elegant bottle arrangement
+* warm cinematic lighting
+* luxury whisky lounge/bar feel
+* premium typography
+* visually consistent with:
+
+  * Patrón artwork
+  * Clonakilty artwork
+  * Bushmills artwork
+
+Text inspiration:
+Headline:
+`THE MACALLAN COLLECTION`
+
+Supporting line:
+`Luxury Scotch Whisky. One Extraordinary Collection.`
+
+Prize value:
+`WORTH OVER £2,500`
+
+Luxury cues:
+
+* aged oak barrels
+* dim premium bar ambience
+* warm amber whisky tones
+* elegant reflections
+* premium gold typography
+
+Image requirements:
+
+* wide cinematic hero ratio
+* desktop-safe
+* mobile responsive
+* no awkward cropping
+* suitable for:
+
+  * hero slideshow
+  * Active Draw card
+  * draw detail page
+
+Save image in project assets.
+
+---
+
+## Stage 4 — Homepage / Active Draw Integration
+
+Add support so the new draw works exactly like:
+
+* Patrón
+* Clonakilty
+* Bushmills
+
+Requirements:
+
+* use promotional hero artwork
+* no bottle thumbnail grid on homepage
+* image fits correctly
+* uses same premium layout
+* obey visibility logic
+
+Public display rules:
+Only show if:
+
+* active = true
+* visible/public = true
+* paused = false
+* not ended
+
+Admin still sees all states.
+
+---
+
+## Stage 5 — Draw Details
+
+Ensure the detail section shows:
+
+* collection title
+* prize value
+* short premium description
+* included bottle list
+* progress bar
+* countdown
+* CTA (beta-safe)
+
+Example description tone:
+
+“An extraordinary collection of premium Macallan Scotch whiskies featuring rare cask expressions, aged single malts and collector favourites — professionally handled and insured.”
+
+CTA:
+`Preview Giveaway`
+
+Do not imply live checkout is active.
+
+---
+
+## Stage 6 — Final Testing
+
+Test:
+
+Homepage:
+
+* hidden by default
+* no public visibility until enabled
+* image displays correctly
+
+Admin:
+
+* visible in `/admin`
+* visible in `/admin/draws`
+* activate/deactivate works
+* pause works
+* hide/show works
+
+Draw layout:
+
+* premium styling
+* responsive mobile layout
+* no broken images
+* no cropped artwork
+
+Payments:
+
+* checkout disabled
+* `PAYMENTS_ENABLED` untouched
+
+Update docs:
+Add `CHANGELOG.md` entry:
+
+“Added Macallan Luxury Scotch Collection draw with premium hero artwork and admin support.”
+
+Only after testing locally:
+
+git status
+
+Review changes carefully.
+
+Then:
+
+git add .
+git commit -m "Add Macallan Luxury Scotch Collection draw"
+git push
+
+After Railway redeploy:
+
+* verify admin
+* verify homepage visibility logic
+* verify image rendering
