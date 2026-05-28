@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
@@ -116,5 +116,19 @@ if (process.env["NODE_ENV"] === "production") {
     );
   }
 }
+
+// JSON error handler — guarantees `{ "error": "..." }` for any uncaught
+// throw in an /api/* route, instead of Express's default HTML error page.
+app.use(
+  (err: unknown, req: Request, res: Response, _next: NextFunction): void => {
+    if (res.headersSent) return;
+    const e = err as { message?: string; status?: number };
+    const status = typeof e.status === "number" ? e.status : 500;
+    req.log?.error({ err }, "Unhandled API error");
+    res
+      .status(status)
+      .json({ error: e.message ?? "Internal server error" });
+  },
+);
 
 export default app;

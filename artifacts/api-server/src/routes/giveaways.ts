@@ -55,26 +55,50 @@ router.get("/giveaways", async (req, res): Promise<void> => {
 router.post("/giveaways", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreateGiveawayBody.safeParse(req.body);
   if (!parsed.success) {
-    req.log.warn({ errors: parsed.error.message }, "Invalid giveaway input");
-    res.status(400).json({ error: parsed.error.message });
+    const friendly = parsed.error.issues
+      .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`)
+      .join("; ");
+    req.log.warn({ issues: parsed.error.issues, body: req.body }, "Invalid giveaway input");
+    res.status(400).json({ error: `Invalid input — ${friendly}` });
     return;
   }
 
   const { prizeValueNumeric, drawDate, isActive, ticketPriceGbp, ...rest } = parsed.data;
-  const [giveaway] = await db
-    .insert(giveawaysTable)
-    .values({
-      ...rest,
-      prizeValueNumeric: String(prizeValueNumeric),
-      drawDate: new Date(drawDate),
-      isActive: isActive ?? true,
-      ...(ticketPriceGbp !== undefined ? { ticketPriceGbp: String(ticketPriceGbp) } : {}),
-    })
-    .returning();
 
-  const [withCount] = await withEntryCount([giveaway]);
-  req.log.info({ giveawayId: giveaway.id }, "Giveaway created");
-  res.status(201).json(GetGiveawayResponse.parse(withCount));
+  try {
+    const [giveaway] = await db
+      .insert(giveawaysTable)
+      .values({
+        ...rest,
+        prizeValueNumeric: String(prizeValueNumeric),
+        drawDate: new Date(drawDate),
+        isActive: isActive ?? true,
+        ...(ticketPriceGbp !== undefined ? { ticketPriceGbp: String(ticketPriceGbp) } : {}),
+      })
+      .returning();
+
+    const [withCount] = await withEntryCount([giveaway]);
+    req.log.info({ giveawayId: giveaway.id }, "Giveaway created");
+    res.status(201).json(GetGiveawayResponse.parse(withCount));
+  } catch (err) {
+    const e = err as { code?: string; message?: string };
+    req.log.error({ err, body: parsed.data }, "Giveaway create failed");
+    if (e.code === "23505") {
+      res.status(409).json({ error: "A giveaway with that name already exists." });
+      return;
+    }
+    if (e.code === "22007" || e.code === "22008") {
+      res.status(400).json({ error: "Invalid draw date — please pick a valid date and time." });
+      return;
+    }
+    if (e.code === "22P02" || e.code === "22003") {
+      res.status(400).json({ error: "Invalid numeric value in prize value, ticket price, or max entries." });
+      return;
+    }
+    res
+      .status(500)
+      .json({ error: `Could not create giveaway: ${e.message ?? "unknown server error"}` });
+  }
 });
 
 router.get(
@@ -197,20 +221,32 @@ router.patch(
     if (ticketPriceGbp !== undefined)
       updates.ticketPriceGbp = String(ticketPriceGbp);
 
-    const [updated] = await db
-      .update(giveawaysTable)
-      .set(updates)
-      .where(eq(giveawaysTable.id, params.data.id))
-      .returning();
+    try {
+      const [updated] = await db
+        .update(giveawaysTable)
+        .set(updates)
+        .where(eq(giveawaysTable.id, params.data.id))
+        .returning();
 
-    if (!updated) {
-      res.status(404).json({ error: "Giveaway not found" });
-      return;
+      if (!updated) {
+        res.status(404).json({ error: "Giveaway not found" });
+        return;
+      }
+
+      const [withCount] = await withEntryCount([updated]);
+      req.log.info({ giveawayId: updated.id }, "Giveaway updated");
+      res.json(UpdateGiveawayResponse.parse(withCount));
+    } catch (err) {
+      const e = err as { code?: string; message?: string };
+      req.log.error({ err, updates }, "Giveaway update failed");
+      if (e.code === "23505") {
+        res.status(409).json({ error: "A giveaway with that name already exists." });
+        return;
+      }
+      res
+        .status(500)
+        .json({ error: `Could not update giveaway: ${e.message ?? "unknown server error"}` });
     }
-
-    const [withCount] = await withEntryCount([updated]);
-    req.log.info({ giveawayId: updated.id }, "Giveaway updated");
-    res.json(UpdateGiveawayResponse.parse(withCount));
   },
 );
 

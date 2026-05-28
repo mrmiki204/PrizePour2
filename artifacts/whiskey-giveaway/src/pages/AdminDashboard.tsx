@@ -277,18 +277,28 @@ export function AdminDashboard() {
     try {
       await createGiveaway.mutateAsync({
         data: {
-          name: form.name,
-          description: form.description,
-          prizeValue: form.prizeValue,
+          name: form.name.trim(),
+          description: form.description.trim(),
+          prizeValue: form.prizeValue.trim(),
           prizeValueNumeric: form.prizeValueNumeric,
           maxEntries: form.maxEntries,
           drawDate: new Date(form.drawDate).toISOString(),
-          imageUrl: form.imageUrl || null,
+          imageUrl: form.imageUrl.trim() || null,
           isActive: true,
         },
       });
       await refetchGiveaways();
       setShowCreateForm(false);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/401|unauthor/i.test(msg)) {
+        const { clearAdminToken } = await import('@/lib/adminToken');
+        clearAdminToken();
+        alert('Admin session expired. Please log in again.');
+        window.location.reload();
+        return;
+      }
+      throw err; // let GiveawayForm display the friendly server message
     } finally {
       setIsSubmitting(false);
     }
