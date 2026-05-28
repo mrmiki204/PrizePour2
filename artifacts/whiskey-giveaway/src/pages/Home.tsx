@@ -7,7 +7,6 @@ import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ArrowLeft, ShieldCheck, Users, Ticket, Lock, Package, ChevronDown, ChevronUp } from 'lucide-react';
 import heroImg from '@/assets/images/hero.png';
-import bushmillsHeroImg from '@/assets/images/bushmills-hero.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
 
@@ -351,25 +350,14 @@ export function Home() {
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
-  // Synthetic Bushmills entry surfaced in the featured rotation only (not API-backed).
-  const BUSHMILLS_ID = -1;
-  const bushmillsFeatured = useMemo(() => ({
-    id: BUSHMILLS_ID,
-    name: 'Bushmills Distillery Tour Experience',
-    prizeValue: 'Worth Over £2,000',
-    description: 'A private distillery tour, rare expression tasting, two nights at the historic Bushmills Inn, and a curated four-bottle take-home collection — for two, on the Causeway Coast.',
-    imageUrl: bushmillsHeroImg,
-    entryCount: 487,
-    maxEntries: 702,
-    drawDate: new Date(Date.now() + 72 * 24 * 60 * 60 * 1000).toISOString(),
-  }), []);
-
-  const featuredGiveaways = useMemo(
-    () => (giveaways ? [bushmillsFeatured, ...giveaways] : [bushmillsFeatured]),
-    [giveaways, bushmillsFeatured],
-  );
+  // Featured carousel & Active Draws grid both come strictly from the public
+  // API — which filters to: isActive AND isPublic AND !entriesPaused AND drawDate >= now.
+  // Admin status changes (deactivate / hide / pause / past draw date) therefore
+  // automatically remove a draw from the homepage. No hardcoded entries.
+  const featuredGiveaways = useMemo(() => giveaways ?? [], [giveaways]);
 
   const goToSlide = (i: number) => {
+    if (featuredGiveaways.length === 0) return;
     setDirection(i > featuredIndex ? 1 : -1);
     setFeaturedIndex(((i % featuredGiveaways.length) + featuredGiveaways.length) % featuredGiveaways.length);
   };
@@ -377,7 +365,8 @@ export function Home() {
   const prevSlide = () => goToSlide(featuredIndex - 1);
 
   const featured = featuredGiveaways[featuredIndex];
-  const isBushmillsFeatured = featured?.id === BUSHMILLS_ID;
+  const isBushmillsFeatured =
+    !!featured && featured.name === 'Bushmills Distillery Tour Experience';
   const isPatronFeatured = featured?.id === 2;
   const isClonakiltyFeatured = featured?.id === 1;
   const hasSpotlight = isPatronFeatured || isClonakiltyFeatured;
@@ -660,93 +649,6 @@ export function Home() {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* ── Bushmills Distillery Tour Experience (featured static card) ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-card border border-primary/40 rounded-sm overflow-hidden grid lg:grid-cols-2 hover:border-primary/70 transition-colors group"
-            >
-              <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-[440px] overflow-hidden">
-                <img
-                  src={bushmillsHeroImg}
-                  alt="Bushmills Distillery at golden hour"
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.4s] group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent" />
-                <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/60 bg-background/80 backdrop-blur-md">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  <span className="text-[10px] font-serif text-primary uppercase tracking-[0.25em]">Featured Experience</span>
-                </div>
-              </div>
-
-              <div className="p-5 sm:p-8 lg:p-10 flex flex-col justify-between gap-6 sm:gap-8">
-                <div className="space-y-4">
-                  <div>
-                    <span className="text-xs font-serif text-primary uppercase tracking-widest">Luxury Whiskey Getaway</span>
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-serif mt-2 mb-1 break-words leading-tight">
-                      Bushmills Distillery Tour Experience
-                    </h3>
-                    <p className="text-2xl sm:text-3xl md:text-4xl font-serif text-primary break-words leading-tight">Worth Over £2,000</p>
-                  </div>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    A private distillery tour, rare expression tasting, two nights at the historic Bushmills Inn,
-                    and a curated four-bottle take-home collection — for two, on the Causeway Coast.
-                  </p>
-
-                  <div className="space-y-1.5 pt-2">
-                    {[
-                      'Guided Bushmills Distillery Tour',
-                      'Premium Whiskey Tasting Flight',
-                      'Two Nights at Bushmills Inn',
-                      'Exclusive 4-Bottle Bushmills Collection',
-                      'VIP Chauffeur Transport',
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center text-xs font-serif py-1 border-b border-border/30 last:border-0">
-                        <span className="text-foreground/70">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-5 sm:space-y-6">
-                  <div>
-                    <div className="flex justify-between items-center text-xs font-serif mb-2 gap-2">
-                      <span className="text-muted-foreground truncate">487 / 702 sold</span>
-                      <span className="shrink-0 text-primary">215 left</span>
-                    </div>
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full bg-primary"
-                        initial={{ width: 0 }}
-                        whileInView={{ width: '69%' }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.2 }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <CountdownTimer daysToAdd={72} />
-                    <div className="flex items-center gap-2 text-xs font-serif text-muted-foreground">
-                      <Ticket className="w-3.5 h-3.5 text-primary" />
-                      69% sold
-                    </div>
-                  </div>
-
-                  <Button
-                    size="lg"
-                    className="w-full h-14 min-h-[48px] bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-xs sm:text-sm font-serif px-3"
-                    onClick={() => setLocation('/experiences/bushmills')}
-                  >
-                    <span className="truncate">View Draw — Preview Entry</span>
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-
             {giveaways.map((g, idx) => {
               const pct = Math.min((g.entryCount / g.maxEntries) * 100, 100);
               const remaining = g.maxEntries - g.entryCount;

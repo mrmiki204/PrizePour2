@@ -1,0 +1,56 @@
+Fix admin draw status changes not updating the public Active Draws section.
+
+Problem:
+When I disable/deactivate/hide a live draw from the admin control panel, it does not disappear or update in the public Active Draws section on the website.
+
+Goal:
+Admin status changes must immediately affect what appears publicly.
+
+Requirements:
+
+* When a draw is deactivated, hidden, paused, or marked previous/ended in `/admin/draws`, it should no longer appear in the public Active Draws section.
+* The public Active Draws section should only show draws that are:
+
+  * active
+  * visible/public
+  * not paused
+  * not ended
+* Admin `/admin/draws` should still show all draws regardless of status.
+* Ensure changes persist in the database.
+* Ensure the public `/api/giveaways` or public draw fetch route filters correctly.
+* Ensure the frontend Active Draws section refetches fresh data after status changes, not stale cached data.
+* Clear/invalidate any React Query/cache after admin updates if needed.
+* Avoid hardcoded seeded/static draws overriding database status.
+* If Patrón, Clonakilty, or Bushmills are shown from static data anywhere, update them to respect database active/hidden/paused status.
+
+Specific things to check:
+
+* Public API filtering logic.
+* Admin update endpoint actually saves `isActive`, `isHidden`, `isPaused`, or equivalent fields.
+* Frontend active draws query cache.
+* Homepage hero carousel and active draw grid.
+* Whether hero slides use hardcoded data instead of database data.
+
+Expected result:
+If I disable or hide Patrón from admin, Patrón disappears from:
+
+* homepage Active Draws
+* hero carousel if applicable
+* public draw list
+
+If I re-enable it, it appears again.
+
+Important:
+
+* Do not remove admin access to inactive/hidden draws.
+* Do not enable payments.
+* Do not break existing draw detail pages.
+* Keep beta/payment safety unchanged.
+
+After completion:
+
+* explain the root cause
+* list files changed
+* confirm admin status updates persist
+* confirm public Active Draws now respects admin status
+* confirm if I need to push to GitHub/Railway

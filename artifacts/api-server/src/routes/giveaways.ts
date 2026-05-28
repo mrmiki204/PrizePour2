@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { db, giveawaysTable, entriesTable } from "@workspace/db";
 import {
   ListGiveawaysQueryParams,
@@ -44,7 +44,14 @@ router.get("/giveaways", async (req, res): Promise<void> => {
     : await db
         .select()
         .from(giveawaysTable)
-        .where(and(eq(giveawaysTable.isActive, true), eq(giveawaysTable.isPublic, true)))
+        .where(
+          and(
+            eq(giveawaysTable.isActive, true),
+            eq(giveawaysTable.isPublic, true),
+            eq(giveawaysTable.entriesPaused, false),
+            gte(giveawaysTable.drawDate, new Date()),
+          ),
+        )
         .orderBy(giveawaysTable.createdAt);
 
   const giveaways = await withEntryCount(rows);
