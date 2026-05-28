@@ -250,6 +250,36 @@ export const DeleteGiveawayResponse = zod.object({
 });
 
 /**
+ * @summary List all beta signups (admin)
+ */
+export const ListBetaSignupsResponseItem = zod.object({
+  id: zod.number(),
+  firstName: zod.string().nullish(),
+  email: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+export const ListBetaSignupsResponse = zod.array(ListBetaSignupsResponseItem);
+
+/**
+ * @summary Public beta waitlist signup
+ */
+export const CreateBetaSignupBody = zod.object({
+  firstName: zod.string().nullish(),
+  email: zod.string().email(),
+});
+
+/**
+ * @summary Delete a beta signup (admin)
+ */
+export const DeleteBetaSignupParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteBetaSignupResponse = zod.object({
+  ok: zod.boolean(),
+});
+
+/**
  * @summary Create a Stripe Checkout session for ticket purchase
  */
 export const CreateStripeCheckoutBody = zod.object({

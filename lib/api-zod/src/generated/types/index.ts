@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./betaSignup";
+export * from "./betaSignupInput";
+export * from "./betaSignupResult";
+export * from "./deleteBetaSignup200";
 export * from "./deleteGiveawayResult";
 export * from "./entry";
 export * from "./entryInput";

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useListEntries, useListGiveaways, useCreateGiveaway, useUpdateGiveaway, useDeleteGiveaway } from '@workspace/api-client-react';
+import { useListEntries, useListGiveaways, useCreateGiveaway, useUpdateGiveaway, useDeleteGiveaway, useListBetaSignups } from '@workspace/api-client-react';
 import type { Giveaway } from '@workspace/api-client-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { daysUntil } from '@/data/giveaways';
-import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2, LogOut, Settings2 } from 'lucide-react';
+import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2, LogOut, Settings2, Mail } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -197,6 +197,7 @@ export function AdminDashboard() {
   const [, setLocation] = useLocation();
   const { data: entries = [], isLoading: entriesLoading, refetch: refetchEntries, isFetching: fetchingEntries } = useListEntries();
   const { data: giveaways = [], isLoading: giveawaysLoading, refetch: refetchGiveaways, isFetching: fetchingGiveaways } = useListGiveaways({ all: true });
+  const { data: betaSignups = [] } = useListBetaSignups();
 
   const createGiveaway = useCreateGiveaway();
   const updateGiveaway = useUpdateGiveaway();
@@ -360,6 +361,16 @@ export function AdminDashboard() {
                 Draw Management
               </Button>
             </Link>
+            <Link href="/admin/beta-signups">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 font-serif text-xs uppercase tracking-widest border-primary/40 text-primary hover:bg-primary/10"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                Beta Signups
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"
@@ -383,11 +394,12 @@ export function AdminDashboard() {
         </div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <StatCard icon={Users} label="Total Entries" value={entries.length.toString()} sub="across all giveaways" />
           <StatCard icon={DollarSign} label="Total Revenue" value={`£${totalRevenue.toFixed(2)}`} sub="from ticket sales" />
           <StatCard icon={Ticket} label="Tickets Sold" value={totalTickets.toString()} sub={`avg ${avgTickets} per entry`} />
           <StatCard icon={BarChart2} label="Active Draws" value={activeDraws.toString()} sub={`${giveaways.length} total draws`} />
+          <StatCard icon={Mail} label="Beta Signups" value={betaSignups.length.toString()} sub="waitlist" />
         </div>
 
         {/* ── Giveaway Management ── */}

@@ -4,6 +4,7 @@ import { useLocation } from 'wouter';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CountdownTimer } from '@/components/giveaway/CountdownTimer';
+import { WaitlistSection } from '@/components/home/WaitlistSection';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ArrowLeft, ShieldCheck, Users, Ticket, Lock, Package, ChevronDown, ChevronUp, Compass, Trophy } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -576,6 +577,9 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── Beta Waitlist ── */}
+      <WaitlistSection />
 
       {/* ── All Draws ── */}
       <section id="giveaways" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">

@@ -1,0 +1,211 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Treat them as the source of truth.
+
+Important PrizePour rules:
+
+* PrizePour stays in beta
+* DO NOT enable real payments
+* Keep `PAYMENTS_ENABLED` safety
+* Keep checkout disabled/gated
+* Keep `ADMIN_PASSWORD` protection
+* Do not expose admin routes publicly
+* Keep luxury dark/gold styling
+* Keep mobile responsive
+* Prefer DB-driven logic
+* Test before Git push
+
+Task:
+Add a premium beta email waitlist system to PrizePour.
+
+Goal:
+Collect visitor interest while checkout remains disabled.
+
+This is NOT a payment system and must not interact with Stripe or checkout.
+
+---
+
+## Stage 1 — Database
+
+Create a new database model/table:
+
+`beta_signups`
+
+Fields:
+
+* `id`
+* `firstName` optional
+* `email` required and unique
+* `createdAt`
+
+Requirements:
+
+* prevent duplicate emails
+* validate email format
+* safe DB insert
+* idempotent migrations
+* no breaking existing draw/admin DB logic
+
+---
+
+## Stage 2 — Backend/API
+
+Create backend support for beta signups.
+
+Requirements:
+
+* public POST endpoint for new signup
+* validate email
+* reject invalid emails clearly
+* handle duplicate emails gracefully
+* safe error handling
+* do not expose signup list publicly
+* add simple rate-limit/spam protection if easy
+
+Success message:
+“You’re on the list. PrizePour beta updates are coming soon.”
+
+Duplicate message:
+“You’re already signed up.”
+
+Invalid email message:
+“Please enter a valid email address.”
+
+---
+
+## Stage 3 — Homepage Waitlist Section
+
+Add a premium waitlist section to the homepage.
+
+Placement:
+Below the hero / How It Works section and above Active Draws.
+
+Design direction:
+Luxury whisky club / premium early access feel.
+
+Content:
+
+Headline:
+`Join PrizePour Beta Access`
+
+Subheadline:
+`Be first to hear when premium spirit giveaways go live, get launch updates and early access to exclusive collections.`
+
+Form fields:
+
+* First name optional
+* Email required
+
+Button:
+`Join Beta List`
+
+Small trust line:
+`No spam • Early access only • Unsubscribe anytime`
+
+Requirements:
+
+* dark/gold premium styling
+* elegant spacing
+* mobile responsive
+* inline success/error messages
+* loading state on submit
+* no redirect after signup
+* do not make it look like a generic newsletter
+* keep beta-safe wording
+* do not imply live paid entry is available
+
+---
+
+## Stage 4 — Admin Beta Signup Management
+
+Add protected admin route:
+
+`/admin/beta-signups`
+
+Admin must be able to:
+
+* view beta signups
+* see name, email, joined date
+* delete spam/test entries if needed
+
+Add dashboard stat:
+`Beta Signups: X`
+
+Requirements:
+
+* route protected by admin auth
+* do not expose signup data publicly
+* keep admin dark/gold styling
+* keep layout consistent with existing admin pages
+
+---
+
+## Stage 5 — Testing
+
+Test locally/Replit before Git push.
+
+Homepage tests:
+
+* valid signup works
+* duplicate signup shows duplicate message
+* invalid email shows validation message
+* form loading state works
+* mobile layout works
+
+Admin tests:
+
+* `/admin/beta-signups` is protected
+* signups appear in admin
+* delete works
+* dashboard signup count works
+* existing draw admin still works
+
+Draw/public tests:
+
+* Active Draws still load
+* public draw visibility rules unchanged
+* admin draw visibility unchanged
+
+Payment safety tests:
+
+* checkout remains disabled
+* Stripe/test mode untouched
+* `PAYMENTS_ENABLED` untouched
+
+---
+
+## Stage 6 — Documentation
+
+Update `CHANGELOG.md` with:
+
+`Added beta email waitlist and admin signup management.`
+
+Update `PROJECT_CONTEXT.md` only if new routes or database structure should be documented.
+
+---
+
+## Stage 7 — Git Push
+
+Only push after all local/Replit tests pass.
+
+Run:
+
+git status
+
+Review changed files carefully.
+
+Then:
+
+git add .
+git commit -m "Add beta email waitlist system"
+git push
+
+After Railway redeploys:
+
+* test live homepage signup
+* test live `/admin/beta-signups`
+* confirm no draw/admin/payment regressions

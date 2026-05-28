@@ -101,6 +101,7 @@ If any flag is missing, the Step 4 button stays gated with a "Checkout opens at 
 |---|---|---|
 | `/admin` | `pages/AdminDashboard.tsx` | Entry stats, total revenue, tickets sold, active draw count, searchable entry table. |
 | `/admin/draws` | `pages/AdminDraws.tsx` | Draw management — toggle active / public / paused, edit fields, eligibility status row showing exactly why a draw is or isn't visible publicly. |
+| `/admin/beta-signups` | `pages/AdminBetaSignups.tsx` | Beta waitlist management — list, search, delete signups; stat cards (total + last 7 days). |
 
 ### API routes (`artifacts/api-server/src/routes/`)
 
@@ -121,12 +122,15 @@ Mounted under `/api`:
 - `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/me` — admin auth
 - `GET /api/admin/stats` — admin; dashboard stats
 - Rewards routes for referrals (`/api/rewards/*`)
+- `POST /api/beta-signups` — **public**; beta waitlist signup. Validates email (zod), normalizes to lowercase, in-memory IP rate limit (5/min). 201 on create, 409 duplicate, 400 invalid email, 429 rate-limited.
+- `GET /api/beta-signups` — admin (requireAdmin); list all signups (newest first).
+- `DELETE /api/beta-signups/:id` — admin; delete a signup.
 
 ---
 
 ## 4. Database and draw model
 
-Schema lives in `lib/db/src/schema/` (Drizzle). Three tables:
+Schema lives in `lib/db/src/schema/` (Drizzle). Four tables:
 
 ### `giveaways`
 
@@ -156,6 +160,10 @@ Schema lives in `lib/db/src/schema/` (Drizzle). Three tables:
 ### `referral_rewards`
 
 `id, referral_code, referee_entry_id, free_tickets, status, claimed_giveaway_id, claimed_entry_id, created_at, claimed_at`.
+
+### `beta_signups`
+
+`id, first_name (nullable), email (NOT NULL, unique via `beta_signups_email_unique` index), created_at`. Powers the homepage beta waitlist section and `/admin/beta-signups`. Emails stored lowercase; duplicate POSTs return 409.
 
 ### How public visibility works
 

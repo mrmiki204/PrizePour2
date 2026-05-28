@@ -17,6 +17,10 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  BetaSignup,
+  BetaSignupInput,
+  BetaSignupResult,
+  DeleteBetaSignup200,
   DeleteGiveawayResult,
   Entry,
   EntryInput,
@@ -1001,6 +1005,251 @@ export const useDeleteGiveaway = <
   TContext
 > => {
   return useMutation(getDeleteGiveawayMutationOptions(options));
+};
+
+/**
+ * @summary List all beta signups (admin)
+ */
+export const getListBetaSignupsUrl = () => {
+  return `/api/beta-signups`;
+};
+
+export const listBetaSignups = async (
+  options?: RequestInit,
+): Promise<BetaSignup[]> => {
+  return customFetch<BetaSignup[]>(getListBetaSignupsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListBetaSignupsQueryKey = () => {
+  return [`/api/beta-signups`] as const;
+};
+
+export const getListBetaSignupsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listBetaSignups>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listBetaSignups>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListBetaSignupsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listBetaSignups>>> = ({
+    signal,
+  }) => listBetaSignups({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listBetaSignups>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListBetaSignupsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listBetaSignups>>
+>;
+export type ListBetaSignupsQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary List all beta signups (admin)
+ */
+
+export function useListBetaSignups<
+  TData = Awaited<ReturnType<typeof listBetaSignups>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listBetaSignups>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListBetaSignupsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Public beta waitlist signup
+ */
+export const getCreateBetaSignupUrl = () => {
+  return `/api/beta-signups`;
+};
+
+export const createBetaSignup = async (
+  betaSignupInput: BetaSignupInput,
+  options?: RequestInit,
+): Promise<BetaSignupResult> => {
+  return customFetch<BetaSignupResult>(getCreateBetaSignupUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(betaSignupInput),
+  });
+};
+
+export const getCreateBetaSignupMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createBetaSignup>>,
+    TError,
+    { data: BodyType<BetaSignupInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createBetaSignup>>,
+  TError,
+  { data: BodyType<BetaSignupInput> },
+  TContext
+> => {
+  const mutationKey = ["createBetaSignup"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createBetaSignup>>,
+    { data: BodyType<BetaSignupInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createBetaSignup(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateBetaSignupMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createBetaSignup>>
+>;
+export type CreateBetaSignupMutationBody = BodyType<BetaSignupInput>;
+export type CreateBetaSignupMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Public beta waitlist signup
+ */
+export const useCreateBetaSignup = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createBetaSignup>>,
+    TError,
+    { data: BodyType<BetaSignupInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createBetaSignup>>,
+  TError,
+  { data: BodyType<BetaSignupInput> },
+  TContext
+> => {
+  return useMutation(getCreateBetaSignupMutationOptions(options));
+};
+
+/**
+ * @summary Delete a beta signup (admin)
+ */
+export const getDeleteBetaSignupUrl = (id: number) => {
+  return `/api/beta-signups/${id}`;
+};
+
+export const deleteBetaSignup = async (
+  id: number,
+  options?: RequestInit,
+): Promise<DeleteBetaSignup200> => {
+  return customFetch<DeleteBetaSignup200>(getDeleteBetaSignupUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteBetaSignupMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteBetaSignup>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteBetaSignup>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteBetaSignup"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteBetaSignup>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteBetaSignup(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteBetaSignupMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteBetaSignup>>
+>;
+
+export type DeleteBetaSignupMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Delete a beta signup (admin)
+ */
+export const useDeleteBetaSignup = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteBetaSignup>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteBetaSignup>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteBetaSignupMutationOptions(options));
 };
 
 /**

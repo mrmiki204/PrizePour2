@@ -5,6 +5,7 @@ import stripeRouter from "./stripe.js";
 import rewardsRouter from "./rewards.js";
 import giveawaysRouter from "./giveaways.js";
 import adminRouter from "./admin.js";
+import betaSignupsRouter from "./betaSignups.js";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(entriesRouter);
 router.use(stripeRouter);
 router.use(rewardsRouter);
 router.use(giveawaysRouter);
+router.use(betaSignupsRouter);
 
 export default router;

@@ -20,6 +20,23 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Added beta email waitlist and admin signup management
+
+- **Why:** Collect visitor interest while checkout stays disabled in beta. Lets us warm a launch list without touching Stripe / `PAYMENTS_ENABLED`.
+- **DB:** New `beta_signups` table (`id`, `first_name` nullable, `email` not null, `created_at`). Email uniqueness enforced by `beta_signups_email_unique` index. Mirrored in `ensureSchema.ts` for Railway bootstrap. `pnpm --filter @workspace/db run push` applied locally.
+- **API:** Three new endpoints under `betaSignups` tag:
+  - `POST /api/beta-signups` — public, in-memory IP rate limit 5/min, Zod-validated, normalizes email to lowercase, idempotent on duplicate (409). Returns `{ ok, message, signup }`.
+  - `GET /api/beta-signups` — `requireAdmin`.
+  - `DELETE /api/beta-signups/:id` — `requireAdmin`.
+- **Frontend:**
+  - New homepage section `WaitlistSection` between How It Works and Active Draws — dark/gold premium styling, optional first name, required email, success/error/loading states inline, trust line "No spam · Early access only · Unsubscribe anytime".
+  - New admin page `/admin/beta-signups` with stats (total + last 7 days), search, and per-row delete with confirm.
+  - Admin dashboard: new `Beta Signups` stat card (5-col grid) + "Beta Signups" header button linking to the new page.
+- **Files:** `lib/db/src/schema/betaSignups.ts` (new), `lib/db/src/schema/index.ts`, `artifacts/api-server/src/lib/ensureSchema.ts`, `lib/api-spec/openapi.yaml`, `artifacts/api-server/src/routes/betaSignups.ts` (new), `artifacts/api-server/src/routes/index.ts`, `artifacts/whiskey-giveaway/src/components/home/WaitlistSection.tsx` (new), `artifacts/whiskey-giveaway/src/pages/Home.tsx`, `artifacts/whiskey-giveaway/src/pages/AdminBetaSignups.tsx` (new), `artifacts/whiskey-giveaway/src/pages/AdminDashboard.tsx`, `artifacts/whiskey-giveaway/src/App.tsx`. Regenerated: `lib/api-client-react/src/generated`, `lib/api-zod/src/generated`.
+- **Verified locally (curl via shared proxy):** `POST /api/beta-signups` valid → 201, duplicate (case-insensitive) → 409, invalid email → 400 "Please enter a valid email address.", unauth `GET /api/beta-signups` → 401.
+- **Safety untouched:** zero Stripe / checkout / `PAYMENTS_ENABLED` interaction. Admin auth reuses existing `requireAdmin` (session OR `x-admin-token`).
+- **Follow-up:** On Railway redeploy, `ensureSchema()` will create the table automatically — no manual migration step needed.
+
 ### Fixed admin all-draw loading and confirmed Macallan seeded draw visibility in admin
 
 - **Symptom:** Live `/admin` showed `Active Draws: 0` and "No giveaways yet"; Macallan was invisible in admin even though it had seeded correctly. Public homepage continued to show the 3 eligible draws — so the DB was healthy, only the admin fetch was broken.

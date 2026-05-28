@@ -127,6 +127,24 @@ export interface Winner {
   lastName: string;
 }
 
+export interface BetaSignup {
+  id: number;
+  firstName?: string | null;
+  email: string;
+  createdAt: string;
+}
+
+export interface BetaSignupInput {
+  firstName?: string | null;
+  email: string;
+}
+
+export interface BetaSignupResult {
+  ok: boolean;
+  message: string;
+  signup?: BetaSignup;
+}
+
 export interface ErrorResponse {
   error: string;
 }
@@ -143,4 +161,8 @@ export type ListGiveawaysParams = {
    * If true, include inactive giveaways (admin use)
    */
   all?: boolean;
+};
+
+export type DeleteBetaSignup200 = {
+  ok: boolean;
 };

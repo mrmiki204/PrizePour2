@@ -16,6 +16,8 @@ tags:
     description: Giveaway draw management
   - name: stripe
     description: Stripe payment operations
+  - name: betaSignups
+    description: Beta email waitlist signups
 paths:
   /healthz:
     get:
@@ -264,6 +266,97 @@ paths:
                 $ref: "#/components/schemas/DeleteGiveawayResult"
         "404":
           description: Giveaway not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /beta-signups:
+    get:
+      operationId: listBetaSignups
+      tags: [betaSignups]
+      summary: List all beta signups (admin)
+      responses:
+        "200":
+          description: List of beta signups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BetaSignup"
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createBetaSignup
+      tags: [betaSignups]
+      summary: Public beta waitlist signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BetaSignupInput"
+      responses:
+        "201":
+          description: Signup created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BetaSignupResult"
+        "400":
+          description: Invalid email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already signed up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /beta-signups/{id}:
+    delete:
+      operationId: deleteBetaSignup
+      tags: [betaSignups]
+      summary: Delete a beta signup (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Signup deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok:
+                    type: boolean
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Signup not found
           content:
             application/json:
               schema:
@@ -566,6 +659,43 @@ components:
           type: string
         lastName:
           type: string
+
+    BetaSignup:
+      type: object
+      required: [id, email, createdAt]
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+          nullable: true
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    BetaSignupInput:
+      type: object
+      required: [email]
+      properties:
+        firstName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+
+    BetaSignupResult:
+      type: object
+      required: [ok, message]
+      properties:
+        ok:
+          type: boolean
+        message:
+          type: string
+        signup:
+          $ref: "#/components/schemas/BetaSignup"
 
     ErrorResponse:
       type: object
