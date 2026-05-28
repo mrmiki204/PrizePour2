@@ -741,66 +741,61 @@ export function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: idx * 0.1 }}
-                  className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 lg:items-start hover:border-primary/40 transition-colors"
+                  className="bg-card border border-border rounded-sm overflow-hidden flex flex-col hover:border-primary/40 transition-colors"
                 >
-                  {/* Left: bottle grid — cap columns on mobile so bottles don't shrink to nothing */}
+                  {/* Top: compact bottle gallery strip — fixed height, single row, capped count */}
                   {(() => {
                     if (bottles.length === 0) return null;
-                    const desktopRowSize = Math.max(1, Math.ceil(bottles.length / 2));
-                    const mobileMaxCols = 4;
-                    const mobileRowSize = Math.max(1, Math.min(desktopRowSize, mobileMaxCols));
-                    const mobileRows: typeof bottles[] = [];
-                    for (let i = 0; i < bottles.length; i += mobileRowSize) {
-                      mobileRows.push(bottles.slice(i, i + mobileRowSize));
-                    }
-                    const desktopRows = [bottles.slice(0, desktopRowSize), bottles.slice(desktopRowSize)];
-                    const renderRows = (rows: typeof bottles[], rowSize: number) => (
-                      <>
-                        {rows.map((row, rowIdx) => (
-                          <div key={rowIdx} className="flex gap-px justify-center">
-                            {row.map((bottle, i) => (
-                              <div
-                                key={i}
-                                className="aspect-[3/4] relative overflow-hidden group/bottle flex-none cursor-pointer"
-                                style={{ background: bottle.background, width: `${100 / rowSize}%` }}
-                              >
-                                {/* Glow halo on hover */}
-                                <div className={`absolute inset-0 opacity-0 group-hover/bottle:opacity-100 transition-opacity duration-500 pointer-events-none ${g.id === 2 ? 'bg-gradient-radial' : ''}`}
-                                  style={{ background: g.id === 2
-                                    ? 'radial-gradient(ellipse at 50% 45%, rgba(52,211,153,0.30) 0%, transparent 65%)'
-                                    : 'radial-gradient(ellipse at 50% 45%, rgba(234,146,55,0.28) 0%, transparent 65%)'
-                                  }}
-                                />
-                                <img
-                                  src={bottle.image}
-                                  alt={bottle.name}
-                                  className="relative w-full h-full object-contain p-1 sm:p-2 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-110 group-hover/bottle:-translate-y-1 transition-all duration-500"
-                                  style={{ filter: 'drop-shadow(0 10px 14px rgba(0,0,0,0.6))' }}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                                <div className="absolute bottom-0 left-0 right-0 p-1 sm:p-2 text-center">
-                                  <p className="text-[9px] text-white/60 leading-tight line-clamp-1 group-hover/bottle:text-white transition-colors">{bottle.name}</p>
-                                </div>
-                              </div>
-                            ))}
+                    const maxDesktop = 6;
+                    const maxMobile = 4;
+                    const desktopBottles = bottles.slice(0, maxDesktop);
+                    const mobileBottles = bottles.slice(0, maxMobile);
+                    const moreDesktop = bottles.length - desktopBottles.length;
+                    const moreMobile = bottles.length - mobileBottles.length;
+                    const renderStrip = (items: typeof bottles, more: number) => (
+                      <div className="flex gap-px bg-border/30 h-44 sm:h-52 lg:h-60">
+                        {items.map((bottle, i) => (
+                          <div
+                            key={i}
+                            className="flex-1 min-w-0 relative overflow-hidden group/bottle cursor-pointer"
+                            style={{ background: bottle.background }}
+                          >
+                            <div
+                              className="absolute inset-0 opacity-0 group-hover/bottle:opacity-100 transition-opacity duration-500 pointer-events-none"
+                              style={{ background: g.id === 2
+                                ? 'radial-gradient(ellipse at 50% 45%, rgba(52,211,153,0.30) 0%, transparent 65%)'
+                                : 'radial-gradient(ellipse at 50% 45%, rgba(234,146,55,0.28) 0%, transparent 65%)'
+                              }}
+                            />
+                            <img
+                              src={bottle.image}
+                              alt={bottle.name}
+                              className="relative w-full h-full object-contain p-2 sm:p-3 opacity-85 group-hover/bottle:opacity-100 group-hover/bottle:scale-110 group-hover/bottle:-translate-y-1 transition-all duration-500"
+                              style={{ filter: 'drop-shadow(0 10px 14px rgba(0,0,0,0.6))' }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                            <div className="absolute bottom-0 left-0 right-0 p-1 sm:p-2 text-center">
+                              <p className="text-[9px] text-white/60 leading-tight line-clamp-1 group-hover/bottle:text-white transition-colors">{bottle.name}</p>
+                            </div>
                           </div>
                         ))}
-                      </>
+                        {more > 0 && (
+                          <div className="flex-none w-20 sm:w-24 flex items-center justify-center bg-card/40">
+                            <span className="text-[10px] font-serif text-primary/80 uppercase tracking-widest text-center px-2">+{more}<br/>more</span>
+                          </div>
+                        )}
+                      </div>
                     );
                     return (
                       <>
-                        <div className="flex flex-col gap-px bg-border/30 sm:hidden">
-                          {renderRows(mobileRows, mobileRowSize)}
-                        </div>
-                        <div className="hidden sm:flex flex-col gap-px bg-border/30 lg:self-start lg:w-full">
-                          {renderRows(desktopRows, desktopRowSize)}
-                        </div>
+                        <div className="sm:hidden">{renderStrip(mobileBottles, moreMobile)}</div>
+                        <div className="hidden sm:block">{renderStrip(desktopBottles, moreDesktop)}</div>
                       </>
                     );
                   })()}
 
-                  {/* Right: info panel */}
-                  <div className="p-5 sm:p-7 lg:p-8 flex flex-col justify-between gap-5 sm:gap-6">
+                  {/* Bottom: details panel */}
+                  <div className="p-5 sm:p-7 lg:p-8 flex flex-col gap-5 sm:gap-6">
                     <div className="space-y-4">
                       <div>
                         <span className="text-xs font-serif text-primary uppercase tracking-widest">Prize Selection</span>

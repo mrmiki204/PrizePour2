@@ -20,7 +20,16 @@ After every meaningful change:
 
 ## 2026-05-28
 
-### Fix Active Draw card gallery column stretching
+### Active Draw cards → stacked premium layout
+
+- **Decision:** abandoned the side-by-side 50/50 layout for Active Draw cards. Even with `items-start`, splitting the card into gallery-column + details-column meant the gallery either stretched (blank box) or sat awkwardly half-height next to a much taller details column. A stacked layout cleanly eliminates the problem.
+- **New structure:** card is now `flex flex-col` — top is a fixed-height bottle strip (`h-44 sm:h-52 lg:h-60`), bottom is the full-width details panel (Prize Selection label, title, value, description, BottleList with Explore Full Collection, progress, countdown, CTA, trust line).
+- **Gallery strip:** single horizontal row, capped at 6 bottles on desktop / 4 on mobile so bottles never become tiny. If a draw has more bottles than the cap, a "+N more" tile is appended; the full collection remains accessible via the existing `BottleList` "Explore Full Collection" toggle in the details panel below.
+- **Why this is better:** card height is now driven entirely by content, no stretching tricks. Gallery is intentionally compact (~176–240px tall) so it never dwarfs the details. Details get the full card width, giving the description, bottle list, and CTA proper breathing room.
+- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx` — Active Draws card section rewritten (one block, ~50 lines).
+- **Preserved:** all DB-driven draw data, public visibility filter (`isActive ∧ isPublic ∧ !entriesPaused ∧ drawDate ≥ now`), admin visibility controls, `BottleList` + Explore Full Collection toggle, Bushmills `/experiences/bushmills` routing, "Preview Giveaway" CTA, trust line, luxury dark/gold styling. Checkout still disabled.
+
+### Fix Active Draw card gallery column stretching (superseded by stacked layout)
 
 - **Root cause (final):** previous attempt only centred the bottles inside a still-stretched left column — the blank space remained, just split above/below. CSS Grid items default to `align-items: stretch`, so the left gallery column was being forced to match the right details column's height.
 - **Fix:** changed the card grid from default stretch to `lg:items-start`, and added `lg:self-start lg:w-full` to the desktop bottle wrapper. Now the gallery column takes only the height it needs and sits at the top; the right details column drives the card height; the outer `bg-card` background fills the area beside/below the gallery seamlessly. No tall empty box remains.

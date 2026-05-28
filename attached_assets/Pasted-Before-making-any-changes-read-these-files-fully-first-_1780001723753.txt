@@ -1,0 +1,102 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Keep PrizePour in beta. Do not enable real payments. Keep `PAYMENTS_ENABLED` safety and admin protection untouched.
+
+Task:
+Redesign the Active Draw card layout to remove the large empty space under the product/bottle gallery.
+
+Problem:
+The current desktop card uses a two-column layout where the left gallery column stretches to match the height of the right details column. This creates a large empty dark block under the bottles.
+
+Best fix:
+Stop using the 50/50 side-by-side layout for Active Draw cards.
+
+Change each Active Draw card to a stacked premium layout:
+
+1. Product/gallery area at the top
+2. Draw details underneath
+3. Progress/countdown/CTA below details
+
+Target structure:
+
+* Card container
+
+  * Top: compact product image/gallery strip
+  * Bottom: content panel with:
+
+    * Prize Selection label
+    * Draw title
+    * Prize value
+    * short description
+    * bottle preview list / Explore Full Collection
+    * progress bar
+    * countdown
+    * CTA button
+    * trust line
+
+Requirements:
+
+* Remove the left/right stretched image column from Active Draw cards.
+* The gallery should only take the height it needs.
+* No large blank area under bottles.
+* Keep bottle/product data from DB.
+* Keep “Explore Full Collection” functionality.
+* Keep public draw filtering unchanged:
+
+  * active = true
+  * visible/public = true
+  * paused = false
+  * not ended
+* Admin must still control draw status.
+* Do not affect admin routes.
+* Do not enable checkout.
+* Keep luxury dark/gold styling.
+
+Desktop design:
+
+* Card max width should remain premium and centred.
+* Gallery should be a compact horizontal/controlled-height section.
+* Details should sit below the gallery.
+* Card should feel intentional, not empty.
+
+Mobile design:
+
+* Same stacked layout.
+* Images above text.
+* CTA full width.
+* No awkward spacing.
+
+Also:
+
+* Shorten long descriptions if needed.
+* Keep Patrón from looking too crowded.
+* Keep Clonakilty clean.
+* Bushmills should still work with fallback image if visible.
+
+Test:
+
+1. Active Draws on desktop has no large empty gallery space.
+2. Patrón card looks balanced.
+3. Clonakilty card looks balanced.
+4. Bushmills card works if visible.
+5. Mobile layout stacks cleanly.
+6. Explore Full Collection still works.
+7. CTA buttons still work.
+8. Admin visibility still affects public homepage.
+9. Checkout remains disabled.
+
+Update `CHANGELOG.md`:
+“Changed Active Draw cards to a stacked premium layout to remove gallery empty space.”
+
+Only after testing in Replit:
+
+git status
+git add .
+git commit -m "Redesign active draw cards to remove gallery empty space"
+git push
+
+After Railway redeploys, verify the live homepage.
