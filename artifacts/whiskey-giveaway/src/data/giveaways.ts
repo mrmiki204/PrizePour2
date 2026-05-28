@@ -202,6 +202,14 @@ export const GIVEAWAY_BOTTLES: Record<number, Bottle[]> = {
   2: PATRON_BOTTLES,
 };
 
+// Bottle imagery keyed by exact giveaway name — stable across environments
+// (DB ids auto-increment per database, names are unique and seeded). This is
+// the canonical lookup; the id map above is kept as a dev-only safety net.
+const GIVEAWAY_BOTTLES_BY_NAME: Record<string, Bottle[]> = {
+  'The Clonakilty Collection': COLLECTION_BOTTLES,
+  'The Patrón Collection': PATRON_BOTTLES,
+};
+
 // Bundled hero images by DB id (dev environment only — ids differ in prod).
 export const BUNDLED_IMAGE_MAP: Record<number, string> = {
   1: heroClonakiltyImg,
@@ -218,7 +226,15 @@ const BUNDLED_IMAGE_BY_NAME: Record<string, string> = {
   'The Macallan Luxury Scotch Collection': heroMacallanImg,
 };
 
-export function getGiveawayBottles(giveawayId: number): Bottle[] {
+/**
+ * Resolve bottle imagery for a giveaway. Priority:
+ *   1. Bundled bottles matched by exact giveaway name (stable across envs).
+ *   2. Bundled bottles matched by DB id (dev fallback).
+ *   3. `[]` — callers should render a non-bottle fallback (e.g. hero image
+ *      or descriptive item cards).
+ */
+export function getGiveawayBottles(giveawayId: number, name?: string | null): Bottle[] {
+  if (name && GIVEAWAY_BOTTLES_BY_NAME[name]) return GIVEAWAY_BOTTLES_BY_NAME[name];
   return GIVEAWAY_BOTTLES[giveawayId] ?? [];
 }
 

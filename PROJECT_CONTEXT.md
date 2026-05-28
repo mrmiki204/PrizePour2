@@ -88,7 +88,7 @@ If any flag is missing, the Step 4 button stays gated with a "Checkout opens at 
 | Path | File | Purpose |
 |---|---|---|
 | `/` | `pages/Home.tsx` | Hero (headline + trust line + "View Active Draws" / "How It Works" CTAs) → featured-draw carousel → **`#how-it-works`** 3-card section → **`#giveaways`** Active Draws grid → "Why Us" → **`#about`** FAQ (accordion) → winners. All CTAs say "Preview Giveaway" with a "Secure • Transparent • Beta Preview" trust line. |
-| `/giveaway/:id` | `pages/GiveawayDetail.tsx` | 4-step entry flow: tickets → details → Stripe checkout → confirmation + referral link. |
+| `/giveaway/:id` | `pages/GiveawayDetail.tsx` | **Premium collection landing** (step 1) → entry flow (steps 2–5). Step 1 = `<CollectionLanding>` (cinematic hero + DB stats/countdown/capacity bar + "Preview Giveaway"/"Join Beta List" CTAs + beta helper, What's Included, Why It Matters story, Highlights cards, FAQ) + `#enter` ticket selector (beta-gated) + `<WaitlistSection>`. "Preview Giveaway" enters the 4-step flow: tickets → details → Stripe checkout (disabled in beta) → confirmation + referral link. Bushmills uses its own page instead. |
 | `/draw/:id` | `pages/DrawPage.tsx` | Live cinematic draw animation (lobby → spinner → reveal). |
 | `/experiences/bushmills` | `pages/BushmillsExperience.tsx` | Dedicated Bushmills landing page (uses its own static images). |
 | `/terms` | `pages/Terms.tsx` | Terms of Service. |

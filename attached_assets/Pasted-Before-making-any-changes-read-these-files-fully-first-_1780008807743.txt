@@ -1,0 +1,365 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Treat them as the source of truth.
+
+Important PrizePour rules:
+
+* PrizePour stays in beta
+* DO NOT enable real payments
+* Keep `PAYMENTS_ENABLED` safety
+* Keep checkout disabled/gated
+* Keep `ADMIN_PASSWORD` protection
+* Do not expose admin routes publicly
+* Keep luxury dark/gold styling
+* Keep mobile responsive
+* Prefer DB-driven logic
+* Do not redesign the whole website unnecessarily
+* Test before Git push
+
+Task:
+Upgrade PrizePour draw detail pages into premium luxury product landing pages.
+
+Goal:
+Make users WANT the collection.
+
+Current state:
+Draw pages are functional but feel too basic.
+
+Target:
+Luxury whisky / premium spirits brand feel.
+
+The draw detail page should create:
+
+* desire
+* trust
+* excitement
+* premium perception
+* waitlist intent (beta-safe)
+
+This should apply to:
+
+* Patrón Collection
+* Clonakilty Collection
+* Bushmills Distillery Tour Experience
+* Macallan Luxury Scotch Collection
+
+Keep everything DB-driven.
+
+Do NOT hardcode separate page templates for each collection.
+
+---
+
+## Stage 1 — Premium Detail Page Structure
+
+Redesign draw detail pages using reusable sections.
+
+Recommended structure:
+
+### Section 1 — Cinematic Hero
+
+Large premium hero section using collection artwork.
+
+Display:
+
+* collection hero image
+* title
+* prize value
+* short premium description
+* countdown
+* progress bar
+* entry/ticket price (beta-safe)
+* CTA
+
+CTA wording:
+`Preview Giveaway`
+
+Beta-safe helper text:
+`PrizePour is currently in beta. Checkout remains disabled while we refine the experience.`
+
+Requirements:
+
+* cinematic premium feel
+* elegant spacing
+* mobile responsive
+* image fitted properly
+* no awkward cropping
+* dark gradient overlay allowed
+
+---
+
+### Section 2 — What’s Included
+
+Premium collection breakdown.
+
+For spirit collections:
+Display included bottles in premium cards.
+
+Card example:
+
+* bottle image
+* bottle name
+* short description if available
+
+Bushmills:
+Instead show experience inclusions.
+
+Example:
+
+* distillery tour
+* whiskey tasting
+* exclusive extras
+* premium hospitality
+
+Requirements:
+
+* reusable component
+* DB-driven
+* premium spacing
+* visually rich
+
+---
+
+### Section 3 — Why This Collection Matters
+
+Add premium storytelling section.
+
+Examples:
+
+Macallan:
+Explain craftsmanship, cask ageing, prestige, collector appeal.
+
+Patrón:
+Explain premium tequila, rare expressions, luxury positioning.
+
+Clonakilty:
+Explain Irish whiskey heritage, Atlantic coast identity.
+
+Bushmills:
+Explain history, experience, exclusivity.
+
+Implementation:
+
+* DB field preferred if easy
+  OR
+* reusable description mapping layer
+
+Requirements:
+
+* luxury editorial feel
+* not overly long
+* premium typography
+
+---
+
+### Section 4 — Collection Highlights
+
+Luxury trust cards.
+
+Examples:
+
+* Premium Verified Prize
+* Professionally Packed & Insured
+* Transparent Winner Selection
+* Premium Curated Collection
+
+Bushmills:
+swap relevant experience-focused highlights.
+
+Requirements:
+
+* reusable card system
+* elegant icons
+* consistent styling
+
+---
+
+### Section 5 — FAQ
+
+Collection-specific FAQ.
+
+Examples:
+
+* What happens during beta?
+* How are winners selected?
+* Is checkout active?
+* How is the prize delivered?
+* When will entries open?
+
+Keep beta-safe messaging.
+
+Reusable component preferred.
+
+---
+
+### Section 6 — Waitlist CTA
+
+At bottom of page:
+
+Headline:
+`Want early access to this collection?`
+
+Text:
+`Join the PrizePour beta list to be first to hear when premium giveaways go live.`
+
+Button:
+`Join Beta List`
+
+Integrate with existing waitlist system.
+
+---
+
+## Stage 2 — Data Model Improvements
+
+If needed, extend draw model with optional fields:
+
+Suggested optional fields:
+
+* heroImage
+* shortDescription
+* premiumStory
+* highlights
+* faq
+* includedItems
+
+Requirements:
+
+* backwards compatible
+* idempotent migration
+* no broken draws
+
+---
+
+## Stage 3 — Draw-Specific Content
+
+Populate premium content for:
+
+### Patrón Collection
+
+Focus:
+
+* ultra-premium tequila
+* rare expressions
+* collector appeal
+
+### Clonakilty Collection
+
+Focus:
+
+* premium Irish whiskey
+* Atlantic coast heritage
+* craft distilling
+
+### Bushmills Experience
+
+Focus:
+
+* VIP experience
+* distillery heritage
+* tasting + premium extras
+
+### Macallan Collection
+
+Focus:
+
+* luxury Scotch
+* age statements
+* cask maturation
+* prestige
+
+Keep tone:
+luxury, premium, editorial.
+
+Avoid hypey/gambling wording.
+
+---
+
+## Stage 4 — UX / Design Requirements
+
+Requirements:
+
+* premium luxury spacing
+* subtle animation only
+* elegant transitions
+* fast loading
+* responsive desktop/mobile
+* no clutter
+* no cheap “raffle site” feel
+
+Do NOT:
+
+* overuse glow effects
+* overcrowd page
+* duplicate hero information excessively
+
+Target feeling:
+Luxury whisky website × premium collector experience.
+
+---
+
+## Stage 5 — Testing
+
+Test:
+
+Desktop:
+
+* all draw pages render
+* hero image fits
+* layout premium
+* CTA works
+* waitlist works
+
+Mobile:
+
+* responsive
+* cards stack nicely
+* no overflow
+* no awkward spacing
+
+Draw logic:
+
+* DB-driven content works
+* existing visibility rules unchanged
+* admin still works
+
+Payments:
+
+* checkout disabled
+* Stripe untouched
+* `PAYMENTS_ENABLED` untouched
+
+---
+
+## Stage 6 — Documentation
+
+Update `CHANGELOG.md`:
+
+`Upgraded draw detail pages into premium collection landing pages.`
+
+Update `PROJECT_CONTEXT.md` if structure/routes/data changed.
+
+---
+
+## Stage 7 — Git Push
+
+Only after testing locally/Replit:
+
+git status
+
+Review changes carefully.
+
+Then:
+
+git add .
+git commit -m "Upgrade premium draw detail pages"
+git push
+
+After Railway redeploy:
+
+* test all draw pages
+* test mobile
+* test waitlist CTA
+* confirm admin unaffected

@@ -10,7 +10,9 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Ticket, CheckCircle2, Loader2, ArrowLeft, XCircle, Share2, Copy, Check, Gift, HelpCircle, RefreshCw, ShieldCheck, Lock, Mail } from 'lucide-react';
 import { useGetGiveaway } from '@workspace/api-client-react';
-import { getGiveawayImage, daysUntil, getGiveawayBottles } from '@/data/giveaways';
+import { daysUntil, getGiveawayBottles, getGiveawayImage } from '@/data/giveaways';
+import { CollectionLanding } from '@/components/giveaway/CollectionLanding';
+import { WaitlistSection } from '@/components/home/WaitlistSection';
 
 // ── Beta / Payments flag ───────────────────────────────────────────────────
 // PrizePour is in beta. Payments are disabled by default. Set
@@ -126,6 +128,14 @@ export function GiveawayDetail() {
     setStep(s => s + 1);
   };
 
+  const scrollToEnter = () => {
+    document.getElementById('enter')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const scrollToWaitlist = () => {
+    document.getElementById('beta-waitlist')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   const currentQuiz = QUIZ_QUESTIONS[quizIndex % QUIZ_QUESTIONS.length];
 
   const submitQuiz = () => {
@@ -216,7 +226,6 @@ export function GiveawayDetail() {
     );
   }
 
-  const img = getGiveawayImage(giveaway.id, giveaway.imageUrl, giveaway.name);
   const entryCount = giveaway.entryCount;
   const pct = Math.min((entryCount / giveaway.maxEntries) * 100, 100);
   const remaining = giveaway.maxEntries - entryCount;
@@ -227,49 +236,28 @@ export function GiveawayDetail() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
 
-      <div className="flex-1 pt-24 sm:pt-28 md:pt-36 pb-12 max-w-4xl mx-auto w-full px-4 sm:px-6">
-        <Button variant="ghost" className="mb-6 -ml-4 text-muted-foreground hover:text-foreground" onClick={() => setLocation('/')}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Giveaways
-        </Button>
+      {step === 1 ? (
+        <>
+          {/* Premium luxury landing — reusable, content-driven sections */}
+          <CollectionLanding
+            giveaway={giveaway}
+            onPreview={scrollToEnter}
+            onJoinWaitlist={scrollToWaitlist}
+          />
 
-        {/* Progress Bar — 5 steps */}
-        <div className="mb-12">
-          {/* Mobile: show only current step label */}
-          <div className="sm:hidden text-center text-xs font-serif tracking-widest text-primary mb-4 uppercase">
-            Step {step} of {TOTAL_STEPS} ·{' '}
-            {['Tickets', 'Details', 'Question', 'Payment', 'Confirmed'][step - 1]}
-          </div>
-          {/* Desktop: full step list */}
-          <div className="hidden sm:flex justify-between items-center text-xs font-serif tracking-widest text-muted-foreground mb-4">
-            <span className={step >= 1 ? "text-primary" : ""}>Tickets</span>
-            <span>→</span>
-            <span className={step >= 2 ? "text-primary" : ""}>Details</span>
-            <span>→</span>
-            <span className={step >= 3 ? "text-primary" : ""}>Question</span>
-            <span>→</span>
-            <span className={step >= 4 ? "text-primary" : ""}>Payment</span>
-            <span>→</span>
-            <span className={step >= 5 ? "text-primary" : ""}>Confirmed</span>
-          </div>
-          <div className="h-1 bg-secondary rounded-full overflow-hidden">
+          {/* Entry / ticket selection (beta: checkout disabled downstream) */}
+          <section id="enter" className="scroll-mt-24 pt-6 pb-16 max-w-4xl mx-auto w-full px-4 sm:px-6">
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Preview The Entry</p>
+              <h2 className="text-3xl sm:text-4xl font-serif mb-3">Choose Your Tickets</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Step through the full entry experience. PrizePour is in beta, so checkout stays disabled — no card is charged and no tickets are issued yet.
+              </p>
+            </div>
+
             <motion.div
-              className="h-full bg-primary"
-              initial={{ width: `${(1 / TOTAL_STEPS) * 100}%` }}
-              animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-        </div>
-
-        <AnimatePresence mode="wait">
-
-          {/* ── STEP 1: TICKETS ── */}
-          {step === 1 && (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               className="space-y-8"
             >
               {referredBy && (
@@ -301,7 +289,17 @@ export function GiveawayDetail() {
               <div className="grid md:grid-cols-2 gap-6 sm:gap-8 bg-card border border-border p-4 sm:p-6 rounded-sm shadow-xl">
                 <div className="aspect-[4/5] relative bg-black/50 rounded-sm overflow-hidden">
                   {(() => {
-                    const bottles = getGiveawayBottles(giveaway.id);
+                    const bottles = getGiveawayBottles(giveaway.id, giveaway.name);
+                    if (bottles.length === 0) {
+                      const heroImg = getGiveawayImage(giveaway.id, giveaway.imageUrl, giveaway.name);
+                      return heroImg ? (
+                        <img src={heroImg} alt={giveaway.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">
+                          <Gift className="w-12 h-12" />
+                        </div>
+                      );
+                    }
                     const rowSize = Math.ceil(bottles.length / 2);
                     const rows = [bottles.slice(0, rowSize), bottles.slice(rowSize)];
                     return (
@@ -425,7 +423,46 @@ export function GiveawayDetail() {
                 </div>
               </motion.div>
             </motion.div>
-          )}
+          </section>
+
+          <WaitlistSection />
+        </>
+      ) : (
+        <div className="flex-1 pt-24 sm:pt-28 md:pt-36 pb-12 max-w-4xl mx-auto w-full px-4 sm:px-6">
+          <Button variant="ghost" className="mb-6 -ml-4 text-muted-foreground hover:text-foreground" onClick={() => setStep(1)}>
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Giveaway
+          </Button>
+
+          {/* Progress Bar — entry flow (steps 2–5) */}
+          <div className="mb-12">
+            {/* Mobile: show only current step label */}
+            <div className="sm:hidden text-center text-xs font-serif tracking-widest text-primary mb-4 uppercase">
+              Step {step} of {TOTAL_STEPS} ·{' '}
+              {['Tickets', 'Details', 'Question', 'Payment', 'Confirmed'][step - 1]}
+            </div>
+            {/* Desktop: full step list */}
+            <div className="hidden sm:flex justify-between items-center text-xs font-serif tracking-widest text-muted-foreground mb-4">
+              <span className={step >= 1 ? "text-primary" : ""}>Tickets</span>
+              <span>→</span>
+              <span className={step >= 2 ? "text-primary" : ""}>Details</span>
+              <span>→</span>
+              <span className={step >= 3 ? "text-primary" : ""}>Question</span>
+              <span>→</span>
+              <span className={step >= 4 ? "text-primary" : ""}>Payment</span>
+              <span>→</span>
+              <span className={step >= 5 ? "text-primary" : ""}>Confirmed</span>
+            </div>
+            <div className="h-1 bg-secondary rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-primary"
+                initial={{ width: `${(1 / TOTAL_STEPS) * 100}%` }}
+                animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+          </div>
+
+          <AnimatePresence mode="wait">
 
           {/* ── STEP 2: DETAILS ── */}
           {step === 2 && (
@@ -759,6 +796,7 @@ export function GiveawayDetail() {
 
         </AnimatePresence>
       </div>
+      )}
 
       <Footer />
     </div>

@@ -20,6 +20,19 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Upgraded /giveaway/:id into premium collection landing pages
+
+- **Why:** Draw detail pages looked like a bare entry form. Turn them into premium luxury product landing pages (à la Prize Guy) to build desire before the (still-disabled) checkout. Bushmills keeps its own bespoke `/experiences/bushmills` page — this is for the DB-driven collections (Clonakilty, Patrón, Macallan, and any future draw).
+- **What:**
+  - New `src/data/collectionContent.ts` — name-keyed **presentational** content layer (kicker, includedIntro, includedItems, story, highlights, faq) for Clonakilty/Patrón/Macallan + `getCollectionContent()` generic fallback. Shared `TRUST_HIGHLIGHTS` + `COMMON_FAQ`. Same pattern as bottle/hero-image data — content is presentational only; live draw stats still come from `GET /api/giveaways`.
+  - New `src/components/giveaway/CollectionLanding.tsx` — reusable premium landing: cinematic hero (hero/bottle image + DB stats + countdown + capacity bar + "Preview Giveaway" / "Join Beta List" CTAs + beta helper text), What's Included (bottle grid when bottles exist, else descriptive item cards), Why This Collection Matters story, Collection Highlights trust cards, collection FAQ accordion.
+  - `GiveawayDetail.tsx` restructured: step 1 now renders `<CollectionLanding>` + `<section id="enter">` (existing ticket selector, still beta-gated/checkout-disabled) + `<WaitlistSection>`. Steps 2–5 (entry flow) moved into a narrow container behind a "Back to Giveaway" button with the entry-flow progress bar. Removed now-unused `img`/`getGiveawayImage`.
+- **Macallan** has no bottle array → renders item-card "What's Included" mode; Clonakilty/Patrón render the bottle grid.
+- **Safety:** No payment changes — `VITE_PAYMENTS_ENABLED` gating intact, checkout stays disabled, beta notice unchanged. Verified via e2e: hero/CTAs/beta text render, "Preview Giveaway" scrolls to entry section, and **no enabled Pay button** exists.
+- **Robustness (post-review):** `getGiveawayBottles(id, name?)` now resolves bottle imagery by stable giveaway **name** first (id is dev-only fallback), matching the hero-image pattern — collections no longer break if DB ids differ across environments. `genericContent()` always ships descriptive "What's Included" cards so a generic/future draw never renders an empty section. Step-1 entry preview now falls back to the hero image (then a Gift icon) when a collection has no individual bottle shots (e.g. Macallan), avoiding a blank panel.
+- **Files:** `src/data/collectionContent.ts` (new), `src/components/giveaway/CollectionLanding.tsx` (new), `src/pages/GiveawayDetail.tsx` (edited), `src/data/giveaways.ts` (name-keyed bottle lookup).
+- **Risk:** Presentational only; new draws without an entry in `collectionContent.ts` fall back to generic content via `getCollectionContent()`.
+
 ### Added lightweight analytics + admin conversion dashboard
 
 - **Why:** Need visibility into pre-launch visitor behaviour and the waitlist funnel without bolting on a third-party analytics SDK. Helps decide which draws resonate before checkout opens.
