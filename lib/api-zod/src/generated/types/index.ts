@@ -6,6 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./analyticsCount";
+export * from "./analyticsDrawInterest";
+export * from "./analyticsEvent";
+export * from "./analyticsEventInput";
+export * from "./analyticsEventInputEventType";
+export * from "./analyticsSummary";
+export * from "./analyticsWaitlistFunnel";
 export * from "./betaSignup";
 export * from "./betaSignupInput";
 export * from "./betaSignupResult";
@@ -18,6 +25,7 @@ export * from "./giveaway";
 export * from "./giveawayInput";
 export * from "./giveawayUpdate";
 export * from "./healthStatus";
+export * from "./listAnalyticsEventsParams";
 export * from "./listEntriesParams";
 export * from "./listGiveawaysParams";
 export * from "./stripeCheckoutRequest";

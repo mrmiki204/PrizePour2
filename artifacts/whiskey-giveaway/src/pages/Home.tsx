@@ -16,6 +16,7 @@ import macallanCollectionHero from '@assets/ChatGPT_Image_May_28,_2026,_10_51_35
 import macallanHeroSlide from '@assets/ChatGPT_Image_May_28,_2026,_11_06_11_PM_1780005983787.png';
 import { getGiveawayImage, daysUntil, getGiveawayBottles, PATRON_BOTTLES, COLLECTION_BOTTLES } from '@/data/giveaways';
 import { useListGiveaways } from '@workspace/api-client-react';
+import { track, slugForGiveawayName } from '@/lib/track';
 
 function getCollectionHero(name: string): string | null {
   const n = name.toLowerCase();
@@ -58,7 +59,7 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 }
 
-function BottleList({ bottles }: { bottles: { name: string }[] }) {
+function BottleList({ bottles, drawSlug }: { bottles: { name: string }[]; drawSlug?: string | null }) {
   const [expanded, setExpanded] = useState(false);
   const COLLAPSED = 4;
   const needsToggle = bottles.length > COLLAPSED;
@@ -83,7 +84,17 @@ function BottleList({ bottles }: { bottles: { name: string }[] }) {
       {needsToggle && (
         <button
           type="button"
-          onClick={() => setExpanded(v => !v)}
+          onClick={() => {
+            const next = !expanded;
+            if (next) {
+              track({
+                eventType: 'explore_collection_click',
+                eventName: 'explore_full_collection',
+                drawSlug: drawSlug ?? null,
+              });
+            }
+            setExpanded(next);
+          }}
           className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-serif uppercase tracking-[0.15em] text-primary hover:text-amber-300 transition-colors"
         >
           {expanded ? (
@@ -400,6 +411,11 @@ export function Home() {
     return () => clearInterval(id);
   }, [heroSlides.length]);
 
+  // Fire a page_view exactly once per mount.
+  useEffect(() => {
+    track({ eventType: 'page_view', eventName: 'home' });
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
       <Navbar onScrollTo={scrollTo} />
@@ -444,7 +460,10 @@ export function Home() {
               <Button
                 size="lg"
                 className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-[0.15em] h-12 min-h-[48px] px-6 shadow-[0_8px_30px_-6px_rgba(234,146,55,0.55)]"
-                onClick={() => scrollTo('giveaways')}
+                onClick={() => {
+                  track({ eventType: 'hero_cta_click', eventName: 'view_active_draws' });
+                  scrollTo('giveaways');
+                }}
               >
                 View Active Draws <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -452,7 +471,10 @@ export function Home() {
                 size="lg"
                 variant="outline"
                 className="w-full sm:w-auto border-primary/40 hover:border-primary text-foreground hover:text-primary font-semibold uppercase tracking-[0.15em] h-12 min-h-[48px] px-6 bg-card/50 backdrop-blur"
-                onClick={() => scrollTo('how-it-works')}
+                onClick={() => {
+                  track({ eventType: 'hero_cta_click', eventName: 'how_it_works' });
+                  scrollTo('how-it-works');
+                }}
               >
                 How It Works
               </Button>
@@ -693,7 +715,7 @@ export function Home() {
                       </div>
                       <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">{g.description}</p>
 
-                      <BottleList bottles={bottles} />
+                      <BottleList bottles={bottles} drawSlug={slugForGiveawayName(g.name)} />
                     </div>
 
                     <div className="space-y-5 sm:space-y-6">
@@ -724,7 +746,19 @@ export function Home() {
                       <Button
                         size="lg"
                         className="w-full h-14 min-h-[48px] bg-primary hover:bg-primary/90 text-primary-foreground uppercase tracking-widest text-xs sm:text-sm font-serif px-4 sm:px-6"
-                        onClick={() => setLocation(g.name === 'Bushmills Distillery Tour Experience' ? '/experiences/bushmills' : `/giveaway/${g.id}`)}
+                        onClick={() => {
+                          const slug = slugForGiveawayName(g.name);
+                          track({
+                            eventType: 'draw_click',
+                            eventName: 'preview_giveaway',
+                            drawSlug: slug,
+                          });
+                          setLocation(
+                            g.name === 'Bushmills Distillery Tour Experience'
+                              ? '/experiences/bushmills'
+                              : `/giveaway/${g.id}`,
+                          );
+                        }}
                       >
                         <span className="truncate">Preview Giveaway</span>
                       </Button>
@@ -802,7 +836,14 @@ export function Home() {
         </div>
 
         <div className="text-center mt-10 sm:mt-16">
-          <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider min-h-[48px]" onClick={() => scrollTo('giveaways')}>
+          <Button
+            size="lg"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider min-h-[48px]"
+            onClick={() => {
+              track({ eventType: 'hero_cta_click', eventName: 'browse_active_draws_faq' });
+              scrollTo('giveaways');
+            }}
+          >
             Browse Active Draws
           </Button>
         </div>

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Mail, CheckCircle2, Sparkles } from 'lucide-react';
 import { useCreateBetaSignup } from '@workspace/api-client-react';
+import { track } from '@/lib/track';
 
 type Status =
   | { kind: 'idle' }
@@ -19,6 +20,7 @@ export function WaitlistSection() {
   const createSignup = useCreateBetaSignup({
     mutation: {
       onSuccess: (data) => {
+        track({ eventType: 'waitlist_completed', eventName: 'beta_waitlist' });
         setStatus({
           kind: 'success',
           message: data.message || "You're on the list. PrizePour beta updates are coming soon.",
@@ -28,11 +30,22 @@ export function WaitlistSection() {
       },
       onError: (err: unknown) => {
         let message = 'Something went wrong. Please try again.';
-        const errObj = err as { data?: { error?: string } | null; message?: string };
+        let status = 0;
+        const errObj = err as { data?: { error?: string } | null; message?: string; status?: number };
+        if (typeof errObj?.status === 'number') status = errObj.status;
         if (errObj?.data && typeof errObj.data === 'object' && typeof errObj.data.error === 'string') {
           message = errObj.data.error;
         } else if (err instanceof Error && err.message) {
           message = err.message;
+        }
+        if (status === 409) {
+          track({ eventType: 'waitlist_duplicate', eventName: 'beta_waitlist' });
+        } else {
+          track({
+            eventType: 'waitlist_failed',
+            eventName: 'beta_waitlist',
+            metadata: status ? `status=${status}` : null,
+          });
         }
         setStatus({ kind: 'error', message });
       },
@@ -44,10 +57,12 @@ export function WaitlistSection() {
     setStatus({ kind: 'idle' });
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      track({ eventType: 'waitlist_failed', eventName: 'beta_waitlist', metadata: 'client_validation' });
       setStatus({ kind: 'error', message: 'Please enter a valid email address.' });
       return;
     }
     const trimmedFirst = firstName.trim();
+    track({ eventType: 'waitlist_started', eventName: 'beta_waitlist' });
     createSignup.mutate({
       data: {
         firstName: trimmedFirst.length > 0 ? trimmedFirst : null,

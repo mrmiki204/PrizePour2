@@ -102,6 +102,7 @@ If any flag is missing, the Step 4 button stays gated with a "Checkout opens at 
 | `/admin` | `pages/AdminDashboard.tsx` | Entry stats, total revenue, tickets sold, active draw count, searchable entry table. |
 | `/admin/draws` | `pages/AdminDraws.tsx` | Draw management — toggle active / public / paused, edit fields, eligibility status row showing exactly why a draw is or isn't visible publicly. |
 | `/admin/beta-signups` | `pages/AdminBetaSignups.tsx` | Beta waitlist management — list, search, delete signups; stat cards (total + last 7 days). |
+| `/admin/analytics` | `pages/AdminAnalytics.tsx` | Pre-launch analytics — page views, hero CTA clicks, draw card clicks, beta signups, waitlist funnel (started → completed/duplicate/failed + conversion rate), events-by-type, draw interest, recent events. |
 
 ### API routes (`artifacts/api-server/src/routes/`)
 
@@ -125,6 +126,9 @@ Mounted under `/api`:
 - `POST /api/beta-signups` — **public**; beta waitlist signup. Validates email (zod), normalizes to lowercase, in-memory IP rate limit (5/min). 201 on create, 409 duplicate, 400 invalid email, 429 rate-limited.
 - `GET /api/beta-signups` — admin (requireAdmin); list all signups (newest first).
 - `DELETE /api/beta-signups/:id` — admin; delete a signup.
+- `POST /api/analytics-events` — **public**; record one analytics event (fire-and-forget, 204). Enum-validated event type, in-memory IP rate limit (60/min). Never blocks the frontend.
+- `GET /api/analytics-events?limit=` — admin (requireAdmin); recent events newest-first (default 100, max 500).
+- `GET /api/analytics-summary` — admin; aggregated counts by event type, top 4 tracked draws (patron / clonakilty / bushmills / macallan), waitlist funnel (started/completed/failed/duplicate/conversion rate), live beta signup total.
 
 ---
 
@@ -164,6 +168,10 @@ Schema lives in `lib/db/src/schema/` (Drizzle). Four tables:
 ### `beta_signups`
 
 `id, first_name (nullable), email (NOT NULL, unique via `beta_signups_email_unique` index), created_at`. Powers the homepage beta waitlist section and `/admin/beta-signups`. Emails stored lowercase; duplicate POSTs return 409.
+
+### `analytics_events`
+
+`id, event_type (NOT NULL), event_name (NOT NULL), draw_slug (nullable), page_path (nullable), metadata (nullable), created_at`. Indexes on `event_type` and `created_at`. Allowed `event_type` values are enum-locked server-side: `page_view`, `hero_cta_click`, `draw_click`, `explore_collection_click`, `waitlist_started`, `waitlist_completed`, `waitlist_failed`, `waitlist_duplicate`. No PII captured.
 
 ### How public visibility works
 

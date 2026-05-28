@@ -17,6 +17,9 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AnalyticsEvent,
+  AnalyticsEventInput,
+  AnalyticsSummary,
   BetaSignup,
   BetaSignupInput,
   BetaSignupResult,
@@ -29,6 +32,7 @@ import type {
   GiveawayInput,
   GiveawayUpdate,
   HealthStatus,
+  ListAnalyticsEventsParams,
   ListEntriesParams,
   ListGiveawaysParams,
   StripeCheckoutRequest,
@@ -1167,6 +1171,267 @@ export const useCreateBetaSignup = <
 > => {
   return useMutation(getCreateBetaSignupMutationOptions(options));
 };
+
+/**
+ * @summary List recent analytics events (admin)
+ */
+export const getListAnalyticsEventsUrl = (
+  params?: ListAnalyticsEventsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/analytics-events?${stringifiedParams}`
+    : `/api/analytics-events`;
+};
+
+export const listAnalyticsEvents = async (
+  params?: ListAnalyticsEventsParams,
+  options?: RequestInit,
+): Promise<AnalyticsEvent[]> => {
+  return customFetch<AnalyticsEvent[]>(getListAnalyticsEventsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListAnalyticsEventsQueryKey = (
+  params?: ListAnalyticsEventsParams,
+) => {
+  return [`/api/analytics-events`, ...(params ? [params] : [])] as const;
+};
+
+export const getListAnalyticsEventsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAnalyticsEvents>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  params?: ListAnalyticsEventsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listAnalyticsEvents>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAnalyticsEventsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAnalyticsEvents>>
+  > = ({ signal }) =>
+    listAnalyticsEvents(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAnalyticsEvents>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListAnalyticsEventsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAnalyticsEvents>>
+>;
+export type ListAnalyticsEventsQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary List recent analytics events (admin)
+ */
+
+export function useListAnalyticsEvents<
+  TData = Awaited<ReturnType<typeof listAnalyticsEvents>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  params?: ListAnalyticsEventsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listAnalyticsEvents>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListAnalyticsEventsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Record an analytics event (public, fire-and-forget)
+ */
+export const getCreateAnalyticsEventUrl = () => {
+  return `/api/analytics-events`;
+};
+
+export const createAnalyticsEvent = async (
+  analyticsEventInput: AnalyticsEventInput,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getCreateAnalyticsEventUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(analyticsEventInput),
+  });
+};
+
+export const getCreateAnalyticsEventMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createAnalyticsEvent>>,
+    TError,
+    { data: BodyType<AnalyticsEventInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createAnalyticsEvent>>,
+  TError,
+  { data: BodyType<AnalyticsEventInput> },
+  TContext
+> => {
+  const mutationKey = ["createAnalyticsEvent"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createAnalyticsEvent>>,
+    { data: BodyType<AnalyticsEventInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createAnalyticsEvent(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateAnalyticsEventMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createAnalyticsEvent>>
+>;
+export type CreateAnalyticsEventMutationBody = BodyType<AnalyticsEventInput>;
+export type CreateAnalyticsEventMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Record an analytics event (public, fire-and-forget)
+ */
+export const useCreateAnalyticsEvent = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createAnalyticsEvent>>,
+    TError,
+    { data: BodyType<AnalyticsEventInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createAnalyticsEvent>>,
+  TError,
+  { data: BodyType<AnalyticsEventInput> },
+  TContext
+> => {
+  return useMutation(getCreateAnalyticsEventMutationOptions(options));
+};
+
+/**
+ * @summary Aggregated analytics overview (admin)
+ */
+export const getGetAnalyticsSummaryUrl = () => {
+  return `/api/analytics-summary`;
+};
+
+export const getAnalyticsSummary = async (
+  options?: RequestInit,
+): Promise<AnalyticsSummary> => {
+  return customFetch<AnalyticsSummary>(getGetAnalyticsSummaryUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetAnalyticsSummaryQueryKey = () => {
+  return [`/api/analytics-summary`] as const;
+};
+
+export const getGetAnalyticsSummaryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAnalyticsSummary>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getAnalyticsSummary>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAnalyticsSummaryQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getAnalyticsSummary>>
+  > = ({ signal }) => getAnalyticsSummary({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAnalyticsSummary>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetAnalyticsSummaryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAnalyticsSummary>>
+>;
+export type GetAnalyticsSummaryQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Aggregated analytics overview (admin)
+ */
+
+export function useGetAnalyticsSummary<
+  TData = Awaited<ReturnType<typeof getAnalyticsSummary>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getAnalyticsSummary>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetAnalyticsSummaryQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Delete a beta signup (admin)

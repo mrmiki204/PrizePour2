@@ -145,6 +145,70 @@ export interface BetaSignupResult {
   signup?: BetaSignup;
 }
 
+export interface AnalyticsEvent {
+  id: number;
+  eventType: string;
+  eventName: string;
+  drawSlug?: string | null;
+  pagePath?: string | null;
+  metadata?: string | null;
+  createdAt: string;
+}
+
+export type AnalyticsEventInputEventType =
+  (typeof AnalyticsEventInputEventType)[keyof typeof AnalyticsEventInputEventType];
+
+export const AnalyticsEventInputEventType = {
+  page_view: "page_view",
+  hero_cta_click: "hero_cta_click",
+  draw_click: "draw_click",
+  explore_collection_click: "explore_collection_click",
+  waitlist_started: "waitlist_started",
+  waitlist_completed: "waitlist_completed",
+  waitlist_failed: "waitlist_failed",
+  waitlist_duplicate: "waitlist_duplicate",
+} as const;
+
+export interface AnalyticsEventInput {
+  eventType: AnalyticsEventInputEventType;
+  eventName: string;
+  drawSlug?: string | null;
+  pagePath?: string | null;
+  metadata?: string | null;
+}
+
+export interface AnalyticsCount {
+  key: string;
+  count: number;
+}
+
+export interface AnalyticsDrawInterest {
+  slug: string;
+  drawClicks: number;
+  exploreCollectionClicks: number;
+  pageViews: number;
+}
+
+export interface AnalyticsWaitlistFunnel {
+  started: number;
+  completed: number;
+  failed: number;
+  duplicate: number;
+  conversionRate: number;
+}
+
+export interface AnalyticsSummary {
+  totalEvents: number;
+  totalPageViews: number;
+  betaSignups: number;
+  heroCtaClicks: number;
+  drawClicks: number;
+  waitlistCompleted: number;
+  eventsByType: AnalyticsCount[];
+  topDraws: AnalyticsDrawInterest[];
+  waitlistFunnel: AnalyticsWaitlistFunnel;
+}
+
 export interface ErrorResponse {
   error: string;
 }
@@ -161,6 +225,14 @@ export type ListGiveawaysParams = {
    * If true, include inactive giveaways (admin use)
    */
   all?: boolean;
+};
+
+export type ListAnalyticsEventsParams = {
+  /**
+   * @minimum 1
+   * @maximum 500
+   */
+  limit?: number;
 };
 
 export type DeleteBetaSignup200 = {

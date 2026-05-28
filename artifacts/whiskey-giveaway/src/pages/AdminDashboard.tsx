@@ -4,7 +4,7 @@ import type { Giveaway } from '@workspace/api-client-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { daysUntil } from '@/data/giveaways';
-import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2, LogOut, Settings2, Mail } from 'lucide-react';
+import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2, LogOut, Settings2, Mail, Activity } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -369,6 +369,16 @@ export function AdminDashboard() {
               >
                 <Mail className="w-3.5 h-3.5" />
                 Beta Signups
+              </Button>
+            </Link>
+            <Link href="/admin/analytics">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 font-serif text-xs uppercase tracking-widest border-primary/40 text-primary hover:bg-primary/10"
+              >
+                <Activity className="w-3.5 h-3.5" />
+                Analytics
               </Button>
             </Link>
             <Button

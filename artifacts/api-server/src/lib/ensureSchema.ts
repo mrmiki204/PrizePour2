@@ -104,6 +104,29 @@ export async function ensureSchema(): Promise<void> {
         ON beta_signups (email);
     `);
 
+    // ── analytics_events ─────────────────────────────────────────────────
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS analytics_events (
+        id SERIAL PRIMARY KEY,
+        event_type TEXT NOT NULL,
+        event_name TEXT NOT NULL,
+        draw_slug TEXT,
+        page_path TEXT,
+        metadata TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await db.execute(sql`
+      CREATE INDEX IF NOT EXISTS analytics_events_event_type_idx
+        ON analytics_events (event_type);
+    `);
+
+    await db.execute(sql`
+      CREATE INDEX IF NOT EXISTS analytics_events_created_at_idx
+        ON analytics_events (created_at);
+    `);
+
     logger.info("Database schema ensured (tables + columns up to date)");
   } catch (err) {
     logger.error({ err }, "Failed to ensure database schema");

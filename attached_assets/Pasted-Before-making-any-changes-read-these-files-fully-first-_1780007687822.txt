@@ -1,0 +1,255 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Treat them as the source of truth.
+
+Important PrizePour rules:
+
+* PrizePour stays in beta
+* DO NOT enable real payments
+* Keep `PAYMENTS_ENABLED` safety
+* Keep checkout disabled/gated
+* Keep `ADMIN_PASSWORD` protection
+* Do not expose admin routes publicly
+* Keep luxury dark/gold styling
+* Keep mobile responsive
+* Prefer DB-driven logic
+* Test before Git push
+
+Task:
+Add lightweight analytics and conversion tracking to PrizePour.
+
+Goal:
+Understand visitor behaviour before launch without enabling payments.
+
+Track:
+
+* which draws users click most
+* which hero CTAs get clicked
+* which collections get most interest
+* waitlist signup conversions
+* basic visitor/page activity
+
+Do NOT add payment tracking. Do NOT enable checkout.
+
+---
+
+## Stage 1 — Analytics Data Model
+
+Create a lightweight analytics table/model.
+
+Suggested table:
+`analytics_events`
+
+Fields:
+
+* `id`
+* `eventType`
+* `eventName`
+* `drawSlug` optional
+* `pagePath` optional
+* `metadata` optional JSON/text
+* `createdAt`
+
+Suggested event types:
+
+* `page_view`
+* `hero_cta_click`
+* `draw_click`
+* `explore_collection_click`
+* `waitlist_started`
+* `waitlist_completed`
+* `waitlist_failed`
+* `waitlist_duplicate`
+
+Requirements:
+
+* safe DB insert
+* no sensitive personal data
+* no payment data
+* no breaking existing DB
+* idempotent migration
+
+---
+
+## Stage 2 — Tracking API
+
+Create a public analytics POST endpoint.
+
+Requirements:
+
+* accepts safe event payloads only
+* validates allowed event types
+* rejects unknown/unsafe events
+* does not expose analytics data publicly
+* does not log secrets
+* handles errors silently so analytics never breaks the frontend
+* optional basic rate-limit/spam protection if easy
+
+---
+
+## Stage 3 — Frontend Tracking
+
+Add tracking to:
+
+Hero:
+
+* hero slide viewed if easy
+* “View Active Draws” clicked
+* “How It Works” clicked
+
+Draws:
+
+* draw card clicked
+* “View Collection” clicked
+* “Explore Full Collection” clicked
+* specific draw slug tracked:
+
+  * patron-collection
+  * clonakilty-collection
+  * bushmills
+  * macallan-luxury-collection
+
+Waitlist:
+
+* signup started
+* signup completed
+* signup failed
+* duplicate signup
+
+Pages:
+
+* homepage page view
+* draw detail page view if detail pages exist
+* legal/trust page views if simple to add
+
+Important:
+Tracking must never block user actions.
+If analytics fails, site should still work normally.
+
+---
+
+## Stage 4 — Admin Analytics Dashboard
+
+Add protected route:
+
+`/admin/analytics`
+
+Show simple analytics overview.
+
+Dashboard cards:
+
+* Total events
+* Total page views
+* Beta signups
+* Hero CTA clicks
+* Draw clicks
+* Waitlist conversions
+
+Top Draw Interest:
+Show ranked list:
+
+1. draw name / slug
+2. click count
+3. explore collection clicks
+4. page views if available
+
+Waitlist Funnel:
+Show:
+
+* waitlist started
+* waitlist completed
+* waitlist failed
+* duplicate signup
+* conversion rate
+
+Recent Events:
+Show latest analytics events in a simple table:
+
+* event type
+* draw slug/page
+* created date
+
+Requirements:
+
+* admin route protected
+* no public access
+* consistent admin styling
+* clear but simple UI
+* no over-complicated charts unless already easy
+
+---
+
+## Stage 5 — Admin Navigation
+
+Add Analytics link to admin navigation.
+
+Keep admin layout clean.
+
+---
+
+## Stage 6 — Testing
+
+Test locally/Replit before Git push.
+
+Frontend tests:
+
+* homepage still loads
+* hero CTAs still work
+* draw buttons still work
+* waitlist still works
+* analytics failures do not break UI
+
+Admin tests:
+
+* `/admin/analytics` protected
+* analytics dashboard loads
+* events appear after clicks
+* waitlist conversion stats update
+* existing `/admin`, `/admin/draws`, `/admin/beta-signups` still work
+
+Payment safety:
+
+* checkout remains disabled
+* Stripe/test mode untouched
+* `PAYMENTS_ENABLED` untouched
+
+---
+
+## Stage 7 — Documentation
+
+Update `CHANGELOG.md` with:
+
+`Added lightweight analytics and admin conversion dashboard.`
+
+Update `PROJECT_CONTEXT.md` if new routes or data tables are added.
+
+---
+
+## Stage 8 — Git Push
+
+Only push after all local/Replit tests pass.
+
+Run:
+
+git status
+
+Review changed files carefully.
+
+Then:
+
+git add .
+git commit -m "Add lightweight analytics dashboard"
+git push
+
+After Railway redeploys:
+
+* test live homepage
+* click hero CTAs
+* click draw cards
+* submit/test waitlist
+* check `/admin/analytics`
+* confirm no draw/admin/payment regressions

@@ -20,6 +20,19 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Added lightweight analytics + admin conversion dashboard
+
+- **Why:** Need visibility into pre-launch visitor behaviour and the waitlist funnel without bolting on a third-party analytics SDK. Helps decide which draws resonate before checkout opens.
+- **What:**
+  - New `analytics_events` table (id, eventType, eventName, drawSlug, pagePath, metadata, createdAt; 2 indexes). Drizzle schema + mirrored idempotent `ensureSchema.ts` block. Pushed via `pnpm --filter @workspace/db run push`.
+  - Event types are enum-validated server-side: `page_view`, `hero_cta_click`, `draw_click`, `explore_collection_click`, `waitlist_started|completed|failed|duplicate`.
+  - OpenAPI: `POST /analytics-events` (public, 204), `GET /analytics-events?limit=` (admin), `GET /analytics-summary` (admin). Hooks/Zod regenerated.
+  - Server `routes/analytics.ts`: in-memory IP rate limit (60/min via `req.ip`), 400 on bad enum, public POST, admin GET list + aggregated summary (counts by type, top 4 draws, waitlist funnel + conversion rate, beta_signups count).
+  - Frontend `lib/track.ts` fire-and-forget helper (auto-fills `pagePath`, never throws). Wired into Home: page_view on mount, hero CTAs, draw card "Preview Giveaway", "Explore Full Collection" expand, FAQ "Browse Active Draws". Wired into WaitlistSection: started/completed/duplicate(409)/failed.
+  - New `/admin/analytics` page (`AdminAnalytics.tsx`) — stat cards, waitlist funnel, events-by-type, draw interest, recent events table. Nav button added to AdminDashboard.
+- **Files:** `lib/db/src/schema/analyticsEvents.ts` (new), `lib/db/src/schema/index.ts`, `artifacts/api-server/src/lib/ensureSchema.ts`, `artifacts/api-server/src/routes/analytics.ts` (new), `artifacts/api-server/src/routes/index.ts`, `lib/api-spec/openapi.yaml`, generated `lib/api-client-react/*`, `lib/api-zod/*`, `artifacts/whiskey-giveaway/src/lib/track.ts` (new), `artifacts/whiskey-giveaway/src/pages/AdminAnalytics.tsx` (new), `artifacts/whiskey-giveaway/src/App.tsx`, `artifacts/whiskey-giveaway/src/pages/AdminDashboard.tsx`, `artifacts/whiskey-giveaway/src/pages/Home.tsx`, `artifacts/whiskey-giveaway/src/components/home/WaitlistSection.tsx`.
+- **Risks / follow-ups:** Rate limiter is in-memory only — fine for a single Railway dyno; if we ever horizontally scale, swap for a shared store. No PII captured. No Stripe/PAYMENTS_ENABLED/ADMIN_PASSWORD changes. Pre-existing button-group/calendar shadcn typecheck baseline errors remain (not introduced here).
+
 ### Added beta email waitlist and admin signup management
 
 - **Why:** Collect visitor interest while checkout stays disabled in beta. Lets us warm a launch list without touching Stripe / `PAYMENTS_ENABLED`.

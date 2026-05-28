@@ -20,6 +20,7 @@ import { WinnerSelection } from "@/pages/WinnerSelection";
 import { PreLaunchChecklist } from "@/pages/PreLaunchChecklist";
 import { AdminDraws } from "@/pages/AdminDraws";
 import { AdminBetaSignups } from "@/pages/AdminBetaSignups";
+import { AdminAnalytics } from "@/pages/AdminAnalytics";
 import NotFound from "@/pages/not-found";
 import { AgeGate } from "@/components/AgeGate";
 
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/admin/pre-launch-checklist">{() => <AdminGuard><PreLaunchChecklist /></AdminGuard>}</Route>
       <Route path="/admin/draws">{() => <AdminGuard><AdminDraws /></AdminGuard>}</Route>
       <Route path="/admin/beta-signups">{() => <AdminGuard><AdminBetaSignups /></AdminGuard>}</Route>
+      <Route path="/admin/analytics">{() => <AdminGuard><AdminAnalytics /></AdminGuard>}</Route>
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/rules" component={Rules} />

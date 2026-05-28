@@ -269,6 +269,85 @@ export const CreateBetaSignupBody = zod.object({
 });
 
 /**
+ * @summary List recent analytics events (admin)
+ */
+export const listAnalyticsEventsQueryLimitMax = 500;
+
+export const ListAnalyticsEventsQueryParams = zod.object({
+  limit: zod.coerce
+    .number()
+    .min(1)
+    .max(listAnalyticsEventsQueryLimitMax)
+    .optional(),
+});
+
+export const ListAnalyticsEventsResponseItem = zod.object({
+  id: zod.number(),
+  eventType: zod.string(),
+  eventName: zod.string(),
+  drawSlug: zod.string().nullish(),
+  pagePath: zod.string().nullish(),
+  metadata: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+});
+export const ListAnalyticsEventsResponse = zod.array(
+  ListAnalyticsEventsResponseItem,
+);
+
+/**
+ * @summary Record an analytics event (public, fire-and-forget)
+ */
+export const CreateAnalyticsEventBody = zod.object({
+  eventType: zod.enum([
+    "page_view",
+    "hero_cta_click",
+    "draw_click",
+    "explore_collection_click",
+    "waitlist_started",
+    "waitlist_completed",
+    "waitlist_failed",
+    "waitlist_duplicate",
+  ]),
+  eventName: zod.string(),
+  drawSlug: zod.string().nullish(),
+  pagePath: zod.string().nullish(),
+  metadata: zod.string().nullish(),
+});
+
+/**
+ * @summary Aggregated analytics overview (admin)
+ */
+export const GetAnalyticsSummaryResponse = zod.object({
+  totalEvents: zod.number(),
+  totalPageViews: zod.number(),
+  betaSignups: zod.number(),
+  heroCtaClicks: zod.number(),
+  drawClicks: zod.number(),
+  waitlistCompleted: zod.number(),
+  eventsByType: zod.array(
+    zod.object({
+      key: zod.string(),
+      count: zod.number(),
+    }),
+  ),
+  topDraws: zod.array(
+    zod.object({
+      slug: zod.string(),
+      drawClicks: zod.number(),
+      exploreCollectionClicks: zod.number(),
+      pageViews: zod.number(),
+    }),
+  ),
+  waitlistFunnel: zod.object({
+    started: zod.number(),
+    completed: zod.number(),
+    failed: zod.number(),
+    duplicate: zod.number(),
+    conversionRate: zod.number(),
+  }),
+});
+
+/**
  * @summary Delete a beta signup (admin)
  */
 export const DeleteBetaSignupParams = zod.object({

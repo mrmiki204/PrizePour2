@@ -18,6 +18,8 @@ tags:
     description: Stripe payment operations
   - name: betaSignups
     description: Beta email waitlist signups
+  - name: analytics
+    description: Lightweight visitor / conversion analytics
 paths:
   /healthz:
     get:
@@ -322,6 +324,79 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "429":
           description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analytics-events:
+    get:
+      operationId: listAnalyticsEvents
+      tags: [analytics]
+      summary: List recent analytics events (admin)
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+      responses:
+        "200":
+          description: List of recent analytics events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnalyticsEvent"
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createAnalyticsEvent
+      tags: [analytics]
+      summary: Record an analytics event (public, fire-and-forget)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyticsEventInput"
+      responses:
+        "204":
+          description: Event accepted (no body)
+        "400":
+          description: Invalid event payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analytics-summary:
+    get:
+      operationId: getAnalyticsSummary
+      tags: [analytics]
+      summary: Aggregated analytics overview (admin)
+      responses:
+        "200":
+          description: Aggregated analytics summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsSummary"
+        "401":
+          description: Admin authentication required
           content:
             application/json:
               schema:
@@ -696,6 +771,129 @@ components:
           type: string
         signup:
           $ref: "#/components/schemas/BetaSignup"
+
+    AnalyticsEvent:
+      type: object
+      required: [id, eventType, eventName, createdAt]
+      properties:
+        id:
+          type: integer
+        eventType:
+          type: string
+        eventName:
+          type: string
+        drawSlug:
+          type: string
+          nullable: true
+        pagePath:
+          type: string
+          nullable: true
+        metadata:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    AnalyticsEventInput:
+      type: object
+      required: [eventType, eventName]
+      properties:
+        eventType:
+          type: string
+          enum:
+            - page_view
+            - hero_cta_click
+            - draw_click
+            - explore_collection_click
+            - waitlist_started
+            - waitlist_completed
+            - waitlist_failed
+            - waitlist_duplicate
+        eventName:
+          type: string
+        drawSlug:
+          type: string
+          nullable: true
+        pagePath:
+          type: string
+          nullable: true
+        metadata:
+          type: string
+          nullable: true
+
+    AnalyticsCount:
+      type: object
+      required: [key, count]
+      properties:
+        key:
+          type: string
+        count:
+          type: integer
+
+    AnalyticsDrawInterest:
+      type: object
+      required: [slug, drawClicks, exploreCollectionClicks, pageViews]
+      properties:
+        slug:
+          type: string
+        drawClicks:
+          type: integer
+        exploreCollectionClicks:
+          type: integer
+        pageViews:
+          type: integer
+
+    AnalyticsWaitlistFunnel:
+      type: object
+      required: [started, completed, failed, duplicate, conversionRate]
+      properties:
+        started:
+          type: integer
+        completed:
+          type: integer
+        failed:
+          type: integer
+        duplicate:
+          type: integer
+        conversionRate:
+          type: number
+
+    AnalyticsSummary:
+      type: object
+      required:
+        - totalEvents
+        - totalPageViews
+        - betaSignups
+        - heroCtaClicks
+        - drawClicks
+        - waitlistCompleted
+        - eventsByType
+        - topDraws
+        - waitlistFunnel
+      properties:
+        totalEvents:
+          type: integer
+        totalPageViews:
+          type: integer
+        betaSignups:
+          type: integer
+        heroCtaClicks:
+          type: integer
+        drawClicks:
+          type: integer
+        waitlistCompleted:
+          type: integer
+        eventsByType:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsCount"
+        topDraws:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsDrawInterest"
+        waitlistFunnel:
+          $ref: "#/components/schemas/AnalyticsWaitlistFunnel"
 
     ErrorResponse:
       type: object
