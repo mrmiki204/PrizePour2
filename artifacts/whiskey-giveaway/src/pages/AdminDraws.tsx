@@ -563,6 +563,41 @@ export function AdminDraws() {
                         </div>
                       </div>
 
+                      {(() => {
+                        const ended = new Date(g.drawDate).getTime() < now;
+                        const reasons: string[] = [];
+                        if (!g.isActive) reasons.push('not active');
+                        if (!g.isPublic) reasons.push('hidden');
+                        if (g.entriesPaused) reasons.push('entries paused');
+                        if (ended) reasons.push('draw date passed');
+                        const eligible = reasons.length === 0;
+                        return (
+                          <div
+                            className={`mb-3 rounded-sm border px-3 py-2 text-[11px] sm:text-xs font-serif flex flex-wrap items-center gap-x-3 gap-y-1.5 ${
+                              eligible
+                                ? 'border-green-500/30 bg-green-500/5 text-green-300'
+                                : 'border-amber-500/30 bg-amber-500/5 text-amber-300'
+                            }`}
+                          >
+                            {eligible ? (
+                              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                            ) : (
+                              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                            )}
+                            <span className="uppercase tracking-widest text-[10px] shrink-0">
+                              Eligible for public Active Draws:
+                            </span>
+                            <strong className="text-foreground">{eligible ? 'Yes' : 'No'}</strong>
+                            {!eligible && (
+                              <span className="text-muted-foreground">
+                                — hidden from homepage because{' '}
+                                <span className="text-amber-200">{reasons.join(' + ')}</span>.
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
+
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm font-serif">
                         <InfoCell label="Prize value" value={g.prizeValue} accent />
                         <InfoCell label="Ticket price" value={`£${parseFloat(g.ticketPriceGbp).toFixed(2)}`} />

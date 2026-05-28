@@ -1,0 +1,59 @@
+Fix the Clonakilty Collection not appearing in the public Active Draws section.
+
+Problem:
+In the admin panel, The Clonakilty Collection shows as active, but it does not appear in the public Active Draws section.
+
+Goal:
+If a draw is active, public/visible, not paused, and not ended, it must appear in the public Active Draws section.
+
+Please investigate specifically:
+
+* The Clonakilty Collection database record
+* Its `isActive` value
+* Its hidden/public/visible value
+* Its paused value
+* Its draw end date
+* Its ticket/entry values
+* Whether public API filtering excludes it incorrectly
+* Whether homepage Active Draws only shows hardcoded or limited records
+* Whether Clonakilty has a missing/invalid image or field causing it to be filtered out
+* Whether admin “active” badge does not reflect all required public visibility conditions
+
+Required fixes:
+
+* Add a clear admin visibility/status summary for each draw:
+
+  * Active
+  * Public/Visible
+  * Not Paused
+  * Not Ended
+  * Eligible for Active Draws: Yes/No
+* If a draw is active but still hidden from public, show exactly why in admin.
+* Fix Clonakilty so it appears publicly when eligible.
+* Ensure public Active Draws uses the same eligibility logic:
+
+  * active = true
+  * hidden/visible/public = visible
+  * paused = false
+  * draw date has not passed
+* Ensure admin updates persist to database.
+* Ensure public `/api/giveaways` returns Clonakilty when eligible.
+* Ensure homepage Active Draws section renders Clonakilty when returned by the API.
+* Avoid static/hardcoded draw data overriding database status.
+
+Expected result:
+When Clonakilty is set to Active + Public/Visible + Not Paused + Not Ended, it appears in:
+
+* public Active Draws section
+* public draw list
+* homepage if eligible
+
+When it is deactivated/hidden/paused/ended, it disappears from public but remains visible in admin.
+
+After completion:
+
+* explain the root cause
+* list files changed
+* confirm Clonakilty appears in public Active Draws
+* confirm admin now explains why a draw is/isn’t public
+* confirm if I need to push to GitHub/Railway
