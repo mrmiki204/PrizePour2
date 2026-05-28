@@ -1,0 +1,179 @@
+Create and implement two new project memory files:
+
+1. `SYSTEM_RULES.md`
+2. `CHANGELOG.md`
+
+Goal:
+Reduce AI memory drift, prevent hallucinations, preserve business logic, and make future Replit/Codex sessions consistent.
+
+Requirements:
+
+# 1. SYSTEM_RULES.md
+
+Create a permanent source-of-truth file for business rules and architectural constraints.
+
+Include clearly structured sections:
+
+## Project Overview
+
+* PrizePour = premium spirit giveaway website
+* Hosted on Railway
+* Built in Replit → GitHub → Railway auto deploy
+* Domain:
+
+  * prizepour.com (primary)
+  * prizepour.co.uk (future redirect)
+
+## Permanent Safety Rules
+
+* PrizePour is in beta
+* DO NOT enable real payments
+* Stripe must remain TEST/BETA mode
+* Keep PAYMENTS_ENABLED safety
+* Keep checkout gated/disabled
+* Do not expose secret keys
+* Do not expose admin publicly
+* Keep ADMIN_PASSWORD protection
+
+## Admin Rules
+
+Routes:
+
+* `/admin`
+* `/admin/draws`
+
+Admin must be able to:
+
+* create draws
+* edit draws
+* activate/deactivate draws
+* hide/show publicly
+* pause entries
+* delete test draws safely
+* manage seeded experiences/draws
+
+Admin should always see:
+
+* active
+* inactive
+* hidden
+* paused
+* ended
+* previous draws
+
+## Public Draw Visibility Rules
+
+Homepage / Active Draws should ONLY show draws that are:
+
+* active = true
+* visible/public = true
+* paused = false
+* not ended
+
+Public logic must always reflect admin state.
+
+## Seeded Draw Rules
+
+Document seeded collections:
+
+1. Patrón Collection
+2. Clonakilty Collection
+3. Bushmills Distillery Tour Experience
+
+Include:
+
+* expected visibility
+* approximate pricing
+* intended status
+* image requirements
+* fallback image rule
+
+## Styling Rules
+
+* Keep luxury premium dark/gold theme
+* Do not redesign unnecessarily
+* Keep mobile responsive
+* Preserve premium feel
+
+## Engineering Rules
+
+* Prefer DB-driven logic over hardcoded content
+* Fix root cause rather than patch symptoms
+* Make minimal invasive changes
+* Reuse existing components when possible
+* Test in Replit before git push
+
+## Deployment Workflow
+
+Always:
+
+1. Test locally/Replit
+2. Run:
+   git status
+   git add .
+   git commit -m "message"
+   git push
+3. Railway auto deploy
+4. Verify production manually
+
+## Rules For Future AI Assistants
+
+Before making changes:
+
+1. Read:
+
+   * PROJECT_CONTEXT.md
+   * SYSTEM_RULES.md
+   * CHANGELOG.md
+2. Treat them as source of truth.
+3. Never invent features or assumptions.
+4. Inspect code before guessing.
+5. Explain:
+
+   * root cause
+   * plan
+   * changes made
+6. Preserve all beta/payment/admin safety protections.
+
+# 2. CHANGELOG.md
+
+Create a clean human-readable project history log.
+
+Format:
+
+## YYYY-MM-DD
+
+### Change title
+
+* what changed
+* why
+* files affected
+* risks/notes
+
+Populate it with current known history including:
+
+* Google Search Console verification
+* sitemap + robots
+* admin authentication fixes
+* create draw fixes
+* draw sync fixes
+* Clonakilty visibility issue
+* Bushmills admin integration
+* image restoration/fallbacks
+* Railway production seeded draw issue
+
+Add a section at the top:
+
+# CHANGELOG RULES
+
+After every meaningful change:
+
+* append a short entry
+* include why the change was made
+* include affected files if known
+* keep entries concise
+
+Finally:
+Update `PROJECT_CONTEXT.md` to reference both files and add a “Project Memory System” section explaining how they work together.
+
+Do not change application behaviour unless necessary for implementing this memory system.

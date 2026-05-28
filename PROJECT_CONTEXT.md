@@ -2,6 +2,19 @@
 
 > Living summary of the PrizePour codebase as of the latest commit. Keep this file up to date when major features land so future AI sessions don't lose context or hallucinate. **This file is documentation only — do not import it from code.**
 
+## Project memory system
+
+PrizePour uses a four-file memory system to keep AI sessions consistent and prevent drift. **Read all four before making changes.**
+
+| File | Role | Update when |
+|---|---|---|
+| **`PROJECT_CONTEXT.md`** (this file) | Living **snapshot** of current code/state — routes, schema, seeds, fixed issues, deploy workflow | A meaningful change ships that affects what the code does or how it's deployed |
+| **`SYSTEM_RULES.md`** | Permanent **business rules** + safety constraints + architectural conventions | A rule changes (rarely); never violate a rule without explicit user override |
+| **`CHANGELOG.md`** | Chronological **history** of every meaningful change | After every meaningful change (append a short entry at the top) |
+| **`replit.md`** | Operator README + user preferences; entry point that points at the other three | When the user records a new preference or convention |
+
+How they work together: `SYSTEM_RULES.md` tells you what you **must not break**, `PROJECT_CONTEXT.md` tells you **what currently exists**, `CHANGELOG.md` tells you **what just changed and why**, and `replit.md` is the short README that points new sessions at all three. If they disagree, `SYSTEM_RULES.md` wins on rules, `PROJECT_CONTEXT.md` wins on current state, and the most recent `CHANGELOG.md` entry wins on what just happened.
+
 ---
 
 ## 1. Project overview
