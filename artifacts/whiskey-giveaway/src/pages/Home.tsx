@@ -741,7 +741,7 @@ export function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: idx * 0.1 }}
-                  className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 hover:border-primary/40 transition-colors"
+                  className="bg-card border border-border rounded-sm overflow-hidden grid lg:grid-cols-2 lg:items-stretch hover:border-primary/40 transition-colors"
                 >
                   {/* Left: bottle grid — cap columns on mobile so bottles don't shrink to nothing */}
                   {(() => {
@@ -792,7 +792,7 @@ export function Home() {
                         <div className="flex flex-col gap-px bg-border/30 sm:hidden">
                           {renderRows(mobileRows, mobileRowSize)}
                         </div>
-                        <div className="hidden sm:flex flex-col gap-px bg-border/30">
+                        <div className="hidden sm:flex flex-col gap-px bg-border/30 lg:h-full lg:justify-center">
                           {renderRows(desktopRows, desktopRowSize)}
                         </div>
                       </>
@@ -800,7 +800,7 @@ export function Home() {
                   })()}
 
                   {/* Right: info panel */}
-                  <div className="p-5 sm:p-8 lg:p-10 flex flex-col justify-between gap-6 sm:gap-8">
+                  <div className="p-5 sm:p-7 lg:p-8 flex flex-col justify-between gap-5 sm:gap-6">
                     <div className="space-y-4">
                       <div>
                         <span className="text-xs font-serif text-primary uppercase tracking-widest">Prize Selection</span>

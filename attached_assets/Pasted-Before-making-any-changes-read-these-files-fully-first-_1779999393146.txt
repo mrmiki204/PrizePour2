@@ -1,0 +1,91 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Treat them as the source of truth. Do not enable real payments. Keep PrizePour in beta. Keep `PAYMENTS_ENABLED` safety. Keep `ADMIN_PASSWORD` protection. Do not expose admin publicly.
+
+Task:
+Fix the excessive empty spacing inside each Active Draw card on the homepage.
+
+Problem:
+On the live Active Draws section, each draw card has a large empty area under the bottle/product image grid, especially on desktop. This makes the cards look unfinished and wastes vertical space.
+
+Goal:
+Make each draw card feel tighter, more balanced, and premium.
+
+Requirements:
+
+* Reduce the fixed/minimum height causing empty space in the image side of each draw card.
+* Let the image area height fit its content naturally.
+* Keep the card layout balanced between image side and text/details side.
+* Do not stretch the image column unnecessarily.
+* Keep the luxury dark/gold styling.
+* Keep the bottle grid visible and clean.
+* Keep “Explore Full Collection” functionality.
+* Do not remove any draw data.
+* Do not hardcode draw cards separately from DB.
+* Active Draws must still come from database-driven draw data.
+
+Desktop layout target:
+
+* Draw card should only be as tall as needed.
+* Image grid should align better with the text/details column.
+* No large blank box below the images.
+* Cards should still look premium and spacious, but not empty.
+
+Mobile layout target:
+
+* Image grid stacks nicely above details.
+* No excessive vertical gaps.
+* CTA remains easy to tap.
+
+Check CSS/classes/components related to:
+
+* Active Draws card wrapper
+* draw image/gallery column
+* bottle grid
+* min-height / height / padding
+* flex/grid alignment
+* object-fit settings
+
+Likely fix:
+
+* Remove or reduce large `min-height` values on the draw card/image column.
+* Use `align-items: stretch` or `start` carefully.
+* Allow the gallery column to use `height: auto`.
+* Reduce unnecessary padding/margins inside the card.
+* Consider using a more compact gallery layout for desktop.
+
+Test:
+
+1. Homepage Active Draws section on desktop.
+2. Homepage Active Draws section on mobile.
+3. Patrón card.
+4. Clonakilty card.
+5. Bushmills card if visible.
+6. Make sure public visibility rules still work:
+
+   * active = true
+   * visible/public = true
+   * paused = false
+   * not ended
+7. Make sure admin still controls draw visibility correctly.
+8. Make sure no broken images appear.
+
+After fixing:
+
+* Update `CHANGELOG.md` with a short entry:
+  “Reduced excessive empty spacing in Active Draw cards and improved gallery/card layout balance.”
+
+Only push after testing in Replit.
+
+Git workflow after testing:
+
+git status
+git add .
+git commit -m "Fix active draw card spacing"
+git push
+
+After Railway redeploys, check the live homepage again and confirm the empty spacing is gone.

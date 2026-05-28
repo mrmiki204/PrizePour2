@@ -20,6 +20,14 @@ After every meaningful change:
 
 ## 2026-05-28
 
+### Fix Active Draw card empty spacing
+
+- **Root cause:** the Active Draws card uses `grid lg:grid-cols-2`. The right (info) column is naturally tall (description + bottle list + progress + countdown + CTA + trust line), so the grid stretches both columns to match. The left column's bottle rows have a fixed `aspect-[3/4]`, so they can't grow — they sat at the top of the stretched cell, leaving a large blank box below the bottles on desktop.
+- **Fix:** the desktop bottle-grid wrapper now has `lg:h-full lg:justify-center` so the rows distribute vertically inside the stretched cell (no more blank below). The right info column padding tightened from `sm:p-8 lg:p-10` → `sm:p-7 lg:p-8` and inner gap from `gap-6 sm:gap-8` → `gap-5 sm:gap-6` so the card itself doesn't grow as tall. Added explicit `lg:items-stretch` on the grid to make intent obvious.
+- **Why:** cards now feel tighter and more balanced — bottles sit visually centred opposite the text, premium luxury feel preserved.
+- **Files:** `artifacts/whiskey-giveaway/src/pages/Home.tsx` (one section, three small className edits).
+- **Risks:** pure CSS class adjustments — no logic, no DB, no admin/payment touch. Mobile (`<sm`) layout unchanged (it stacks vertically anyway). Bottle data, `Explore Full Collection` toggle, public visibility filter, and admin controls all untouched.
+
 ### Homepage trust & conversion improvements
 
 - **Hero (Stage 1):** new headline "Win Rare Spirits & Luxury Distillery Experiences", premium subhead, trust line ("UK-based • Transparent winners • Premium verified prizes"), and two CTAs ("View Active Draws" → scrolls to `#giveaways`, "How It Works" → scrolls to new `#how-it-works`).
