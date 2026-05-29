@@ -18,6 +18,19 @@ After every meaningful change:
 
 ---
 
+## 2026-05-29
+
+### Fixed admin draw list so hidden draws remain visible in admin while only disappearing from the public homepage
+
+- **Why:** Clicking the eye ("Hide") icon on a draw in the `/admin` dashboard made the draw vanish from the admin list — and hiding draws could empty the list entirely ("No giveaways yet"). Root cause: the dashboard's eye button was wired to `handleToggleActive`, which called `deleteGiveaway` when a draw was active. The delete endpoint **hard-deletes** rows that have no entries, so "Hide" was permanently destroying draws.
+- **Fix:** The eye icon now toggles `isPublic` only (public-website visibility) and never deletes. Added a separate power icon to toggle `isActive`. Both go through a non-destructive `toggleField` → `updateGiveaway` + `refetch` (with 401 re-login handling). Removed the destructive delete path from the dashboard — deletion/archiving still lives in `/admin/draws` behind an explicit confirmation. The status column now shows full badges (Active/Inactive, Public/Hidden, Paused, Ended).
+- **Behaviour:** Admin always shows ALL draws via `GET /api/giveaways?all=true` (unchanged). Public homepage still shows only `isActive && isPublic && !entriesPaused && drawDate>=now` via `GET /api/giveaways` (unchanged). Server was already correct — no server/DB/schema/API-contract changes.
+- **Files:** `artifacts/whiskey-giveaway/src/pages/AdminDashboard.tsx`.
+- **Tested:** typecheck clean (pre-existing baseline errors in `components/ui/button-group.tsx` + `calendar.tsx` only); e2e — logged into admin, hid a public draw → stayed in admin as "Hidden", disappeared from homepage, restored to "Public" again.
+- **Safety:** No payment/admin-auth/Stripe guards touched. Checkout remains gated/disabled.
+
+---
+
 ## 2026-05-28
 
 ### Upgraded /giveaway/:id into premium collection landing pages

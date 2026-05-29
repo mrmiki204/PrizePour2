@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useListEntries, useListGiveaways, useCreateGiveaway, useUpdateGiveaway, useDeleteGiveaway, useListBetaSignups } from '@workspace/api-client-react';
+import { useListEntries, useListGiveaways, useCreateGiveaway, useUpdateGiveaway, useListBetaSignups } from '@workspace/api-client-react';
 import type { Giveaway } from '@workspace/api-client-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { daysUntil } from '@/data/giveaways';
-import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2, LogOut, Settings2, Mail, Activity } from 'lucide-react';
+import { BarChart2, Users, DollarSign, Ticket, ChevronDown, ChevronUp, RefreshCw, Search, Plus, Edit2, EyeOff, Eye, X, Save, Loader2, LogOut, Settings2, Mail, Activity, Power, PowerOff } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -201,7 +201,6 @@ export function AdminDashboard() {
 
   const createGiveaway = useCreateGiveaway();
   const updateGiveaway = useUpdateGiveaway();
-  const deleteGiveaway = useDeleteGiveaway();
 
   const handleLogout = async () => {
     const { getAdminToken, clearAdminToken } = await import('@/lib/adminToken');
@@ -223,6 +222,7 @@ export function AdminDashboard() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [togglingId, setTogglingId] = useState<number | null>(null);
 
   const giveawayMap = Object.fromEntries(giveaways.map(g => [g.id, g]));
 
@@ -327,14 +327,37 @@ export function AdminDashboard() {
     }
   };
 
-  const handleToggleActive = async (g: Giveaway) => {
-    if (g.isActive) {
-      await deleteGiveaway.mutateAsync({ id: g.id });
-    } else {
-      await updateGiveaway.mutateAsync({ id: g.id, data: { isActive: true } });
+  // Non-destructive toggles. These only flip flags on the draw — they NEVER
+  // delete a row. Deleting/archiving a draw is done from /admin/draws with an
+  // explicit confirmation. Admin always shows every draw via ?all=true.
+  const toggleField = async (
+    g: Giveaway,
+    field: 'isActive' | 'isPublic' | 'entriesPaused',
+    next: boolean,
+  ) => {
+    setTogglingId(g.id);
+    try {
+      await updateGiveaway.mutateAsync({ id: g.id, data: { [field]: next } });
+      await refetchGiveaways();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Update failed.';
+      if (/401|unauthor/i.test(msg)) {
+        const { clearAdminToken } = await import('@/lib/adminToken');
+        clearAdminToken();
+        alert('Admin session expired. Please log in again.');
+        window.location.reload();
+      } else {
+        alert(msg);
+      }
+    } finally {
+      setTogglingId(null);
     }
-    await refetchGiveaways();
   };
+
+  // "Hide" only controls PUBLIC website visibility (isPublic). The draw stays
+  // in the admin list regardless.
+  const handleTogglePublic = (g: Giveaway) => toggleField(g, 'isPublic', !g.isPublic);
+  const handleToggleActive = (g: Giveaway) => toggleField(g, 'isActive', !g.isActive);
 
   const isLoading = entriesLoading || giveawaysLoading;
   const isFetching = fetchingEntries || fetchingGiveaways;
@@ -498,13 +521,37 @@ export function AdminDashboard() {
                           {daysUntil(g.drawDate)}d left
                         </td>
                         <td className="px-5 py-3.5 text-right">
-                          <span className={`text-xs font-serif px-2 py-0.5 rounded-full border ${
-                            g.isActive
-                              ? 'border-green-500/40 bg-green-500/10 text-green-400'
-                              : 'border-border bg-secondary/50 text-muted-foreground'
-                          }`}>
-                            {g.isActive ? 'Active' : 'Disabled'}
-                          </span>
+                          {(() => {
+                            const ended = new Date(g.drawDate).getTime() < Date.now();
+                            return (
+                              <div className="flex flex-wrap items-center justify-end gap-1">
+                                <span className={`text-[10px] font-serif px-2 py-0.5 rounded-full border ${
+                                  g.isActive
+                                    ? 'border-green-500/40 bg-green-500/10 text-green-400'
+                                    : 'border-border bg-secondary/50 text-muted-foreground'
+                                }`}>
+                                  {g.isActive ? 'Active' : 'Inactive'}
+                                </span>
+                                <span className={`text-[10px] font-serif px-2 py-0.5 rounded-full border ${
+                                  g.isPublic
+                                    ? 'border-primary/40 bg-primary/10 text-primary'
+                                    : 'border-border bg-secondary/50 text-muted-foreground'
+                                }`}>
+                                  {g.isPublic ? 'Public' : 'Hidden'}
+                                </span>
+                                {g.entriesPaused && (
+                                  <span className="text-[10px] font-serif px-2 py-0.5 rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-400">
+                                    Paused
+                                  </span>
+                                )}
+                                {ended && (
+                                  <span className="text-[10px] font-serif px-2 py-0.5 rounded-full border border-border bg-secondary/50 text-muted-foreground">
+                                    Ended
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </td>
                         <td className="px-5 py-3.5 text-right">
                           <div className="flex items-center justify-end gap-1">
@@ -516,11 +563,20 @@ export function AdminDashboard() {
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
                             <button
-                              title={g.isActive ? 'Disable draw' : 'Enable draw'}
-                              onClick={() => handleToggleActive(g)}
-                              className="p-1.5 rounded-sm hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                              title={g.isPublic ? 'Public — click to hide from homepage' : 'Hidden — click to show on homepage'}
+                              onClick={() => handleTogglePublic(g)}
+                              disabled={togglingId === g.id}
+                              className="p-1.5 rounded-sm hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors disabled:opacity-40"
                             >
-                              {g.isActive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                              {g.isPublic ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                            </button>
+                            <button
+                              title={g.isActive ? 'Active — click to deactivate' : 'Inactive — click to activate'}
+                              onClick={() => handleToggleActive(g)}
+                              disabled={togglingId === g.id}
+                              className="p-1.5 rounded-sm hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors disabled:opacity-40"
+                            >
+                              {g.isActive ? <Power className="w-3.5 h-3.5" /> : <PowerOff className="w-3.5 h-3.5" />}
                             </button>
                             <button
                               title="Filter entries"

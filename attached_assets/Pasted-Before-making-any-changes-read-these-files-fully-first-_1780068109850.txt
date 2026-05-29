@@ -1,0 +1,254 @@
+Before making any changes, read these files fully first:
+
+1. `PROJECT_CONTEXT.md`
+2. `SYSTEM_RULES.md`
+3. `CHANGELOG.md`
+
+Treat them as the source of truth.
+
+Important PrizePour rules:
+
+* PrizePour stays in beta
+* DO NOT enable real payments
+* Keep `PAYMENTS_ENABLED` safety
+* Keep checkout disabled/gated
+* Keep `ADMIN_PASSWORD` protection
+* Do not expose admin routes publicly
+* Keep admin routes protected
+* Keep DB-driven draw management
+* Test before Git push
+
+URGENT BUG:
+When I click the “hide” button on a draw in admin, the draw disappears from the admin dashboard/list and the admin then shows:
+
+“No giveaways yet.”
+
+This is wrong.
+
+Admin should ALWAYS show all draws, including:
+
+* active
+* inactive
+* hidden
+* visible
+* paused
+* ended
+* previous
+* test
+* seeded draws
+
+The hide button should ONLY control public website visibility.
+
+---
+
+## Root Cause To Investigate
+
+Do not guess. Inspect the code.
+
+Check:
+
+1. Admin draw fetch endpoint/query.
+2. Homepage/public draw fetch endpoint/query.
+3. Any shared filtering helper.
+4. The hide/show toggle mutation.
+5. Any frontend filtering in the admin dashboard.
+6. Whether admin is accidentally using the public filtered endpoint.
+7. Whether hidden draws are being removed from state after toggle.
+8. Whether admin uses `visible`, `isVisible`, `public`, `published`, `status`, or similar incorrectly.
+
+Likely issue:
+Admin is fetching or rendering only public-visible draws instead of all draws.
+
+---
+
+## Required Behaviour
+
+### Admin draw list
+
+Admin must show ALL draws with no public visibility filtering.
+
+Admin should show status badges for:
+
+* Active / Inactive
+* Public / Hidden
+* Paused / Open
+* Ended / Live
+
+Hidden draws must remain visible in admin.
+
+### Public homepage / Active Draws
+
+Public website should ONLY show draws where:
+
+* active = true
+* visible/public = true
+* paused = false
+* not ended
+
+This logic must remain unchanged.
+
+---
+
+## Fix Requirements
+
+Create or confirm two separate data flows:
+
+### 1. Admin all-draws flow
+
+Example:
+`GET /api/admin/draws`
+
+Returns ALL draws.
+
+No filtering by:
+
+* active
+* visible
+* paused
+* ended
+
+Only admin auth/protection should apply.
+
+### 2. Public active-draws flow
+
+Example:
+`GET /api/draws` or `GET /api/public/draws`
+
+Returns ONLY public eligible draws.
+
+Filters:
+
+* active = true
+* visible/public = true
+* paused = false
+* not ended
+
+Do not let admin use the public endpoint.
+
+---
+
+## Hide Button Behaviour
+
+When admin clicks Hide:
+
+Expected:
+
+* draw remains visible in admin
+* badge changes to Hidden
+* public homepage removes the draw
+* no full admin list disappears
+* no “No giveaways yet” unless DB truly has zero draws
+
+When admin clicks Show:
+
+Expected:
+
+* draw remains visible in admin
+* badge changes to Public/Visible
+* public homepage shows it only if active, unpaused, and not ended
+
+---
+
+## State Management Fix
+
+If admin list state is updated client-side after hide/show:
+
+* update the changed draw in place
+* do not remove it from the admin array
+* do not reapply public filtering in admin state
+* after mutation, refetch from admin all-draws endpoint if safest
+
+---
+
+## Seeded Draws
+
+Confirm seeded draws still exist and appear in admin:
+
+* Patrón Collection
+* Clonakilty Collection
+* Bushmills
+* Macallan
+* Gin Bar Collection if created
+
+Admin must show hidden seeded draws too.
+
+Do not create duplicates.
+
+---
+
+## Debug Logging
+
+Add temporary safe logs if helpful:
+
+* admin draw count
+* public draw count
+* hide/show action result
+* draw ID/slug updated
+
+Do not log secrets or passwords.
+
+---
+
+## Tests
+
+Test locally/Replit:
+
+1. Admin loads all draws.
+2. Hide Patrón:
+
+   * Patrón remains in admin
+   * Patrón disappears publicly
+3. Show Patrón:
+
+   * Patrón remains in admin
+   * Patrón appears publicly only if active/unpaused/not ended
+4. Hide all draws:
+
+   * admin still shows all hidden draws
+   * public homepage shows no active draws
+5. Pause a draw:
+
+   * admin still shows it
+   * public hides it
+6. Deactivate a draw:
+
+   * admin still shows it
+   * public hides it
+7. Macallan hidden by default still appears in admin.
+8. `/admin/draws` also shows all draws.
+9. `/admin/analytics` and `/admin/beta-signups` still work.
+10. Checkout remains disabled.
+
+---
+
+## Documentation
+
+Update `CHANGELOG.md`:
+
+`Fixed admin draw list so hidden draws remain visible in admin while only disappearing from the public homepage.`
+
+Update `PROJECT_CONTEXT.md` only if endpoint/data-flow structure changed.
+
+---
+
+## Git Workflow
+
+Only after all tests pass:
+
+git status
+
+Review changed files carefully.
+
+Then:
+
+git add .
+git commit -m "Fix admin hidden draw visibility"
+git push
+
+After Railway redeploys:
+
+* test live `/admin`
+* hide a draw
+* confirm it stays in admin
+* confirm it disappears publicly
+* show it again if needed
