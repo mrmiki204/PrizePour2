@@ -71,6 +71,34 @@ Meaningful changes include:
 * architectural changes
 
 
+## 2026-05-31 — Homepage conversion polish (no payment changes)
+
+### Changed
+- **How It Works** → retitled "How PrizePour Works" / "Three Steps to Your Collection". Step copy clarified for beta: Explore a Collection → Reserve Your Place ("Entries open at launch — join the beta list to be first in line") → Winner Announced. Added a prominent "Join the Beta List" CTA below the steps (scrolls to the waitlist) with microcopy "Free to join · No payment during beta".
+- **Beta waitlist** → headline now "Be First Through the Door", clearer subcopy, and a new "Why join early" value row (Early Access / Founding Members / No Spam). Form, validation, and analytics events unchanged.
+- **Active Draws** → renamed eyebrow to "Premium Collections · Limited Access" and heading to "Open Collections"; removed the "Live Raffles" wording (off-brand "raffle" feel per SYSTEM_RULES) and improved the intro copy to push preview + waitlist.
+
+### Why
+- During beta, checkout is disabled, so the highest-value conversion action is joining the waitlist or previewing a draw. These copy/CTA changes make those paths clearer and more premium without enabling payments or redesigning working sections.
+
+### Safety checked
+- admin still protected (untouched)
+- checkout still gated (e2e confirmed payment step shows the beta-disabled state, no live Pay button)
+- payments still TEST mode (no Stripe/payment code touched)
+- mobile still responsive (e2e at 390×844 — sections stack cleanly, no overflow)
+- draw visibility works (DB-driven via `useListGiveaways()`, unchanged)
+
+### Files affected
+- `artifacts/whiskey-giveaway/src/pages/Home.tsx`
+- `artifacts/whiskey-giveaway/src/components/home/WaitlistSection.tsx`
+
+### Notes for future Replit AI
+- Pure content/copy + one CTA + one value-props row. No routes, schema, seeds, API contract, or analytics event types changed (reused existing `hero_cta_click` for the new How-It-Works CTA).
+- Typecheck baseline still has the two pre-existing shadcn/ui errors (`components/ui/button-group.tsx`, `calendar.tsx`) — unrelated.
+- Known pre-existing nit (not addressed here): duplicate waitlist email (409) surfaces the server's validation-style message rather than a dedicated "already on the list" notice.
+
+---
+
 ## 2026-05-29
 
 ### Fixed admin draw list so hidden draws remain visible in admin while only disappearing from the public homepage

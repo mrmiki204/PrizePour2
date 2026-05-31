@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Mail, CheckCircle2, Sparkles } from 'lucide-react';
+import { Loader2, Mail, CheckCircle2, Sparkles, Clock, Crown, ShieldCheck } from 'lucide-react';
 import { useCreateBetaSignup } from '@workspace/api-client-react';
 import { track } from '@/lib/track';
 
@@ -93,15 +93,38 @@ export function WaitlistSection() {
           <div className="text-center mb-8">
             <p className="inline-flex items-center gap-2 text-xs font-serif text-primary uppercase tracking-[0.2em] mb-4">
               <Sparkles className="w-3.5 h-3.5" />
-              Beta Access
+              Join the Beta List
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-foreground mb-4 leading-tight">
-              Join PrizePour Beta Access
+              Be First Through the Door
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Be first to hear when premium spirit giveaways go live, get launch updates
-              and early access to exclusive collections.
+              PrizePour opens to a small group first. Join the beta list to preview new
+              collections, get early access before each draw goes public, and secure your
+              place the moment entries open.
             </p>
+          </div>
+
+          {/* Why join early — concise value props */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
+            {[
+              { icon: Clock, title: 'Early Access', body: 'Preview new collections early and get priority access the moment entries open.' },
+              { icon: Crown, title: 'Founding Members', body: 'Launch-only perks reserved for our earliest members.' },
+              { icon: ShieldCheck, title: 'No Spam', body: 'Occasional launch updates only. Unsubscribe anytime.' },
+            ].map(({ icon: Icon, title, body }) => (
+              <div
+                key={title}
+                className="flex items-start gap-3 rounded-sm border border-border/60 bg-background/40 p-3.5 sm:p-4"
+              >
+                <div className="shrink-0 w-8 h-8 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center">
+                  <Icon className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-sm text-foreground mb-0.5">{title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{body}</p>
+                </div>
+              </div>
+            ))}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>

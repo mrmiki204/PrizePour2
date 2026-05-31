@@ -554,10 +554,10 @@ export function Home() {
       <section id="how-it-works" className="py-16 sm:py-24 bg-card/40 border-y border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="mb-10 sm:mb-12 text-center">
-            <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">The Process</p>
-            <h2 className="text-3xl sm:text-4xl font-serif mb-4 leading-tight">How It Works</h2>
+            <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">How PrizePour Works</p>
+            <h2 className="text-3xl sm:text-4xl font-serif mb-4 leading-tight">Three Steps to Your Collection</h2>
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              Three simple steps — built for serious collectors and spirit enthusiasts.
+              A considered process, built for serious collectors and spirit enthusiasts.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
@@ -565,20 +565,20 @@ export function Home() {
               {
                 icon: Compass,
                 step: 'Step One',
-                title: 'Choose a Collection',
-                body: 'Browse curated whiskey, tequila and premium spirit experiences.',
+                title: 'Explore a Collection',
+                body: 'Browse curated whiskey, tequila and premium spirit collections — each with a fixed number of places.',
               },
               {
                 icon: Lock,
                 step: 'Step Two',
-                title: 'Secure Your Entry',
-                body: 'PrizePour is currently in beta. Entry checkout is disabled while we finalise the platform.',
+                title: 'Reserve Your Place',
+                body: 'Entries open at launch. Join the beta list today to be first in line and get early access before each draw goes public.',
               },
               {
                 icon: Trophy,
                 step: 'Step Three',
                 title: 'Winner Announced',
-                body: 'Winners are selected transparently and prizes are professionally handled.',
+                body: 'Winners are drawn by auditable RNG, independently witnessed, and notified within 24 hours.',
               },
             ].map(({ icon: Icon, step, title, body }) => (
               <div
@@ -597,6 +597,21 @@ export function Home() {
               </div>
             ))}
           </div>
+          <div className="mt-10 sm:mt-12 flex flex-col items-center gap-3">
+            <Button
+              size="lg"
+              className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-[0.15em] h-12 min-h-[48px] px-8 shadow-[0_8px_30px_-6px_rgba(234,146,55,0.55)]"
+              onClick={() => {
+                track({ eventType: 'hero_cta_click', eventName: 'join_beta_how_it_works' });
+                scrollTo('beta-waitlist');
+              }}
+            >
+              Join the Beta List <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+            <p className="text-[11px] font-serif uppercase tracking-[0.2em] text-muted-foreground/80">
+              Free to join · No payment during beta
+            </p>
+          </div>
         </div>
       </section>
 
@@ -606,12 +621,12 @@ export function Home() {
       {/* ── All Draws ── */}
       <section id="giveaways" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="mb-10 sm:mb-16">
-          <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Live Raffles</p>
-          <h2 className="text-3xl sm:text-4xl font-serif mb-4">Active Draws</h2>
-          <p className="text-muted-foreground max-w-xl">
+          <p className="text-xs font-serif text-primary uppercase tracking-widest mb-3">Premium Collections · Limited Access</p>
+          <h2 className="text-3xl sm:text-4xl font-serif mb-4">Open Collections</h2>
+          <p className="text-muted-foreground max-w-xl leading-relaxed">
             {giveaways && giveaways.length > 0
-              ? `Enter for your chance to win.`
-              : 'Check back soon for upcoming draws.'}
+              ? 'Each collection holds a fixed number of places. Preview a draw to explore every bottle — then join the beta list to secure your spot the moment entries open.'
+              : 'New collections are curated regularly. Join the beta list to be first to know when the next one opens.'}
           </p>
         </div>
 
