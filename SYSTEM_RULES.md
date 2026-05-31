@@ -34,7 +34,117 @@ These are inviolable unless the user explicitly overrides them more than once.
 7. **Keep `ADMIN_PASSWORD` protection on every admin route** via the `requireAdmin` middleware. Sessions are signed with `SESSION_SECRET`. Do not remove either.
 8. **Every Stripe Checkout Session must be tagged `metadata.test_mode = "true"`** for auditability while in beta.
 
+
 ---
+## Architectural guardrails (non-negotiable)
+
+These rules prevent AI drift and accidental redesigns.
+
+### Public vs Admin separation
+
+Admin logic and public logic must remain separate.
+
+Rules:
+
+* Admin = ALL DRAWS
+* Public = FILTERED DRAWS
+
+Admin must NEVER reuse public visibility filtering.
+
+Hide button behavior:
+
+Expected:
+
+Admin:
+
+* draw remains visible
+* status updates to hidden
+
+Public:
+
+* draw hidden
+
+Hide affects PUBLIC visibility only.
+
+---
+
+### Database-first architecture
+
+Prefer:
+
+* database-driven systems
+* reusable admin logic
+* centralized filtering
+* scalable endpoints
+
+Avoid:
+
+* hardcoded giveaway state
+* duplicated filtering logic
+* public/admin logic overlap
+* temporary hacks
+
+---
+
+### Design guardrails
+
+PrizePour brand feeling:
+
+**“Luxury whisky brand × premium collector experience”**
+
+Always preserve:
+
+* luxury dark/gold aesthetic
+* premium typography
+* elegant spacing
+* cinematic imagery
+* restrained animations
+* premium feel
+* mobile responsiveness
+
+Avoid:
+
+* cheap raffle feel
+* gambling aesthetics
+* clutter
+* flashy redesigns
+* over-animation
+* excessive glow
+* unnecessary UI rewrites
+
+Rule:
+
+**Premium > flashy**
+
+Do not redesign working sections without explicit approval.
+
+---
+
+### Deployment discipline
+
+Always:
+
+1. Test locally in Replit
+2. Verify functionality
+3. Push only after validation
+
+Never:
+
+* "push and pray"
+* skip testing
+* remove beta safeguards
+* deploy untested payment changes
+
+After deploy always test:
+
+* homepage
+* /admin
+* /admin/draws
+* /admin/beta-signups
+* draw visibility
+* mobile responsiveness
+* checkout remains gated
+
 
 ## Admin rules
 

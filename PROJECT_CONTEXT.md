@@ -13,7 +13,212 @@ PrizePour uses a four-file memory system to keep AI sessions consistent and prev
 | **`CHANGELOG.md`** | Chronological **history** of every meaningful change | After every meaningful change (append a short entry at the top) |
 | **`replit.md`** | Operator README + user preferences; entry point that points at the other three | When the user records a new preference or convention |
 
-How they work together: `SYSTEM_RULES.md` tells you what you **must not break**, `PROJECT_CONTEXT.md` tells you **what currently exists**, `CHANGELOG.md` tells you **what just changed and why**, and `replit.md` is the short README that points new sessions at all three. If they disagree, `SYSTEM_RULES.md` wins on rules, `PROJECT_CONTEXT.md` wins on current state, and the most recent `CHANGELOG.md` entry wins on what just happened.
+  How they work together: `SYSTEM_RULES.md` tells you what you **must not break**, `PROJECT_CONTEXT.md` tells you **what currently exists**, `CHANGELOG.md` tells you **what just changed and why**, and `replit.md` is the short README that points new sessions at all three. If they disagree, `SYSTEM_RULES.md` wins on rules, `PROJECT_CONTEXT.md` wins on current state, and the most recent `CHANGELOG.md` entry wins on what just happened.
+
+
+
+## NON-NEGOTIABLE BUSINESS RULES (SOURCE OF TRUTH)
+
+
+### READ FIRST RULE
+
+Before making ANY Replit/Codex changes ALWAYS read:
+
+1. PROJECT_CONTEXT.md
+2. SYSTEM_RULES.md
+3. CHANGELOG.md
+
+Treat them as source of truth.
+
+Every future Replit/Codex prompt MUST begin with:
+
+"Read PROJECT_CONTEXT.md, SYSTEM_RULES.md, and CHANGELOG.md first before making changes."
+
+---
+
+## PROJECT MISSION
+
+PrizePour is a premium spirit giveaway platform.
+
+Brand positioning:
+
+**“Luxury whisky brand × premium collector experience”**
+
+PrizePour should feel:
+
+* luxury
+* premium
+* elegant
+* cinematic
+* collector-focused
+* trust-driven
+
+PrizePour should NOT feel like:
+
+* cheap raffle website
+* gambling-heavy
+* cluttered
+* over-animated
+* spammy
+* discount-focused
+
+Design philosophy:
+
+**Minimal luxury**
+
+Elegant spacing, premium visuals, restrained effects.
+
+---
+
+## NON-NEGOTIABLE SAFETY RULES
+
+PrizePour is in BETA.
+
+REAL PAYMENTS MUST NEVER BE ENABLED.
+
+Always preserve:
+
+* Stripe TEST mode
+* PAYMENTS_ENABLED safety
+* checkout gating
+* ADMIN_PASSWORD protection
+* private admin routes
+* beta safeguards
+
+DO NOT REMOVE:
+
+* beta banner
+* payment protections
+* admin authentication
+* checkout safety restrictions
+
+Never expose admin publicly.
+
+Protected routes:
+
+* /admin
+* /admin/draws
+* /admin/beta-signups
+* /admin/analytics
+
+---
+
+## ADMIN DRAW RULES (CRITICAL)
+
+ADMIN MUST ALWAYS SHOW ALL DRAWS.
+
+Admin includes:
+
+* active
+* inactive
+* hidden
+* visible
+* paused
+* ended
+* seeded
+* archived
+* test draws
+
+Admin endpoint:
+
+GET ALL DRAWS
+
+Public endpoint:
+
+GET FILTERED DRAWS
+
+Hidden draws MUST NEVER disappear from admin.
+
+Hide button behavior:
+
+Expected:
+
+Admin:
+
+* draw remains visible
+* status updates to hidden
+
+Public:
+
+* draw hidden
+
+Hide ONLY affects public visibility.
+
+---
+
+## PUBLIC DRAW VISIBILITY RULES
+
+Homepage and Active Draws should ONLY show:
+
+* active = true
+* visible/public = true
+* paused = false
+* not ended
+
+Public should NEVER show:
+
+* hidden draws
+* paused draws
+* ended draws
+* inactive draws
+
+---
+
+## CURRENT HIGHEST PRIORITY BUG
+
+BUG:
+
+Hide button removes giveaway from admin.
+
+Wrong behavior:
+
+* draw disappears from admin
+* admin shows "No giveaways yet"
+
+Expected behavior:
+
+Admin:
+
+* draw remains visible
+
+Public:
+
+* draw hidden
+
+Likely cause:
+
+Admin logic incorrectly uses public filtering.
+
+Correct architecture:
+
+Admin = ALL DRAWS
+
+Public = FILTERED DRAWS
+
+---
+
+## DESIGN RULES
+
+Keep:
+
+* luxury dark/gold aesthetic
+* premium typography
+* elegant spacing
+* cinematic imagery
+* restrained animations
+* mobile responsiveness
+
+Avoid:
+
+* clutter
+* cheap raffle feel
+* gambling look
+* excessive glow
+* unnecessary redesigns
+
+Rule:
+
+**Premium > flashy**
 
 ---
 
