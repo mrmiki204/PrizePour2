@@ -17,6 +17,59 @@ After every meaningful change:
 - If unsure whether something is "meaningful": route changes, DB changes, safety changes, seed changes, deployment changes, and bug fixes always are. Pure refactors and doc tweaks usually aren't (unless they affect the memory system itself).
 
 ---
+## STANDARD CHANGE ENTRY FORMAT
+
+For every meaningful Replit change use this structure:
+
+```md
+## YYYY-MM-DD — Short title
+
+### Changed
+- What changed
+
+### Fixed
+- What bug was fixed
+
+### Why
+- Why this change was necessary
+
+### Safety checked
+- admin still protected
+- checkout still gated
+- payments still TEST mode
+- mobile still responsive
+- draw visibility works
+
+### Files affected
+- file names if known
+
+### Notes for future Replit AI
+- warnings, caveats, follow-up work
+```
+
+Rules:
+
+* newest entries stay at the top
+* explain WHY, not only WHAT
+* include safety checks after risky changes
+* mention affected files when possible
+* include follow-up tasks if unfinished
+* bug fixes should include root cause when known
+* keep entries concise and readable
+* avoid huge paragraphs
+
+Meaningful changes include:
+
+* admin logic changes
+* route changes
+* DB/schema changes
+* deployment changes
+* payment logic
+* UI changes
+* bug fixes
+* security changes
+* architectural changes
+
 
 ## 2026-05-29
 
