@@ -2,19 +2,23 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logoSrc from '@/assets/prizepour-logo.png';
 
-const STORAGE_KEY = 'prizepour_age_verified';
+// Session-only verification: persists for the current browser tab/session
+// (survives reloads and direct deep links within the same session) but is
+// cleared when the tab/browser is closed — so returning visitors are always
+// re-prompted. Intentionally NOT localStorage (no permanent remembering).
+const STORAGE_KEY = 'prizepour_age_verified_session';
 
 export function AgeGate({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<'pending' | 'allowed' | 'denied'>(() => {
     try {
-      return localStorage.getItem(STORAGE_KEY) === 'true' ? 'allowed' : 'pending';
+      return sessionStorage.getItem(STORAGE_KEY) === 'true' ? 'allowed' : 'pending';
     } catch {
       return 'pending';
     }
   });
 
   function allow() {
-    try { localStorage.setItem(STORAGE_KEY, 'true'); } catch {}
+    try { sessionStorage.setItem(STORAGE_KEY, 'true'); } catch {}
     setStatus('allowed');
   }
 

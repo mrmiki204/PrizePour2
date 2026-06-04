@@ -71,6 +71,34 @@ Meaningful changes include:
 * architectural changes
 
 
+## 2026-05-31 — Age gate now per-session (no permanent localStorage)
+
+### Changed
+- Age verification now uses **`sessionStorage`** with key **`prizepour_age_verified_session`** instead of `localStorage` (`prizepour_age_verified`).
+
+### Why
+- The age gate must appear on every fresh visit/session for both new and returning visitors. `localStorage` permanently remembered verification, so returning visitors skipped the gate. Session storage persists only for the current tab/session.
+
+### Behaviour
+- Gate shows first on any public route (incl. direct deep links like `/giveaway/:id`) before content renders (synchronous read in `useState` initializer — no content flash).
+- Within the same session, internal SPA navigation and full-page reloads/deep links do NOT re-prompt.
+- Closing the tab/browser clears the session → gate shows again next visit.
+
+### Safety checked
+- admin still password-protected (`AdminGuard`/`ADMIN_PASSWORD`, untouched) — e2e confirmed `/admin` shows login form
+- checkout still gated / payments still TEST mode (no payment/Stripe code touched)
+- public draw visibility unchanged (DB-driven)
+- no DB schema change
+
+### Files affected
+- `artifacts/whiskey-giveaway/src/components/AgeGate.tsx` (only file changed)
+
+### Notes for future Replit AI
+- Old `localStorage` key `prizepour_age_verified` is no longer read or written. Other `localStorage` usage (Profile, PreLaunchChecklist) is unrelated and left as-is.
+- e2e verified: fresh context → gate first on `/` and `/giveaway/1`; no re-prompt on internal nav or same-session deep link; brand-new context re-prompts; `/admin` still requires password.
+
+---
+
 ## 2026-05-31 — Homepage conversion polish (no payment changes)
 
 ### Changed

@@ -1,0 +1,82 @@
+Read PROJECT_CONTEXT.md, SYSTEM_RULES.md, and CHANGELOG.md first before making changes.
+
+Update the PrizePour age verification flow so the Age Verification page appears every time anyone opens the public website, even if they have visited before.
+
+Goal:
+The age verification screen must always be the first screen shown when a user opens prizepour.com in a new visit/session.
+
+Important:
+Do NOT permanently remember age verification using localStorage.
+Do NOT let revisiting users skip the age verification page automatically.
+
+Required behaviour:
+1. Every time a visitor opens prizepour.com, the Age Verification page must show first.
+2. This must happen for both new and returning visitors.
+3. Remove or stop using any persistent localStorage key such as:
+   - prizepour_age_verified
+   - age_verified
+   - any similar saved age verification value
+4. After the visitor confirms they are old enough, allow them into the homepage or the page they originally tried to visit.
+5. During the same open browser tab/session, the user should not be blocked repeatedly on every internal page click.
+6. If the user closes the tab/browser and comes back later, the Age Verification page must show again.
+7. Direct links to pages like /draws or individual giveaway pages must still show the Age Verification page first.
+8. Admin routes must remain password protected and must not be exposed publicly.
+9. Payments must remain disabled and Stripe must stay in TEST MODE.
+
+Recommended implementation:
+- Replace localStorage with sessionStorage, or use in-memory React state if better.
+- Use a key such as:
+  prizepour_age_verified_session
+- This should only last for the current browser session.
+- Do not use localStorage for age verification anymore.
+
+Files/components to check:
+- App.tsx
+- Main router file
+- Existing Age Verification component/page
+- Route guard components
+- Homepage
+- Draws page
+- GiveawayDetail page
+- Admin route protection
+
+Implementation instructions:
+- Create or update an AgeVerificationGate component.
+- Wrap all public-facing routes with the gate.
+- The gate should check sessionStorage only, not localStorage.
+- If no valid session verification exists, render the Age Verification page first.
+- After confirmation, save verification to sessionStorage.
+- Then redirect the user to the homepage or the original page they attempted to visit.
+- Prevent homepage/draw content from flashing before the age gate appears.
+- Do not apply this gate in a way that breaks admin login routes.
+
+Testing steps:
+1. Open prizepour.com in a fresh browser tab.
+2. Confirm Age Verification appears first.
+3. Click confirm/enter.
+4. Confirm homepage loads correctly.
+5. Click around the website.
+6. Confirm Age Verification does not keep appearing during normal navigation.
+7. Close the browser tab completely.
+8. Open prizepour.com again.
+9. Confirm Age Verification appears again.
+10. Open a direct draw URL in a fresh tab.
+11. Confirm Age Verification appears before the draw page.
+12. Confirm /admin still requires password login.
+13. Confirm no payment or Stripe live mode settings were changed.
+
+Rollback protection:
+- Do not remove existing admin protection.
+- Do not enable payments.
+- Do not change Stripe from TEST MODE.
+- Do not delete any existing collections or draws.
+- Do not change database schema unless absolutely necessary.
+- Do not break public draw visibility.
+- Do not use permanent localStorage for age verification.
+
+After completing the fix, report:
+- Which files were changed.
+- Whether localStorage was removed for age verification.
+- What sessionStorage key is used.
+- Confirmation that the age page appears again after closing and reopening the website.
+- Confirmation that admin and payment protections still work.
