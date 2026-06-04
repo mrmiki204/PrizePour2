@@ -71,6 +71,36 @@ Meaningful changes include:
 * architectural changes
 
 
+## 2026-06-04 — Luxury redesign of the Age Verification gate
+
+### Changed
+- Redesigned the full-screen age gate (`AgeGate.tsx`) to a premium luxury look matching the brand: dark black/deep-brown radial gradient background, warm amber glow behind the card, soft edge vignette, subtle film-grain noise (inline SVG, no new asset), and faint amber accents on the left/right edges.
+- Larger centered logo with a soft gold drop-shadow glow.
+- New centered glass card: translucent dark background, thin gold border, soft gold glow, ~32px rounded corners, backdrop blur, responsive (max ~1000px desktop / 90% mobile).
+- Added a gold-outlined circular **18+** badge overlapping the top of the card.
+- Typography: "AGE VERIFICATION" eyebrow, serif heading "Are you **18** or over?" (the 18 in gold), a thin gold divider, and the existing legal paragraph.
+- Buttons: gold-gradient **YES — ENTER** (dark text, shine + hover brightness/scale, arrow icon) and outlined **NO — LEAVE** (gold border/text, hover gold glow). Side-by-side on desktop, stacked on mobile.
+- Footer note now has a small shield icon (lucide, already in deps).
+
+### Why
+- The previous gate was functional but plain. The brand is "luxury whisky × premium collector experience" — the first screen every visitor sees should reflect that.
+
+### Safety checked
+- Session-only logic unchanged: still `sessionStorage` key `prizepour_age_verified_session` (NOT localStorage). e2e confirmed re-prompt on a fresh session, no re-prompt on same-session deep links.
+- YES — ENTER still confirms + reveals the app; NO — LEAVE still shows the denial message and redirects to google.com — both e2e verified.
+- `/admin` still shows the password login (AdminGuard/`ADMIN_PASSWORD` untouched).
+- No payment/Stripe/DB-schema/seed/route changes. Payments still gated, Stripe still TEST mode.
+- Mobile responsive verified (buttons stack, no horizontal scroll, no clipped text).
+
+### Files affected
+- `artifacts/whiskey-giveaway/src/components/AgeGate.tsx` (only file changed)
+
+### Notes for future Replit AI
+- No new dependencies added (used existing `lucide-react` + `framer-motion`). Noise texture is an inline SVG data URI — no image asset to manage.
+- Only the visual layer changed; the verification/session/routing logic is identical to the prior per-session implementation.
+
+---
+
 ## 2026-05-31 — Age gate now per-session (no permanent localStorage)
 
 ### Changed

@@ -1,0 +1,164 @@
+Read PROJECT_CONTEXT.md, SYSTEM_RULES.md, and CHANGELOG.md first before making changes.
+
+Rework the PrizePour Age Verification page to match the luxury mockup/design provided.
+
+Goal:
+Make the age verification screen look premium, dark, elegant, and luxury, matching the existing PrizePour colours: black, deep brown, gold, amber, and warm cream/white text.
+
+Important project rules:
+- PrizePour is still in beta.
+- Payments must remain disabled.
+- Stripe must stay in TEST MODE.
+- No live checkout should be enabled.
+- Admin routes must remain password protected.
+- Do not break the existing age verification routing/session logic.
+- Do not remove any existing public pages, admin pages, draws, or collections.
+
+Design requirements:
+Create a full-screen luxury age verification landing page with:
+
+1. Background
+- Full viewport height.
+- Dark black/deep brown gradient background.
+- Subtle warm amber glow behind the centre card.
+- Add soft vignette around the edges.
+- Add subtle luxury texture/noise if possible.
+- Optional decorative whiskey glass/splash style background elements on the far left and right edges, but keep them subtle and not distracting.
+
+2. Logo
+- PrizePour logo centered at the top.
+- Logo should be larger and more premium than current version.
+- Add subtle gold glow around logo.
+- Keep spacing clean and balanced.
+
+3. Main verification card
+- Large centered rounded rectangle card.
+- Dark translucent background.
+- Thin gold border.
+- Soft gold glow around the card.
+- Rounded corners around 28px to 36px.
+- Card should feel like a premium modal/panel.
+- Use backdrop blur if supported.
+- Width should be responsive:
+  - Desktop: around 900px to 1050px max width.
+  - Mobile: around 90% width.
+
+4. Top badge
+- Add a small gold outlined badge near the top of the card.
+- Badge text: 18+
+- Shape can be octagon, circle, or rounded badge.
+- It should look premium and subtle.
+
+5. Text layout
+Inside the card:
+- Small uppercase label:
+  AGE VERIFICATION
+- Main heading:
+  Are you 18 or over?
+- Make the “18” gold/amber if possible.
+- Use elegant serif-style heading if already used on the site.
+- Paragraph:
+  PrizePour competitions involve alcohol and are strictly for adults. You must be 18 or over to enter.
+- Add a thin decorative gold divider under the heading or paragraph.
+
+6. Buttons
+Create two large premium buttons side by side on desktop:
+- YES — ENTER
+- NO — LEAVE
+
+YES button:
+- Gold/amber gradient background.
+- Dark text.
+- Subtle shine/glow effect.
+- Strong hover effect.
+- Slight scale or brightness increase on hover.
+
+NO button:
+- Transparent/dark background.
+- Thin gold border.
+- Gold/cream text.
+- Hover should add subtle gold background/glow.
+
+Both buttons:
+- Large width.
+- Tall height.
+- Letter spacing.
+- Premium uppercase styling.
+- Add a small arrow icon or chevron if easy, but do not add a new dependency unless already available.
+
+7. Footer/legal note inside card
+At the bottom of the card add:
+By entering you confirm you are of legal age in your jurisdiction.
+
+Add a small lock/shield icon above this text if an icon library already exists. Do not install a new icon package just for this.
+
+8. Mobile responsiveness
+- On mobile, stack the YES and NO buttons vertically.
+- Reduce heading size.
+- Keep logo and card properly spaced.
+- Make sure no text is cut off.
+- Page must fit nicely on smaller screens.
+- Avoid horizontal scrolling.
+
+9. Existing functionality must remain
+- YES — ENTER should continue the existing age verification confirmation flow.
+- NO — LEAVE should send the user away from the site or to a safe external page such as google.com.
+- The page must still appear first every time someone opens PrizePour, based on the current age verification logic.
+- Do not switch back to permanent localStorage age verification.
+- Keep the current session-only behaviour if it already exists.
+
+Files to check:
+- Existing Age Verification component/page
+- App.tsx
+- Router setup
+- CSS/Tailwind/global styling files
+- Any existing logo asset paths
+- Existing colour/theme variables
+- Existing button styles
+
+Implementation instructions:
+- Reuse the existing Age Verification component if it already exists.
+- Do not create duplicate age verification pages.
+- Update styling cleanly using the existing styling system.
+- Prefer existing CSS variables, Tailwind classes, or theme colours.
+- Keep the code readable and easy to maintain.
+- Do not affect homepage, draw pages, admin pages, or payment logic.
+
+Testing steps:
+1. Open prizepour.com in a fresh tab.
+2. Confirm the age verification page appears first.
+3. Confirm the design matches the luxury mockup:
+   - dark background
+   - centered logo
+   - large premium card
+   - gold border
+   - 18+ badge
+   - luxury typography
+   - gold YES button
+   - outlined NO button
+4. Click YES — ENTER.
+5. Confirm the homepage loads correctly.
+6. Open and close the site again.
+7. Confirm the age verification page appears again on a new visit/session.
+8. Click NO — LEAVE.
+9. Confirm it redirects away safely.
+10. Test on mobile width.
+11. Confirm buttons stack properly.
+12. Confirm /admin still requires admin login.
+13. Confirm payments remain disabled and Stripe remains in TEST MODE.
+
+Rollback protection:
+- Do not remove admin password protection.
+- Do not enable payments.
+- Do not change Stripe environment variables.
+- Do not delete existing collections.
+- Do not change database schema.
+- Do not break active draw visibility.
+- Do not break the existing age verification routing logic.
+
+After completion, report:
+- Which files were changed.
+- What styling approach was used.
+- Confirmation that the YES and NO buttons still work.
+- Confirmation that mobile layout works.
+- Confirmation that admin protection and payment gating were not changed.
